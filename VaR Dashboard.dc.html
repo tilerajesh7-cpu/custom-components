@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1a2b5c"></rect><rect x="30" y="52" width="8" height="18" rx="2" fill="#5b86f5"></rect><rect x="46" y="40" width="8" height="30" rx="2" fill="#8fb0fb"></rect><rect x="62" y="30" width="8" height="40" rx="2" fill="#ffffff"></rect></svg></template>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:radial-gradient(1100px 520px at 88% -8%,#e2ebff 0,rgba(226,235,255,0) 62%),radial-gradient(900px 420px at 10% 0,#eef4ff 0,rgba(238,244,255,0) 60%),linear-gradient(180deg,#f1f4fa 0,#f6f8fb 480px);background-attachment:fixed;color:#101828;font-family:'IBM Plex Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#2f62c9;text-decoration:none}a:hover{color:#1d4596;text-decoration:underline}
+*{box-sizing:border-box}
+button{font-family:inherit}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#d4d9e1;border-radius:10px;border:3px solid transparent;background-clip:content-box}::-webkit-scrollbar-thumb:hover{background:#b8bfcb;background-clip:content-box;border:3px solid transparent}::-webkit-scrollbar-track{background:transparent}
+@keyframes omSpin{to{transform:rotate(360deg)}}@keyframes omBar{0%{transform:translateX(-100%)}100%{transform:translateX(320%)}}@keyframes omIn{from{opacity:0;transform:translate(-50%,-44%) scale(.96)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}@keyframes omPulse{0%,100%{opacity:.35}50%{opacity:1}}
+::selection{background:#d6e2fb}
+input[type=date]{font-family:'IBM Plex Mono',monospace}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex">
+<aside style="position:sticky;top:12px;margin:12px 0 12px 12px;height:calc(100vh - 24px);border-radius:20px;flex:none;width:{{ sideW }}px;background:radial-gradient(420px 260px at 0 0,rgba(79,124,240,.28) 0,rgba(79,124,240,0) 70%),linear-gradient(180deg,#1a2b5c 0,#14224a 45%,#0f1a3a 100%);color:#d3dbef;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.06);box-shadow:0 20px 40px -18px rgba(15,26,58,.55),0 2px 6px rgba(15,26,58,.18),inset 0 1px 0 rgba(255,255,255,.08);transition:width .18s ease;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:10px;padding:18px 16px 14px;min-height:64px">
+    <div style="flex:none;width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#4a7ee6,#2550ad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;box-shadow:0 4px 12px -2px rgba(47,98,201,.55),inset 0 1px 0 rgba(255,255,255,.25)">MR</div>
+    <sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;min-width:0">
+        <span style="font-size:14px;font-weight:600;color:#fff;white-space:nowrap">Market Risk</span>
+        <span style="font-size:11px;color:#9aa8cc;white-space:nowrap;font-family:'IBM Plex Mono',monospace">SOEID · AB12345</span>
+      </div>
+    </sc-if>
+  </div>
+  <nav style="flex:1;overflow-y:auto;overflow-x:hidden;padding:6px 10px;display:flex;flex-direction:column;gap:2px">
+    <sc-for list="{{ nav }}" as="g" hint-placeholder-count="3">
+      <sc-if value="{{ g.isHead }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:14px 8px 6px;font-size:10.5px;font-weight:600;letter-spacing:.08em;color:#8392bb;white-space:nowrap;height:{{ g.headH }}">{{ g.label }}</div>
+      </sc-if>
+      <sc-if value="{{ g.isItem }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ g.onClick }}" title="{{ g.label }}" style="display:flex;align-items:center;gap:10px;width:100%;border:0;text-align:left;cursor:pointer;border-radius:10px;padding:8px {{ g.padR }}px 8px {{ g.padL }}px;background:{{ g.bg }};color:{{ g.fg }};font-size:13px;font-weight:{{ g.fw }};box-shadow:{{ g.sh }};transition:background .18s ease,color .18s ease" style-hover="background:{{ g.hov }};color:#ffffff">
+          <span style="flex:none;width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;background:{{ g.icoBg }};color:{{ g.icoFg }}">{{ g.ico }}</span>
+          <sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}">
+            <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ g.label }}</span>
+            <sc-if value="{{ g.hasBadge }}" hint-placeholder-val="{{ false }}">
+              <span style="flex:none;font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;background:{{ g.badgeBg }};color:{{ g.badgeFg }}">{{ g.badge }}</span>
+            </sc-if>
+          </sc-if>
+        </button>
+      </sc-if>
+    </sc-for>
+  </nav>
+  <button onClick="{{ toggleSide }}" style="margin:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#b3bfdd;border-radius:10px;transition:all .18s ease;padding:8px 12px;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap" style-hover="background:rgba(255,255,255,.08);color:#fff">
+    <span style="font-family:'IBM Plex Mono',monospace">{{ sideArrow }}</span>
+    <sc-if value="{{ sideOpen }}" hint-placeholder-val="{{ true }}"><span>Collapse sidebar</span></sc-if>
+  </button>
+</aside>
+<div style="flex:1;min-width:0;display:flex;flex-direction:column">
+
+<header style="position:sticky;top:0;z-index:20;background:rgba(255,255,255,.78);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border-bottom:1px solid rgba(228,231,236,.9);box-shadow:0 10px 30px -18px rgba(16,24,40,.25)">{{ topBar }}
+  <div style="max-width:1640px;margin:0 auto;padding:14px 24px 10px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px">
+    <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+      <div style="display:flex;gap:6px;font-size:12px;color:#667085">
+        <span>Daily Risk</span><span>/</span><span>Equities</span><span>/</span><span style="color:#344054;font-weight:500">VaR Summary</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap">
+        <h1 style="margin:0;font-size:20px;font-weight:600;letter-spacing:-0.01em">Equities L4 VaR Dashboard</h1>
+        <span style="display:flex;align-items:center;gap:6px;font-size:12px;color:#475467"><span style="width:7px;height:7px;border-radius:50%;background:#16895a;box-shadow:0 0 0 3px rgba(22,137,90,.18)"></span>Final · loaded 11:41 ET</span>
+      </div>
+    </div>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+      <span style="font-size:12px;color:#667085;margin-right:2px">Views</span>
+      <sc-for list="{{ views }}" as="v" hint-placeholder-count="3">
+        <button onClick="{{ v.onClick }}" style="border:1px solid {{ v.bd }};background:{{ v.bg }};color:{{ v.fg }};padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:500;cursor:pointer;box-shadow:{{ v.sh }};transition:all .18s ease" style-hover="transform:translateY(-1px)">{{ v.label }}</button>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button onClick="{{ onShare }}" style="border:1px solid #d0d5dd;background:#fff;color:#344054;padding:7px 14px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,.06);transition:all .18s ease" style-hover="background:#f9fafb;box-shadow:0 4px 10px -4px rgba(16,24,40,.18)">Copy link</button>
+      <button onClick="{{ onExport }}" style="border:1px solid #17285a;background:linear-gradient(180deg,#2c4ea3,#1a2b5c);color:#fff;padding:7px 14px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,.25),0 6px 14px -6px rgba(16,24,40,.45),inset 0 1px 0 rgba(255,255,255,.14);transition:all .18s ease" style-hover="transform:translateY(-1px);box-shadow:0 2px 4px rgba(16,24,40,.25),0 10px 20px -8px rgba(16,24,40,.5),inset 0 1px 0 rgba(255,255,255,.14)">Export</button>
+    </div>
+  </div>
+
+  <div style="max-width:1592px;width:calc(100% - 48px);margin:0 auto 12px;padding:12px 16px;display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 20px;background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(247,250,255,.96));border:1px solid #e4eaf4;border-radius:18px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 12px 28px -16px rgba(20,34,74,.28),inset 0 1px 0 #ffffff">
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <span style="font-size:10.5px;color:#6b7896;font-weight:600;letter-spacing:.07em;text-transform:uppercase">COB</span>
+      <input type="date" value="{{ cob }}" onChange="{{ onCob }}" style="height:34px;border:1px solid #e2e8f2;border-radius:12px;padding:0 12px;font-size:12.5px;color:#101828;background:#fff;box-shadow:0 1px 2px rgba(16,24,40,.05)">
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <span style="font-size:10.5px;color:#6b7896;font-weight:600;letter-spacing:.07em;text-transform:uppercase">Compare vs <span style="font-family:'IBM Plex Mono',monospace;color:#344054">{{ pcob }}</span></span>
+      <div style="display:flex;gap:2px;padding:3px;background:#eef2f8;border:1px solid #e2e8f2;border-radius:12px;box-shadow:inset 0 1px 2px rgba(20,34,74,.06)">
+        <sc-for list="{{ compareOpts }}" as="o" hint-placeholder-count="3">
+          <button onClick="{{ o.onClick }}" style="border:0;height:26px;padding:0 11px;border-radius:9px;font-size:12.5px;cursor:pointer;transition:background .18s ease,color .18s ease,box-shadow .18s ease;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }};font-weight:{{ o.fw }}">{{ o.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="width:1px;height:34px;background:linear-gradient(180deg,rgba(214,222,236,0),#d6deec,rgba(214,222,236,0))"></div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <span style="font-size:10.5px;color:#6b7896;font-weight:600;letter-spacing:.07em;text-transform:uppercase">Region</span>
+      <div style="display:flex;gap:2px;padding:3px;background:#eef2f8;border:1px solid #e2e8f2;border-radius:12px;box-shadow:inset 0 1px 2px rgba(20,34,74,.06)">
+        <sc-for list="{{ regionOpts }}" as="o" hint-placeholder-count="6">
+          <button onClick="{{ o.onClick }}" style="border:0;height:26px;padding:0 11px;border-radius:9px;font-size:12.5px;cursor:pointer;transition:background .18s ease,color .18s ease,box-shadow .18s ease;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }};font-weight:{{ o.fw }}">{{ o.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <span style="font-size:10.5px;color:#6b7896;font-weight:600;letter-spacing:.07em;text-transform:uppercase">Horizon</span>
+      <div style="display:flex;gap:2px;padding:3px;background:#eef2f8;border:1px solid #e2e8f2;border-radius:12px;box-shadow:inset 0 1px 2px rgba(20,34,74,.06)">
+        <sc-for list="{{ variantOpts }}" as="o" hint-placeholder-count="2">
+          <button onClick="{{ o.onClick }}" style="border:0;height:26px;padding:0 11px;border-radius:9px;font-size:12.5px;cursor:pointer;transition:background .18s ease,color .18s ease,box-shadow .18s ease;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }};font-weight:{{ o.fw }}">{{ o.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <span style="font-size:10.5px;color:#6b7896;font-weight:600;letter-spacing:.07em;text-transform:uppercase">Model</span>
+      <div style="display:flex;gap:2px;padding:3px;background:#eef2f8;border:1px solid #e2e8f2;border-radius:12px;box-shadow:inset 0 1px 2px rgba(20,34,74,.06)">
+        <sc-for list="{{ modelOpts }}" as="o" hint-placeholder-count="2">
+          <button onClick="{{ o.onClick }}" style="border:0;height:26px;padding:0 11px;border-radius:9px;font-size:12.5px;cursor:pointer;transition:background .18s ease,color .18s ease,box-shadow .18s ease;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }};font-weight:{{ o.fw }}">{{ o.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <span style="font-size:10.5px;color:#6b7896;font-weight:600;letter-spacing:.07em;text-transform:uppercase">Attribute</span>
+      <div style="display:flex;gap:2px;padding:3px;background:#eef2f8;border:1px solid #e2e8f2;border-radius:12px;box-shadow:inset 0 1px 2px rgba(20,34,74,.06);flex-wrap:wrap">
+        <sc-for list="{{ attrOpts }}" as="o" hint-placeholder-count="5">
+          <button onClick="{{ o.onClick }}" style="border:0;height:26px;padding:0 11px;border-radius:9px;font-size:12.5px;cursor:pointer;transition:background .18s ease,color .18s ease,box-shadow .18s ease;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }};font-weight:{{ o.fw }}">{{ o.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <span style="font-size:10.5px;color:#6b7896;font-weight:600;letter-spacing:.07em;text-transform:uppercase">Measure</span>
+      <div style="display:flex;gap:2px;padding:3px;background:#eef2f8;border:1px solid #e2e8f2;border-radius:12px;box-shadow:inset 0 1px 2px rgba(20,34,74,.06)">
+        <sc-for list="{{ measureOpts }}" as="o" hint-placeholder-count="3">
+          <button onClick="{{ o.onClick }}" style="border:0;height:26px;padding:0 11px;border-radius:9px;font-size:12.5px;cursor:pointer;transition:background .18s ease,color .18s ease,box-shadow .18s ease;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }};font-weight:{{ o.fw }}">{{ o.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+<div style="border-top:1px solid {{ fb.bd }};background:{{ fb.bg }};transition:background .25s ease">
+  <div style="max-width:1640px;margin:0 auto;padding:8px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;min-height:46px">
+    <span style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:{{ fb.labelColor }};white-space:nowrap"><span style="display:flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:{{ fb.countBg }};color:{{ fb.countFg }};font-size:11px;font-family:'IBM Plex Mono',monospace">{{ fb.count }}</span>Cross-filters</span>
+    <sc-if value="{{ fb.none }}" hint-placeholder-val="{{ true }}">
+      <span style="font-size:12.5px;color:#667085">None applied · click a desk, FS type, chart legend or limit to filter related panels</span>
+    </sc-if>
+    <sc-for list="{{ chips }}" as="c" hint-placeholder-count="0">
+      <div style="display:flex;align-items:center;gap:8px;padding:3px 4px 3px 10px;background:#fff;border:1px solid #bcd0f5;border-radius:999px;box-shadow:0 1px 2px rgba(47,98,201,.10),0 4px 10px -6px rgba(47,98,201,.35)">
+        <span style="width:8px;height:8px;border-radius:3px;background:{{ c.dot }}"></span>
+        <span style="font-size:10.5px;color:#5b7fc9;font-weight:600;letter-spacing:.06em">{{ c.kind }}</span>
+        <span style="font-size:12.5px;font-weight:600;color:#101828;white-space:nowrap">{{ c.value }}</span>
+        <button onClick="{{ c.clear }}" title="Remove" style="width:22px;height:22px;border-radius:50%;border:0;background:#eef3fd;color:#2f62c9;cursor:pointer;font-size:13px;line-height:1;transition:background .15s ease" style-hover="background:#dbe6fb">×</button>
+      </div>
+    </sc-for>
+    <sc-if value="{{ fb.any }}" hint-placeholder-val="{{ false }}">
+      <span style="font-size:12px;color:#344054">Applied to <b style="font-weight:600">{{ fb.applies }}</b></span>
+      <span style="flex:1"></span>
+      <span style="font-size:11.5px;color:#667085;display:flex;align-items:center;gap:4px"><span style="border:1px solid #d0d5dd;border-bottom-width:2px;border-radius:4px;padding:0 5px;background:#fff;font-family:'IBM Plex Mono',monospace;font-size:10.5px">Esc</span>clears</span>
+      <button onClick="{{ clearAll }}" style="border:1px solid #bcd0f5;background:#fff;color:#1d4596;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .15s ease" style-hover="background:#eef3fd">Clear all</button>
+    </sc-if>
+  </div>
+</div>
+</header>
+
+<main style="max-width:1640px;width:100%;margin:0 auto;padding:16px 24px 40px;display:flex;flex-direction:column;gap:16px;opacity:{{ mainOp }};filter:{{ mainFilter }};transition:opacity .35s ease,filter .35s ease">
+
+  <sc-if value="{{ showAlert }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:10px 14px;background:linear-gradient(90deg,#fff3f1,#ffffff 45%);border:1px solid #f4cfca;border-radius:14px;box-shadow:0 1px 2px rgba(194,57,47,.06),0 8px 20px -10px rgba(194,57,47,.25)">
+      <span style="display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:#9b2c22"><span style="width:8px;height:8px;border-radius:50%;background:#c2392f;box-shadow:0 0 0 4px rgba(194,57,47,.15)"></span>2 limits need attention</span>
+      <sc-for list="{{ breaches }}" as="b" hint-placeholder-count="2">
+        <button onClick="{{ b.onClick }}" style="display:flex;align-items:center;gap:8px;border:1px solid #e4e7ec;background:#fff;padding:4px 12px;border-radius:999px;font-size:12.5px;cursor:pointer;color:#344054;box-shadow:0 1px 2px rgba(16,24,40,.05);transition:all .18s ease" style-hover="border-color:#98a2b3;transform:translateY(-1px);box-shadow:0 4px 10px -4px rgba(16,24,40,.2)">
+          <span>{{ b.name }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-weight:600;color:{{ b.color }}">{{ b.util }}</span>
+        </button>
+      </sc-for>
+      <span style="flex:1"></span>
+      <span style="font-size:12px;color:#667085">Click a desk to focus it</span>
+      <button onClick="{{ dismissAlert }}" style="border:0;background:transparent;color:#667085;font-size:12.5px;cursor:pointer;padding:4px 6px">Dismiss</button>
+    </div>
+  </sc-if>
+
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px">
+    <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="5">
+      <div style="background:linear-gradient(180deg,#ffffff,#fbfcfe);border:1px solid #e7eaf0;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;min-width:0;box-shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -8px rgba(16,24,40,.10),inset 0 1px 0 #ffffff;transition:box-shadow .25s ease,transform .25s ease" style-hover="transform:translateY(-2px);box-shadow:0 2px 4px rgba(16,24,40,.04),0 16px 32px -12px rgba(16,24,40,.18),inset 0 1px 0 #ffffff">
+        <span style="font-size:12px;color:#667085;font-weight:500">{{ k.label }}</span>
+        <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;letter-spacing:-0.02em;color:#101828">{{ k.value }}</span>
+          <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:500;color:{{ k.deltaColor }}">{{ k.delta }}</span>
+        </div>
+        <sc-if value="{{ k.hasSpark }}" hint-placeholder-val="{{ false }}">
+          <svg viewBox="0 0 120 28" preserveAspectRatio="none" style="width:100%;height:28px;display:block">
+            <path d="{{ k.spark }}" fill="none" stroke="{{ k.sparkColor }}" style="stroke-width:1.5;vector-effect:non-scaling-stroke"></path>
+          </svg>
+        </sc-if>
+        <sc-if value="{{ k.hasBar }}" hint-placeholder-val="{{ false }}">
+          <div style="height:6px;background:#eef0f3;border-radius:3px;overflow:hidden;margin:11px 0">
+            <div style="height:100%;width:{{ k.bar }}%;background:{{ k.barColor }};border-radius:3px;box-shadow:0 0 8px {{ k.barColor }}"></div>
+          </div>
+        </sc-if>
+        <span style="font-size:12px;color:#475467;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ k.sub }}</span>
+      </div>
+    </sc-for>
+  </section>
+
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),1fr));gap:16px;align-items:start">
+
+    <div style="background:#fff;border:1px solid #e7eaf0;border-radius:16px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -8px rgba(16,24,40,.10),inset 0 1px 0 #ffffff;transition:box-shadow .25s ease,transform .25s ease;display:flex;flex-direction:column;min-width:0">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 16px 10px">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <h2 style="margin:0;font-size:15px;font-weight:600">Standalone {{ measureLabel }} by desk</h2>
+          <span style="font-size:12px;color:#667085">$MM · {{ variant }} · {{ model }} · {{ attr }} · {{ rowCount }} desks</span><sc-if value="{{ pfDesk.on }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pfDesk.clear }}" title="Clear this filter" style="align-self:flex-start;display:flex;align-items:center;gap:6px;margin-top:6px;border:1px solid #c7d6f5;background:#eef3fd;color:#1d4596;border-radius:999px;padding:3px 8px 3px 9px;font-size:11.5px;font-weight:500;cursor:pointer;box-shadow:0 1px 2px rgba(47,98,201,.12);transition:background .15s ease" style-hover="background:#e1eafc"><span style="width:6px;height:6px;border-radius:50%;background:#2f62c9;box-shadow:0 0 0 3px rgba(47,98,201,.18)"></span><span>Filtered by {{ pfDesk.label }}</span><span style="color:#5b7fc9;font-size:13px;line-height:1">×</span></button></sc-if>
+        </div>
+        <div style="flex:1"></div>
+        <input ref="{{ searchRef }}" value="{{ search }}" onChange="{{ onSearch }}" placeholder="Search desks   /" style="height:32px;width:200px;border:1px solid #e1e5ec;border-radius:10px;padding:0 12px;font-size:12.5px;font-family:inherit;color:#101828;outline:none;background:#f8f9fb;transition:all .18s ease" style-focus="border-color:#2f62c9;background:#fff;box-shadow:0 0 0 4px #e3ebfc">
+      </div>
+      <div style="overflow:auto;max-height:560px;border-top:1px solid #eef0f3;border-radius:0 0 16px 16px">
+        <div style="min-width:{{ gridMin }}px">
+  <div style="position:sticky;top:0;z-index:2;display:grid;grid-template-columns:{{ gridCols }};background:rgba(250,251,253,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid #e7eaf0">
+    <div onClick="{{ sortName }}" style="padding:8px 12px 8px 16px;font-size:11.5px;font-weight:600;color:#475467;cursor:pointer;white-space:nowrap">Desk {{ arrowName }}</div>
+    <sc-if value="{{ showVar }}" hint-placeholder-val="{{ true }}">
+      <div onClick="{{ sortVar }}" style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap;cursor:pointer">VaR COB {{ arrowVar }}</div>
+      <div style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap">PCOB</div>
+      <div onClick="{{ sortVarDiff }}" style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap;cursor:pointer">Δ {{ arrowVarDiff }}</div>
+    </sc-if>
+    <sc-if value="{{ showSvar }}" hint-placeholder-val="{{ true }}">
+      <div onClick="{{ sortSvar }}" style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap;cursor:pointer;border-left:1px solid #eef0f3">SVaR COB {{ arrowSvar }}</div>
+      <div style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap">PCOB</div>
+      <div onClick="{{ sortSvarDiff }}" style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap;cursor:pointer">Δ {{ arrowSvarDiff }}</div>
+    </sc-if>
+    <div onClick="{{ sortUtil }}" style="padding:8px 16px 8px 12px;font-size:11.5px;font-weight:600;color:#475467;cursor:pointer;white-space:nowrap;border-left:1px solid #eef0f3">Limit use {{ arrowUtil }}</div>
+  </div>
+  <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12">
+    <div onClick="{{ r.onClick }}" style="display:grid;grid-template-columns:{{ gridCols }};align-items:center;font-size:13px;border-bottom:1px solid #f1f3f6;cursor:pointer;background:{{ r.bg }};box-shadow:{{ r.sh }};transition:background .15s ease" style-hover="background:#f6f8fc">
+      <div title="{{ r.name }}" style="padding:{{ rowPad }} 12px {{ rowPad }} 16px;display:flex;align-items:center;gap:8px;min-width:0">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#101828;font-weight:{{ r.fw }}">{{ r.name }}</span>
+        <span style="flex:none;font-size:10.5px;color:#667085;background:#f2f4f7;padding:1px 6px;border-radius:4px">{{ r.region }}</span>
+      </div>
+      <sc-if value="{{ showVar }}" hint-placeholder-val="{{ true }}">
+        <div style="position:relative;padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace">
+          <div style="position:absolute;left:6px;top:4px;bottom:4px;width:calc(({{ r.varBar }}% - 12px));min-width:2px;background:linear-gradient(90deg,#dbe6fb,#eaf0fd);border-radius:5px"></div>
+          <span style="position:relative;font-weight:600">{{ r.varCob }}</span>
+        </div>
+        <div style="padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace;color:#667085">{{ r.varPcob }}</div>
+        <div style="padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace;color:{{ r.varDiffColor }};font-weight:500">{{ r.varDiff }}</div>
+      </sc-if>
+      <sc-if value="{{ showSvar }}" hint-placeholder-val="{{ true }}">
+        <div style="position:relative;padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace;border-left:1px solid #f0f2f5">
+          <div style="position:absolute;left:6px;top:4px;bottom:4px;width:calc(({{ r.svarBar }}% - 12px));min-width:2px;background:linear-gradient(90deg,#d5efec,#e8f6f4);border-radius:5px"></div>
+          <span style="position:relative;font-weight:600">{{ r.svarCob }}</span>
+        </div>
+        <div style="padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace;color:#667085">{{ r.svarPcob }}</div>
+        <div style="padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace;color:{{ r.svarDiffColor }};font-weight:500">{{ r.svarDiff }}</div>
+      </sc-if>
+      <div style="padding:{{ rowPad }} 16px {{ rowPad }} 12px;border-left:1px solid #f0f2f5;display:flex;align-items:center;gap:8px">
+        <div style="flex:1;height:5px;background:#eef0f3;border-radius:3px;overflow:hidden;min-width:40px">
+          <div style="height:100%;width:{{ r.utilW }}%;background:{{ r.utilColor }}"></div>
+        </div>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:40px;text-align:right;color:{{ r.utilText }};font-weight:{{ r.utilFw }}">{{ r.util }}</span>
+      </div>
+    </div>
+  </sc-for>
+  <div style="position:sticky;bottom:0;display:grid;grid-template-columns:{{ gridCols }};background:rgba(247,249,252,.96);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid #d9dee6;box-shadow:0 -8px 16px -12px rgba(16,24,40,.2);font-size:13px">
+    <div style="padding:10px 12px 10px 16px;font-weight:600">Total</div>
+    <sc-if value="{{ showVar }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:10px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600">{{ tot.varCob }}</div>
+      <div style="padding:10px;text-align:right;font-family:'IBM Plex Mono',monospace;color:#475467">{{ tot.varPcob }}</div>
+      <div style="padding:10px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600;color:{{ tot.varDiffColor }}">{{ tot.varDiff }}</div>
+    </sc-if>
+    <sc-if value="{{ showSvar }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:10px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600;border-left:1px solid #eef0f3">{{ tot.svarCob }}</div>
+      <div style="padding:10px;text-align:right;font-family:'IBM Plex Mono',monospace;color:#475467">{{ tot.svarPcob }}</div>
+      <div style="padding:10px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600;color:{{ tot.svarDiffColor }}">{{ tot.svarDiff }}</div>
+    </sc-if>
+    <div style="padding:10px 16px 10px 12px;border-left:1px solid #eef0f3;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#475467">{{ tot.util }}</div>
+  </div>
+</div>
+        <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:32px;text-align:center;color:#667085;font-size:13px">No desks match “{{ search }}”</div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="background:#fff;border:1px solid #e7eaf0;border-radius:16px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -8px rgba(16,24,40,.10),inset 0 1px 0 #ffffff;transition:box-shadow .25s ease,transform .25s ease;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+          <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+            <h2 style="margin:0;font-size:15px;font-weight:600">Trend</h2>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#667085;flex-wrap:wrap">
+              <span>{{ chartScope }}</span>
+              
+            </div><sc-if value="{{ pfTrend.on }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pfTrend.clear }}" title="Clear this filter" style="align-self:flex-start;display:flex;align-items:center;gap:6px;margin-top:6px;border:1px solid #c7d6f5;background:#eef3fd;color:#1d4596;border-radius:999px;padding:3px 8px 3px 9px;font-size:11.5px;font-weight:500;cursor:pointer;box-shadow:0 1px 2px rgba(47,98,201,.12);transition:background .15s ease" style-hover="background:#e1eafc"><span style="width:6px;height:6px;border-radius:50%;background:#2f62c9;box-shadow:0 0 0 3px rgba(47,98,201,.18)"></span><span>Filtered by {{ pfTrend.label }}</span><span style="color:#5b7fc9;font-size:13px;line-height:1">×</span></button></sc-if>
+          </div>
+          <div style="flex:1"></div>
+          <div style="display:flex;gap:2px;padding:3px;background:#eef2f8;border:1px solid #e2e8f2;border-radius:12px;box-shadow:inset 0 1px 2px rgba(20,34,74,.06)">
+            <sc-for list="{{ daysOpts }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.onClick }}" style="border:0;height:24px;padding:0 9px;border-radius:8px;font-size:12px;cursor:pointer;transition:background .18s ease,color .18s ease,box-shadow .18s ease;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }};font-weight:{{ o.fw }}">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;font-size:12px;color:#475467">
+          <sc-if value="{{ showVar }}" hint-placeholder-val="{{ true }}">
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:3px;border-radius:2px;background:#2f62c9"></span>VaR <b style="font-family:'IBM Plex Mono',monospace;color:#101828;font-weight:600">{{ lastVar }}</b></span>
+          </sc-if>
+          <sc-if value="{{ showSvar }}" hint-placeholder-val="{{ true }}">
+            <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:3px;border-radius:2px;background:#12918a"></span>SVaR <b style="font-family:'IBM Plex Mono',monospace;color:#101828;font-weight:600">{{ lastSvar }}</b></span>
+          </sc-if>
+        </div>
+        <div style="position:relative">
+          <svg viewBox="0 0 640 250" style="width:100%;height:auto;display:block;overflow:visible">
+            <sc-for list="{{ yTicks }}" as="t" hint-placeholder-count="5">
+              <line x1="44" x2="630" y1="{{ t.y }}" y2="{{ t.y }}" stroke="#eef0f3"></line>
+              <text x="38" y="{{ t.ty }}" fill="#98a2b3" style="font-size:11px;text-anchor:end;font-family:'IBM Plex Mono',monospace">{{ t.label }}</text>
+            </sc-for>
+            <sc-for list="{{ xTicks }}" as="t" hint-placeholder-count="5">
+              <text x="{{ t.x }}" y="244" fill="#98a2b3" style="font-size:11px;text-anchor:middle">{{ t.label }}</text>
+            </sc-for>
+            <sc-if value="{{ showVar }}" hint-placeholder-val="{{ true }}">
+              <defs><linearGradient id="varGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f62c9" stop-opacity="0.18"></stop><stop offset="1" stop-color="#2f62c9" stop-opacity="0"></stop></linearGradient></defs><path d="{{ varArea }}" fill="url(#varGrad)"></path>
+              <path d="{{ varPath }}" fill="none" stroke="#2f62c9" style="stroke-width:2.25;stroke-linejoin:round;stroke-linecap:round"></path>
+            </sc-if>
+            <sc-if value="{{ showSvar }}" hint-placeholder-val="{{ true }}">
+              <path d="{{ svarPath }}" fill="none" stroke="#12918a" style="stroke-width:2.25;stroke-linejoin:round;stroke-linecap:round"></path>
+            </sc-if>
+            <sc-if value="{{ hov }}" hint-placeholder-val="{{ false }}">
+              <line x1="{{ hx }}" x2="{{ hx }}" y1="12" y2="222" stroke="#98a2b3" style="stroke-dasharray:3 3"></line>
+              <sc-if value="{{ showVar }}" hint-placeholder-val="{{ true }}">
+                <circle cx="{{ hx }}" cy="{{ hVarY }}" r="4" fill="#fff" stroke="#2f62c9" style="stroke-width:2"></circle>
+              </sc-if>
+              <sc-if value="{{ showSvar }}" hint-placeholder-val="{{ true }}">
+                <circle cx="{{ hx }}" cy="{{ hSvarY }}" r="4" fill="#fff" stroke="#12918a" style="stroke-width:2"></circle>
+              </sc-if>
+            </sc-if>
+            <rect x="44" y="12" width="586" height="210" fill="transparent" onMouseMove="{{ onChartMove }}" onMouseLeave="{{ onChartLeave }}"></rect>
+          </svg>
+          <sc-if value="{{ hov }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;top:8px;left:{{ tipLeft }}%;transform:{{ tipTransform }};pointer-events:none;background:rgba(16,24,40,.92);backdrop-filter:blur(6px);color:#fff;border-radius:12px;padding:10px 12px;font-size:12px;display:flex;flex-direction:column;gap:5px;min-width:150px;box-shadow:0 12px 28px -8px rgba(16,24,40,.45),inset 0 1px 0 rgba(255,255,255,.08)">
+              <span style="color:#c9ced8">{{ tipDate }}</span>
+              <sc-if value="{{ showVar }}" hint-placeholder-val="{{ true }}">
+                <span style="display:flex;justify-content:space-between;gap:12px"><span>VaR</span><b style="font-family:'IBM Plex Mono',monospace;font-weight:500">{{ tipVar }}</b></span>
+              </sc-if>
+              <sc-if value="{{ showSvar }}" hint-placeholder-val="{{ true }}">
+                <span style="display:flex;justify-content:space-between;gap:12px"><span>SVaR</span><b style="font-family:'IBM Plex Mono',monospace;font-weight:500">{{ tipSvar }}</b></span>
+              </sc-if>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #e7eaf0;border-radius:16px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -8px rgba(16,24,40,.10),inset 0 1px 0 #ffffff;transition:box-shadow .25s ease,transform .25s ease;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <h2 style="margin:0;font-size:15px;font-weight:600">What moved</h2>
+          <span style="font-size:12px;color:#667085">Largest {{ primaryLabel }} changes vs {{ compare }} · click to focus</span><sc-if value="{{ pfMovers.on }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pfMovers.clear }}" title="Clear this filter" style="align-self:flex-start;display:flex;align-items:center;gap:6px;margin-top:6px;border:1px solid #c7d6f5;background:#eef3fd;color:#1d4596;border-radius:999px;padding:3px 8px 3px 9px;font-size:11.5px;font-weight:500;cursor:pointer;box-shadow:0 1px 2px rgba(47,98,201,.12);transition:background .15s ease" style-hover="background:#e1eafc"><span style="width:6px;height:6px;border-radius:50%;background:#2f62c9;box-shadow:0 0 0 3px rgba(47,98,201,.18)"></span><span>Filtered by {{ pfMovers.label }}</span><span style="color:#5b7fc9;font-size:13px;line-height:1">×</span></button></sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ movers }}" as="m" hint-placeholder-count="6">
+            <div onClick="{{ m.onClick }}" style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) 62px;align-items:center;gap:12px;padding:7px 10px;border-radius:10px;cursor:pointer;background:{{ m.bg }};transition:background .15s ease" style-hover="background:#f6f8fc">
+              <span style="font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#344054">{{ m.name }}</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr;height:10px">
+                <div style="display:flex;justify-content:flex-end"><div style="width:{{ m.negW }}%;height:100%;background:linear-gradient(270deg,#16895a,#3bb07f);border-radius:5px 0 0 5px"></div></div>
+                <div style="border-left:1px solid #cfd4dc"><div style="width:{{ m.posW }}%;height:100%;background:linear-gradient(90deg,#c2392f,#e0685e);border-radius:0 5px 5px 0"></div></div>
+              </div>
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;text-align:right;font-weight:500;color:{{ m.color }}">{{ m.diff }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:14px;font-size:11.5px;color:#667085;padding:4px 8px 0">
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;background:#16895a;border-radius:2px"></span>Risk down</span>
+          <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;background:#c2392f;border-radius:2px"></span>Risk up</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),1fr));gap:16px;align-items:start"><div style="background:#fff;border:1px solid #e7eaf0;border-radius:16px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -8px rgba(16,24,40,.10),inset 0 1px 0 #ffffff;transition:box-shadow .25s ease,transform .25s ease;display:flex;flex-direction:column;min-width:0">
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 16px 10px">
+    <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+      <h2 style="margin:0;font-size:15px;font-weight:600">Component VaR / SVaR by FS type</h2>
+      <span style="font-size:12px;color:#667085">$MM · {{ model }} · {{ fsScope }} · click a row to filter</span>
+      <sc-if value="{{ pfFs.on }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pfFs.clear }}" title="Clear this filter" style="align-self:flex-start;display:flex;align-items:center;gap:6px;margin-top:6px;border:1px solid #c7d6f5;background:#eef3fd;color:#1d4596;border-radius:999px;padding:3px 8px 3px 9px;font-size:11.5px;font-weight:500;cursor:pointer;box-shadow:0 1px 2px rgba(47,98,201,.12);transition:background .15s ease" style-hover="background:#e1eafc"><span style="width:6px;height:6px;border-radius:50%;background:#2f62c9;box-shadow:0 0 0 3px rgba(47,98,201,.18)"></span><span>Filtered by {{ pfFs.label }}</span><span style="color:#5b7fc9;font-size:13px;line-height:1">×</span></button></sc-if>
+    </div>
+  </div>
+  <div style="overflow:auto;max-height:520px;border-top:1px solid #eef0f3;border-radius:0 0 16px 16px">
+    <div style="min-width:{{ fsMin }}px">
+      <div style="position:sticky;top:0;z-index:2;display:grid;background:rgba(250,251,253,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid #e7eaf0;grid-template-columns:{{ fsCols }}">
+        <div style="padding:8px 12px 8px 16px;font-size:11.5px;font-weight:600;color:#475467;white-space:nowrap">FS type</div>
+        <sc-if value="{{ showVar }}" hint-placeholder-val="{{ true }}"><div style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap">VaR COB</div><div style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap">PCOB</div><div style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap">Δ</div></sc-if>
+        <sc-if value="{{ showSvar }}" hint-placeholder-val="{{ true }}"><div style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap;border-left:1px solid #eef0f3">SVaR COB</div><div style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap">PCOB</div><div style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap">Δ</div></sc-if>
+        <div style="padding:8px 12px 8px 16px;font-size:11.5px;font-weight:600;color:#475467;white-space:nowrap;border-left:1px solid #eef0f3;padding-left:12px">Share of {{ primaryLabel }}</div>
+      </div>
+      <sc-for list="{{ fsGridRows }}" as="r" hint-placeholder-count="10">
+        <div onClick="{{ r.onClick }}" style="display:grid;grid-template-columns:{{ fsCols }};align-items:center;font-size:13px;border-bottom:1px solid #f1f3f6;cursor:pointer;background:{{ r.bg }};box-shadow:{{ r.sh }};transition:background .15s ease" style-hover="background:#f6f8fc">
+          <div style="padding:{{ rowPad }} 12px {{ rowPad }} 16px;display:flex;align-items:center;gap:8px"><span style="width:9px;height:9px;border-radius:3px;background:{{ r.color }};flex:none"></span><span style="font-family:'IBM Plex Mono',monospace;font-weight:{{ r.fw }};color:#101828">{{ r.code }}</span></div>
+          <sc-if value="{{ showVar }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative;padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace"><div style="position:absolute;left:6px;top:4px;bottom:4px;width:calc(({{ r.varBar }}% - 12px));min-width:2px;background:linear-gradient(90deg,#dbe6fb,#eaf0fd);border-radius:5px"></div><span style="position:relative;font-weight:600">{{ r.varCob }}</span></div>
+            <div style="padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace;color:#667085">{{ r.varPcob }}</div>
+            <div style="padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace;color:{{ r.varDiffColor }};font-weight:500">{{ r.varDiff }}</div>
+          </sc-if>
+          <sc-if value="{{ showSvar }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative;padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace;border-left:1px solid #f0f2f5"><div style="position:absolute;left:6px;top:4px;bottom:4px;width:calc(({{ r.svarBar }}% - 12px));min-width:2px;background:linear-gradient(90deg,#d5efec,#e8f6f4);border-radius:5px"></div><span style="position:relative;font-weight:600">{{ r.svarCob }}</span></div>
+            <div style="padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace;color:#667085">{{ r.svarPcob }}</div>
+            <div style="padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace;color:{{ r.svarDiffColor }};font-weight:500">{{ r.svarDiff }}</div>
+          </sc-if>
+          <div style="padding:{{ rowPad }} 16px {{ rowPad }} 12px;border-left:1px solid #f0f2f5;display:flex;align-items:center;gap:8px">
+            <div style="flex:1;height:5px;background:#eef0f3;border-radius:3px;overflow:hidden;min-width:40px"><div style="height:100%;width:{{ r.shareW }}%;background:{{ r.color }};border-radius:3px"></div></div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:48px;text-align:right;color:#475467">{{ r.share }}</span>
+          </div>
+        </div>
+      </sc-for>
+      <div style="position:sticky;bottom:0;display:grid;background:rgba(247,249,252,.96);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid #d9dee6;box-shadow:0 -8px 16px -12px rgba(16,24,40,.2);font-size:13px;grid-template-columns:{{ fsCols }}">
+        <div style="padding:10px 12px 10px 16px;font-weight:600">Total</div>
+        <sc-if value="{{ showVar }}" hint-placeholder-val="{{ true }}"><div style="padding:10px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600">{{ fsTot.varCob }}</div><div style="padding:10px;text-align:right;font-family:'IBM Plex Mono',monospace;color:#475467">{{ fsTot.varPcob }}</div><div style="padding:10px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600;color:{{ fsTot.varDiffColor }}">{{ fsTot.varDiff }}</div></sc-if>
+        <sc-if value="{{ showSvar }}" hint-placeholder-val="{{ true }}"><div style="padding:10px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600;border-left:1px solid #eef0f3">{{ fsTot.svarCob }}</div><div style="padding:10px;text-align:right;font-family:'IBM Plex Mono',monospace;color:#475467">{{ fsTot.svarPcob }}</div><div style="padding:10px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600;color:{{ fsTot.svarDiffColor }}">{{ fsTot.svarDiff }}</div></sc-if>
+        <div style="padding:10px 16px 10px 12px;border-left:1px solid #eef0f3;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#475467">100%</div>
+      </div>
+    </div>
+  </div>
+</div><div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+<sc-for list="{{ stackCharts }}" as="sc" hint-placeholder-count="2">
+  <div style="background:#fff;border:1px solid #e7eaf0;border-radius:16px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -8px rgba(16,24,40,.10),inset 0 1px 0 #ffffff;transition:box-shadow .25s ease,transform .25s ease;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0">
+    <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px">
+      <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+        <h2 style="margin:0;font-size:15px;font-weight:600">{{ sc.title }}</h2>
+        <span style="font-size:12px;color:#667085">{{ sc.sub }}</span>
+        <sc-if value="{{ sc.pf.on }}" hint-placeholder-val="{{ false }}"><button onClick="{{ sc.pf.clear }}" title="Clear this filter" style="align-self:flex-start;display:flex;align-items:center;gap:6px;margin-top:6px;border:1px solid #c7d6f5;background:#eef3fd;color:#1d4596;border-radius:999px;padding:3px 8px 3px 9px;font-size:11.5px;font-weight:500;cursor:pointer;box-shadow:0 1px 2px rgba(47,98,201,.12);transition:background .15s ease" style-hover="background:#e1eafc"><span style="width:6px;height:6px;border-radius:50%;background:#2f62c9;box-shadow:0 0 0 3px rgba(47,98,201,.18)"></span><span>Filtered by {{ sc.pf.label }}</span><span style="color:#5b7fc9;font-size:13px;line-height:1">×</span></button></sc-if>
+      </div>
+      <div style="flex:1"></div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><span style="font-size:11px;color:#667085">Latest · $MM</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#101828">{{ sc.last }}</span></div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px 6px">
+      <sc-for list="{{ sc.legend }}" as="lg" hint-placeholder-count="7">
+        <button onClick="{{ lg.onClick }}" style="display:flex;align-items:center;gap:6px;border:1px solid {{ lg.bd }};background:{{ lg.bg }};border-radius:999px;padding:2px 9px;font-size:11.5px;font-family:'IBM Plex Mono',monospace;color:#344054;cursor:pointer;opacity:{{ lg.op }};font-weight:{{ lg.fw }};transition:all .15s ease" style-hover="background:#f2f5fa"><span style="width:8px;height:8px;border-radius:3px;background:{{ lg.color }}"></span>{{ lg.code }}</button>
+      </sc-for>
+    </div>
+    <div style="position:relative">
+      <svg viewBox="0 0 640 222" style="width:100%;height:auto;display:block;overflow:visible">
+        <sc-for list="{{ sc.yT }}" as="t" hint-placeholder-count="0"><line x1="44" x2="630" y1="{{ t.y }}" y2="{{ t.y }}" stroke="#eef0f3"></line><text x="38" y="{{ t.ty }}" fill="#98a2b3" style="font-size:11px;text-anchor:end;font-family:'IBM Plex Mono',monospace">{{ t.label }}</text></sc-for><sc-for list="{{ sc.xT }}" as="t" hint-placeholder-count="0"><text x="{{ t.x }}" y="216" fill="#98a2b3" style="font-size:11px;text-anchor:middle">{{ t.label }}</text></sc-for>
+        <sc-if value="{{ sc.hov }}" hint-placeholder-val="{{ false }}"><rect x="{{ sc.bandX }}" y="10" width="{{ sc.bandW }}" height="186" rx="2" fill="#101828" style="opacity:.06"></rect></sc-if>
+        <g onMouseMove="{{ sc.onMove }}" onMouseLeave="{{ sc.onLeave }}">
+          <rect x="44" y="10" width="586" height="186" fill="transparent"></rect>
+          <sc-for list="{{ sc.bars }}" as="b" hint-placeholder-count="0">
+            <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" rx="1" fill="{{ b.fill }}" onClick="{{ b.onClick }}" style="opacity:{{ b.op }};cursor:pointer;transition:opacity .2s ease"></rect>
+          </sc-for>
+        </g>
+      </svg>
+      <sc-if value="{{ sc.hov }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;top:4px;pointer-events:none;background:rgba(16,24,40,.92);backdrop-filter:blur(6px);color:#fff;border-radius:12px;padding:10px 12px;font-size:12px;display:flex;flex-direction:column;gap:4px;min-width:170px;box-shadow:0 12px 28px -8px rgba(16,24,40,.45),inset 0 1px 0 rgba(255,255,255,.08);z-index:3;left:{{ sc.tipLeft }}%;transform:{{ sc.tipTransform }}">
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:2px"><span style="color:#c9ced8">{{ sc.tipDate }}</span><b style="font-family:'IBM Plex Mono',monospace;font-weight:600">{{ sc.tipTotal }}</b></div>
+          <sc-for list="{{ sc.tipItems }}" as="ti" hint-placeholder-count="0">
+            <div style="display:flex;align-items:center;gap:8px"><span style="width:8px;height:8px;border-radius:2px;background:{{ ti.color }}"></span><span style="flex:1;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:{{ ti.fg }};font-weight:{{ ti.fw }}">{{ ti.name }}</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px">{{ ti.val }}</span></div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+</sc-for>
+</div></section>
+  <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,560px),1fr));gap:16px;align-items:start"><div style="background:#fff;border:1px solid #e7eaf0;border-radius:16px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -8px rgba(16,24,40,.10),inset 0 1px 0 #ffffff;transition:box-shadow .25s ease,transform .25s ease;display:flex;flex-direction:column;min-width:0">
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 16px 10px">
+    <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+      <h2 style="margin:0;font-size:15px;font-weight:600">VaR limits</h2>
+      <span style="font-size:12px;color:#667085">{{ limCount }} · sorted by utilisation · click to chart</span>
+      <sc-if value="{{ pfLim.on }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pfLim.clear }}" title="Clear this filter" style="align-self:flex-start;display:flex;align-items:center;gap:6px;margin-top:6px;border:1px solid #c7d6f5;background:#eef3fd;color:#1d4596;border-radius:999px;padding:3px 8px 3px 9px;font-size:11.5px;font-weight:500;cursor:pointer;box-shadow:0 1px 2px rgba(47,98,201,.12);transition:background .15s ease" style-hover="background:#e1eafc"><span style="width:6px;height:6px;border-radius:50%;background:#2f62c9;box-shadow:0 0 0 3px rgba(47,98,201,.18)"></span><span>Filtered by {{ pfLim.label }}</span><span style="color:#5b7fc9;font-size:13px;line-height:1">×</span></button></sc-if>
+    </div>
+  </div>
+  <div style="overflow:auto;max-height:520px;border-top:1px solid #eef0f3;border-radius:0 0 16px 16px">
+    <div style="min-width:{{ limMin }}px">
+      <div style="position:sticky;top:0;z-index:2;display:grid;background:rgba(250,251,253,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid #e7eaf0;grid-template-columns:{{ limCols }}">
+        <div style="padding:8px 12px 8px 16px;font-size:11.5px;font-weight:600;color:#475467;white-space:nowrap">Limit</div>
+        <div style="padding:8px 12px 8px 16px;font-size:11.5px;font-weight:600;color:#475467;white-space:nowrap;padding-left:10px">Tier</div>
+        <div style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap">Threshold</div>
+        <div style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap">Exposure</div>
+        <div style="padding:8px 12px 8px 16px;font-size:11.5px;font-weight:600;color:#475467;white-space:nowrap;padding-left:12px;border-left:1px solid #eef0f3">Utilisation</div>
+        <div style="padding:8px 10px;font-size:11.5px;font-weight:600;color:#475467;text-align:right;white-space:nowrap;padding-right:16px">1D Δ</div>
+      </div>
+      <sc-for list="{{ limRows }}" as="r" hint-placeholder-count="10">
+        <div onClick="{{ r.onClick }}" style="display:grid;grid-template-columns:{{ limCols }};align-items:center;font-size:13px;border-bottom:1px solid #f1f3f6;cursor:pointer;background:{{ r.bg }};box-shadow:{{ r.sh }};transition:background .15s ease" style-hover="background:#f6f8fc">
+          <div style="padding:{{ rowPad }} 12px {{ rowPad }} 16px;display:flex;flex-direction:column;gap:1px;min-width:0">
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#2f62c9;font-weight:600">{{ r.id }}</span>
+            <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#101828;font-weight:{{ r.fw }}">{{ r.name }}</span>
+          </div>
+          <div style="padding:{{ rowPad }} 10px;color:#475467;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="{{ r.tier }}">{{ r.tier }}</div>
+          <div style="padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace;color:#475467">{{ r.thr }}</div>
+          <div style="padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace;font-weight:600">{{ r.exp }}</div>
+          <div style="padding:{{ rowPad }} 12px;border-left:1px solid #f0f2f5;display:flex;align-items:center;gap:8px">
+            <div style="flex:1;height:6px;background:#eef0f3;border-radius:3px;overflow:hidden;min-width:40px;position:relative"><div style="height:100%;width:{{ r.utilW }}%;background:{{ r.utilColor }};border-radius:3px"></div><div style="position:absolute;left:80%;top:0;bottom:0;width:1px;background:#98a2b3"></div></div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;width:48px;text-align:right;color:{{ r.utilText }};font-weight:{{ r.utilFw }}">{{ r.util }}</span>
+          </div>
+          <div style="padding:{{ rowPad }} 10px;text-align:right;font-family:'IBM Plex Mono',monospace;padding-right:16px;color:{{ r.chgColor }};font-weight:500">{{ r.chg }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div><div style="background:#fff;border:1px solid #e7eaf0;border-radius:16px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -8px rgba(16,24,40,.10),inset 0 1px 0 #ffffff;transition:box-shadow .25s ease,transform .25s ease;padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-width:0">
+  <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px">
+    <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+      <h2 style="margin:0;font-size:15px;font-weight:600">Exposure vs limit</h2>
+      <span style="font-size:12px;color:#667085"><span style="font-family:'IBM Plex Mono',monospace;color:#2f62c9;font-weight:600">{{ ex.id }}</span> · {{ ex.name }} · 90 business days</span>
+      <sc-if value="{{ ex.auto }}" hint-placeholder-val="{{ true }}"><span style="font-size:11.5px;color:#98a2b3;margin-top:2px">Showing highest utilisation · click a limit to switch</span></sc-if>
+      <sc-if value="{{ pfExp.on }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pfExp.clear }}" title="Clear this filter" style="align-self:flex-start;display:flex;align-items:center;gap:6px;margin-top:6px;border:1px solid #c7d6f5;background:#eef3fd;color:#1d4596;border-radius:999px;padding:3px 8px 3px 9px;font-size:11.5px;font-weight:500;cursor:pointer;box-shadow:0 1px 2px rgba(47,98,201,.12);transition:background .15s ease" style-hover="background:#e1eafc"><span style="width:6px;height:6px;border-radius:50%;background:#2f62c9;box-shadow:0 0 0 3px rgba(47,98,201,.18)"></span><span>Filtered by {{ pfExp.label }}</span><span style="color:#5b7fc9;font-size:13px;line-height:1">×</span></button></sc-if>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+    <sc-for list="{{ ex.stats }}" as="st" hint-placeholder-count="3">
+      <div style="background:#f8f9fb;border:1px solid #eef0f3;border-radius:12px;padding:8px 12px;display:flex;flex-direction:column;gap:2px;box-shadow:inset 0 1px 0 #ffffff">
+        <span style="font-size:11px;color:#667085;white-space:nowrap">{{ st.label }}</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;color:{{ st.color }}">{{ st.value }}</span>
+      </div>
+    </sc-for>
+  </div>
+  <div style="position:relative">
+    <svg viewBox="0 0 640 222" style="width:100%;height:auto;display:block;overflow:visible">
+      <sc-for list="{{ ex.yT }}" as="t" hint-placeholder-count="0"><line x1="44" x2="630" y1="{{ t.y }}" y2="{{ t.y }}" stroke="#eef0f3"></line><text x="38" y="{{ t.ty }}" fill="#98a2b3" style="font-size:11px;text-anchor:end;font-family:'IBM Plex Mono',monospace">{{ t.label }}</text></sc-for><sc-for list="{{ ex.xT }}" as="t" hint-placeholder-count="0"><text x="{{ t.x }}" y="216" fill="#98a2b3" style="font-size:11px;text-anchor:middle">{{ t.label }}</text></sc-for>
+      <sc-if value="{{ ex.hov }}" hint-placeholder-val="{{ false }}"><rect x="{{ ex.bandX }}" y="10" width="{{ ex.bandW }}" height="186" rx="2" fill="#101828" style="opacity:.06"></rect></sc-if>
+      <g onMouseMove="{{ ex.onMove }}" onMouseLeave="{{ ex.onLeave }}">
+        <rect x="44" y="10" width="586" height="186" fill="transparent"></rect>
+        <sc-for list="{{ ex.bars }}" as="b" hint-placeholder-count="0">
+          <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" rx="1.5" fill="{{ b.fill }}" style="opacity:{{ b.op }};transition:opacity .15s ease"></rect>
+        </sc-for>
+      </g>
+      <path d="{{ ex.warnPath }}" fill="none" stroke="#d08a0e" style="stroke-width:1.5;stroke-dasharray:5 4;pointer-events:none"></path>
+      <path d="{{ ex.limPath }}" fill="none" stroke="#101828" style="stroke-width:2;stroke-linejoin:round;pointer-events:none"></path>
+      <sc-for list="{{ ex.excess }}" as="e" hint-placeholder-count="0">
+        <circle cx="{{ e.cx }}" cy="{{ e.cy }}" r="3.5" fill="#c2392f" stroke="#fff" style="stroke-width:1.5;pointer-events:none"></circle>
+      </sc-for>
+    </svg>
+    <sc-if value="{{ ex.hov }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;top:4px;pointer-events:none;background:rgba(16,24,40,.92);backdrop-filter:blur(6px);color:#fff;border-radius:12px;padding:10px 12px;font-size:12px;display:flex;flex-direction:column;gap:4px;min-width:170px;box-shadow:0 12px 28px -8px rgba(16,24,40,.45),inset 0 1px 0 rgba(255,255,255,.08);z-index:3;left:{{ ex.tipLeft }}%;transform:{{ ex.tipTransform }}">
+        <span style="color:#c9ced8">{{ ex.tipDate }}</span>
+        <sc-for list="{{ ex.tipItems }}" as="ti" hint-placeholder-count="0">
+          <div style="display:flex;justify-content:space-between;gap:12px"><span>{{ ti.name }}</span><b style="font-family:'IBM Plex Mono',monospace;font-weight:500;color:{{ ti.color }}">{{ ti.val }}</b></div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px 16px;font-size:11.5px;color:#475467">
+    <span style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:2px;background:#2f62c9"></span>Exposure</span>
+    <span style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:2px;background:#d08a0e"></span>≥ 80% of limit</span>
+    <span style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:#c2392f"></span>Excess</span>
+    <span style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:2px;background:#101828"></span>Limit</span>
+    <span style="display:flex;align-items:center;gap:6px"><span style="width:14px;border-top:2px dashed #d08a0e"></span>80% warning</span>
+  </div>
+</div></section>
+  <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+    <section style="margin-top:16px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <h2 style="margin:0;font-size:17px;font-weight:600">What changed from the current dashboard, and why</h2>
+        <span style="font-size:13px;color:#475467">Design rationale mapped to React · AG Grid · Highcharts. Hide via Tweaks.</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
+        <sc-for list="{{ notes }}" as="n" hint-placeholder-count="9">
+          <div style="background:#fff;border:1px solid #e7eaf0;border-radius:16px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 8px 24px -8px rgba(16,24,40,.10),inset 0 1px 0 #ffffff;transition:box-shadow .25s ease,transform .25s ease;padding:14px 16px;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#667085">{{ n.num }}</span>
+              <span style="font-size:13.5px;font-weight:600;color:#101828">{{ n.title }}</span>
+            </div>
+            <p style="margin:0;font-size:12.5px;line-height:1.5;color:#475467;text-wrap:pretty">{{ n.body }}</p>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#2f62c9;line-height:1.5">{{ n.tech }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+  </sc-if>
+</main>
+{{ loader }}
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(16,24,40,.94);backdrop-filter:blur(8px);color:#fff;padding:11px 18px;border-radius:12px;font-size:13px;box-shadow:0 16px 36px -10px rgba(16,24,40,.5),inset 0 1px 0 rgba(255,255,255,.08);z-index:50">{{ toast }}</div>
+</sc-if>
+</div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;compact&quot;,&quot;comfortable&quot;],&quot;default&quot;:&quot;compact&quot;,&quot;tsType&quot;:&quot;'compact'|'comfortable'&quot;},&quot;defaultMeasure&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;VaR&quot;,&quot;SVaR&quot;,&quot;Both&quot;],&quot;default&quot;:&quot;Both&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const DESKS = [
+  ['Equity Derivatives NA','NA',52.40,49.10,68.10,66.40,62],
+  ['Equity Client Financing & Delta One NA','NA',29.85,27.60,41.32,39.87,40],
+  ['Equity Derivatives EMEA','EMEA',24.73,18.53,29.00,26.60,35],
+  ['Equity Client Financing & Delta One EMEA','EMEA',11.40,5.05,28.25,11.20,10],
+  ['Hybrid and Fund Derivatives','Global',6.90,7.92,9.39,9.33,12],
+  ['Equity Cash NA','NA',6.18,8.03,6.95,10.37,12],
+  ['Equity Global Convertible Bonds','Global',6.07,5.81,4.31,4.29,9],
+  ['Equity Cash EMEA','EMEA',3.87,3.96,3.49,3.59,6],
+  ['Equity Derivatives APAC','APAC',3.41,11.85,3.10,14.11,15],
+  ['Equity Cash APAC','APAC',2.59,2.62,3.42,3.28,5],
+  ['Equity Client Financing & Delta One Latam','Latam',1.02,1.01,1.17,1.00,3],
+  ['Equity Derivatives Latam','Latam',0.60,0.62,0.84,0.96,2],
+  ['FCX – Futures and OTC Clearing','Global',0.42,0.44,2.19,2.38,2],
+  ['FX Prime Brokerage','Global',0.09,1.46,0.17,2.39,3],
+  ['Global Equity – Non Reportable','Global',0.03,0.03,0.01,0.01,1],
+  ['FI Prime Brokerage','Global',0.01,0.01,0.01,0.01,1],
+];
+const SHORT = n => n.replace('Equity Client Financing & Delta One','EQ CF & D1').replace('Equity Derivatives','EQ Deriv').replace('Equity ','EQ ');
+const F_VAR = { '1D': 1, '10D': Math.sqrt(10) };
+const F_MODEL = { 'MC': 1, 'Hist': 0.91 };
+const F_ATTR = { 'Trading': 1, 'Economic': 1.07, 'Volcker': 0.94, 'Basel 3': 1.12, 'Trading & Credit': 1.18 };
+const PCOB = { DoD: '2026-09-10', WoW: '2026-09-04', MoM: '2026-08-11' };
+const RED = '#c2392f', GREEN = '#16895a', MUTED = '#667085';
+const DATES = (() => { const out = []; let d = new Date(Date.UTC(2026, 8, 11)); while (out.length < 90) { const w = d.getUTCDay(); if (w && w < 6) out.unshift(d.toISOString().slice(0, 10)); d = new Date(d.getTime() - 864e5); } return out; })();
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fmtDate = s => MON[+s.slice(5, 7) - 1] + ' ' + (+s.slice(8, 10));
+const f2 = v => v.toFixed(2);
+const sgn = v => (Math.abs(v) < 0.005 ? '0.00' : (v > 0 ? '+' : '−') + Math.abs(v).toFixed(2));
+const dcol = v => (Math.abs(v) < 0.005 ? MUTED : v > 0 ? RED : GREEN);
+const shape = (seed, n) => { const pts = []; for (let t = 0; t < n; t++) { const k = 90 - n + t; pts.push(1 + 0.07 * Math.sin(k / 11 + seed) + 0.035 * Math.sin(k / 3.7 + seed * 2) + 0.02 * Math.cos(k / 1.9 + seed)); } return pts; };
+const trend = (end, seed, n) => { const p = shape(seed, n); const last = p[n - 1]; return p.map(x => x / last * end); };
+const VIEWS = [
+  { label: 'Morning check', s: { compare: 'DoD', variant: '1D', model: 'MC', attr: 'Trading', measure: 'Both', days: 30, region: 'All' } },
+  { label: 'Weekly review', s: { compare: 'WoW', variant: '1D', model: 'MC', attr: 'Trading', measure: 'VaR', days: 60, region: 'All' } },
+  { label: 'Regulatory', s: { compare: 'MoM', variant: '10D', model: 'Hist', attr: 'Basel 3', measure: 'SVaR', days: 90, region: 'All' } },
+];
+const NOTES = [
+  ['One control bar, saved views', 'Four stacked filter rows become one wrapping bar of segmented controls. Saved views apply a whole combination in one click — the most common reason people re-click filters every morning.', 'URL search params as state · useSearchParams'],
+  ['Answer “are we OK?” first', 'KPI strip gives total VaR/SVaR, change, limit headroom and breach count before any table. Users decide in seconds whether to dig in.', 'Highcharts sparkline (chart.type line, no axes)'],
+  ['Limits inline, not a banner', 'The red banner is replaced by actionable breach pills that focus the desk, plus a limit-use column with threshold colours (80% / 100%).', 'AG Grid cellRenderer · cellClassRules'],
+  ['Click a row, everything follows', 'Selecting a desk cross-filters the trend and highlights it in “What moved”. No separate drill page.', 'onRowClicked → chart.series[i].setData()'],
+  ['Magnitude by length, colour by direction', 'Heat-map fills made every cell compete. Data bars show size; red/green is reserved for risk up/down only.', 'AG Grid custom cellRenderer or agSparklineCellRenderer'],
+  ['Rank the deltas for them', '“What moved” sorts desks by change so the story (EMEA CF & D1 +6.35, APAC Deriv −8.44) is visible without scanning 16 rows.', 'Highcharts bar · negativeColor · point.events.click'],
+  ['Shared crosshair tooltip', 'One tooltip shows VaR and SVaR at the hovered date. Add a navigator for 30/60/90d instead of re-querying.', 'tooltip.shared · xAxis.crosshair · Highcharts Stock rangeSelector'],
+  ['Pinned total, sticky headers', 'Total stays visible while scrolling; header sorts on click. Reclaimed the sidebar width with breadcrumbs.', 'pinnedBottomRowData · suppressMovableColumns · columnState persist'],
+  ['Cross-filters always visible', 'Every click-to-filter lands as a chip in a bar pinned under the header, plus a “Filtered by…” badge on each affected panel. One × removes it; Esc clears all.', 'Shared filter context (React context / Zustand) → gridApi.setFilterModel + chart.update'],
+  ['Next: grouping, drill-down, subscriptions', 'Region → Desk → Book tree, drill from a chart point to risk-factor attribution, and email/Teams alerts when a limit crosses 80%.', 'treeData / rowGroup · Highcharts drilldown · boost module for 90d × N'],
+];
+
+const FS = ['EQDV','EQDL','IRVG','BCSY','ISDL','IDIO','BCID','CMDL','DTID','ECVG','FXVG','IRDL','CMVG','FXRR','FXST','FXDL'];
+const FS_BASE = [.40,.19,.08,.07,.06,.05,.04,.03,.025,.02,.015,.012,.006,.004,.002,-.012];
+const FS_COL = ['#2f62c9','#12918a','#d08a0e','#7a5af0','#c2392f','#3aa0d8','#5f9e3b','#c25a95','#8a6d3b','#4b5fa8','#e07b39','#2c8f6f','#a14bc2','#6b7a8f','#b5a02a','#d0616f'];
+const mkSh = (i, ph) => { const a = FS_BASE.map((b, j) => b * (1 + 0.45 * Math.sin(j * 1.3 + i * 0.7 + ph))); const t = a.reduce((x, y) => x + y, 0); return a.map(x => x / t); };
+const SH = DESKS.map((d, i) => ({ v: mkSh(i, 0), vp: mkSh(i, 0.5), s: mkSh(i, 2), sp: mkSh(i, 2.5) }));
+const LIMITS = [
+  ['504870','Deriv - NAM VaR','Global Equity - AMERICA',0,'var',62],
+  ['504355','D1 - EMEA VaR','Global Equity - EUROPE',3,'var',10],
+  ['504875','D1 - NAM VaR','Global Equity - AMERICA',1,'var',40],
+  ['611663','SVaR - Global','Equity Division',null,'svar',250],
+  ['504360','Deriv - EMEA VaR','Global Equity - EUROPE',2,'var',35],
+  ['505050','Cash - APAC VaR','Global Equity - ASIA',9,'var',5],
+  ['41032','VaR','Cross Asset Derivatives',4,'var',27],
+  ['19582345','CB - Stressed VaR','Equities - Global Convert',6,'svar',20],
+  ['504873','Cash - NAM VaR','Global Equity - AMERICA',5,'var',35],
+  ['505045','Stressed VaR - DER','Global Equity - ASIA',8,'svar',18],
+  ['504878','D1 - LATAM VaR','Global Equity - AMERICA',10,'var',8],
+  ['504357','Cash - SVaR','Global Equity - EUROPE',7,'svar',32],
+  ['504872','D1 - LATAM Stress','Global Equity - AMERICA',10,'svar',14],
+  ['504206','Cash - NAM Stress','Global Equity - AMERICA',5,'svar',90],
+  ['504877','Deriv - LATAM VaR','Global Equity - AMERICA',11,'var',10],
+];
+const nice = hi => { const raw = (hi || 1) / 4; const mag = Math.pow(10, Math.floor(Math.log10(raw))); const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(v => v >= raw); return { step, top: Math.ceil(hi / step) * step }; };
+const noop = () => {};
+
+class Component extends DCLogic {
+  state = { cob: '2026-09-11', compare: 'DoD', region: 'All', variant: '1D', model: 'MC', attr: 'Trading', measure: this.props.defaultMeasure ?? 'Both', days: 30, sel: null, search: '', sortKey: 'cob', sortDir: -1, hover: null, loading: true, loadMsg: 'Loading dashboard', selFs: null, selLimit: null, sHov: null, eHov: null, alert: true, toast: '' };
+  searchRef = React.createRef();
+
+  componentDidMount() {
+    this._key = e => { if (e.key === '/' && document.activeElement !== this.searchRef.current) { e.preventDefault(); this.searchRef.current && this.searchRef.current.focus(); } if (e.key === 'Escape') this.setState({ sel: null, selFs: null, selLimit: null, hover: null }); };
+    window.addEventListener('keydown', this._key);
+    this._lt = setTimeout(() => this.setState({ loading: false }), 1200);
+  }
+  componentWillUnmount() { window.removeEventListener('keydown', this._key); clearTimeout(this._t); clearTimeout(this._lt); }
+
+  pulse(msg) { this.setState({ loading: true, loadMsg: msg || 'Recalculating' }); clearTimeout(this._lt); this._lt = setTimeout(() => this.setState({ loading: false }), 700); }
+  flash(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: '' }), 1800); }
+
+  seg(key, opts) {
+    return opts.map(o => { const v = typeof o === 'object' ? o.v : o; const label = typeof o === 'object' ? o.label : o; const a = this.state[key] === v;
+      return { label, bg: a ? 'linear-gradient(180deg,#3a6ae6,#2552c9)' : 'transparent', fg: a ? '#ffffff' : '#475467', sh: a ? '0 4px 10px -3px rgba(37,82,201,.55),inset 0 1px 0 rgba(255,255,255,.22)' : 'none', fw: a ? 600 : 500, onClick: () => { if (this.state[key] === v) return; this.setState({ [key]: v, hover: null }); this.pulse('Updating ' + label); } }; });
+  }
+
+  sortBy(k) { this.setState(s => ({ sortKey: k, sortDir: s.sortKey === k ? -s.sortDir : (k === 'name' ? 1 : -1) })); }
+
+  renderVals() {
+    const s = this.state;
+    const k = F_VAR[s.variant] * F_MODEL[s.model] * F_ATTR[s.attr];
+    const pc = (base, cob, i) => s.compare === 'DoD' ? base : s.compare === 'WoW' ? cob * (1 - 0.07 * Math.sin(i * 1.7 + 1)) : cob * (1 - 0.12 * Math.cos(i * 1.3 + 0.5));
+    const q = s.search.trim().toLowerCase();
+    const allRaw = DESKS.map((d, i) => {
+      const vc = d[2] * k, sc = d[4] * k, vp = pc(d[3], d[2], i) * k, sp = pc(d[5], d[4], i + 3) * k;
+      return { i, name: d[0], region: d[1], vc, vp, vd: vc - vp, sc, sp, sd: sc - sp, util: d[2] / d[6] };
+    });
+    const all = s.selFs == null ? allRaw : allRaw.map(r => { const q = SH[r.i], j = s.selFs; const vc = r.vc * q.v[j], vp = r.vp * q.vp[j], sc = r.sc * q.s[j], sp = r.sp * q.sp[j]; return Object.assign({}, r, { vc, vp, vd: vc - vp, sc, sp, sd: sc - sp }); });
+    const inScopeRaw = allRaw.filter(r => s.region === 'All' || r.region === s.region);
+    const inScope = all.filter(r => s.region === 'All' || r.region === s.region);
+    const list = inScope.filter(r => !q || r.name.toLowerCase().includes(q));
+    const primary = s.measure === 'SVaR' ? 'svar' : 'var';
+    const keyFn = { name: r => r.name, cob: r => primary === 'svar' ? r.sc : r.vc, var: r => r.vc, svar: r => r.sc, vd: r => r.vd, sd: r => r.sd, util: r => r.util }[s.sortKey] || (r => r.vc);
+    list.sort((a, b) => { const x = keyFn(a), y = keyFn(b); return (x > y ? 1 : x < y ? -1 : 0) * s.sortDir; });
+    const maxV = Math.max(...all.map(r => r.vc)), maxS = Math.max(...all.map(r => r.sc));
+    const rowPad = this.props.density === 'comfortable' ? '10px' : '6px';
+
+    const rows = list.map(r => {
+      const sel = s.sel === r.i;
+      const uc = r.util >= 1 ? RED : r.util >= 0.8 ? '#d08a0e' : '#98a2b3';
+      return {
+        name: r.name, region: r.region, bg: sel ? '#edf2fd' : 'transparent', sh: sel ? 'inset 3px 0 0 #2f62c9' : 'none', fw: sel ? 600 : 400,
+        varCob: f2(r.vc), varPcob: f2(r.vp), varDiff: sgn(r.vd), varDiffColor: dcol(r.vd), varBar: Math.max(1, r.vc / maxV * 100),
+        svarCob: f2(r.sc), svarPcob: f2(r.sp), svarDiff: sgn(r.sd), svarDiffColor: dcol(r.sd), svarBar: Math.max(1, r.sc / maxS * 100),
+        util: Math.round(r.util * 100) + '%', utilW: Math.min(100, r.util * 100), utilColor: uc, utilText: r.util >= 0.8 ? uc : '#475467', utilFw: r.util >= 0.8 ? 600 : 400,
+        onClick: () => this.setState({ sel: sel ? null : r.i, hover: null }),
+      };
+    });
+    const sum = (arr, f) => arr.reduce((a, r) => a + f(r), 0);
+    const T = { vc: sum(inScope, r => r.vc), vp: sum(inScope, r => r.vp), sc: sum(inScope, r => r.sc), sp: sum(inScope, r => r.sp) };
+    const baseScopeVar = sum(inScopeRaw, r => r.vc / k);
+    const limitTotal = s.region === 'All' ? 200 : sum(DESKS.filter(d => d[1] === s.region), d => d[6]);
+    const tot = { varCob: f2(T.vc), varPcob: f2(T.vp), varDiff: sgn(T.vc - T.vp), varDiffColor: dcol(T.vc - T.vp), svarCob: f2(T.sc), svarPcob: f2(T.sp), svarDiff: sgn(T.sc - T.sp), svarDiffColor: dcol(T.sc - T.sp), util: Math.round(baseScopeVar / limitTotal * 100) + '%' };
+
+    // trend
+    const n = s.days;
+    const selRow = s.sel != null ? all[s.sel] : null;
+    const vSeries = selRow ? trend(selRow.vc, selRow.i * 0.9, n) : trend(T.vc, 0.4, n);
+    const sSeries = selRow ? trend(selRow.sc, selRow.i * 0.9 + 2, n) : trend(T.sc, 2.1, n);
+    const showVar = s.measure !== 'SVaR', showSvar = s.measure !== 'VaR';
+    const shown = [...(showVar ? vSeries : []), ...(showSvar ? sSeries : [])];
+    let lo = Math.min(...shown), hi = Math.max(...shown);
+    const raw = (hi - lo) / 4 || 1; const mag = Math.pow(10, Math.floor(Math.log10(raw))); const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(v => v >= raw);
+    lo = Math.floor(lo / step) * step; hi = Math.ceil(hi / step) * step; if (hi === lo) hi = lo + step;
+    const L = 44, R = 630, TOP = 12, BOT = 222, W = R - L, H = BOT - TOP;
+    const X = i => L + (n === 1 ? 0 : i / (n - 1) * W), Y = v => BOT - (v - lo) / (hi - lo) * H;
+    const path = ser => ser.map((v, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1)).join(' ');
+    const yTicks = []; for (let v = lo; v <= hi + 1e-9; v += step) yTicks.push({ y: Y(v), ty: Y(v) + 4, label: step < 1 ? v.toFixed(1) : Math.round(v) });
+    const dates = DATES.slice(90 - n);
+    const xTicks = [0, 0.25, 0.5, 0.75, 1].map(p => { const i = Math.round(p * (n - 1)); return { x: X(i), label: fmtDate(dates[i]) }; });
+    const h = s.hover;
+    const tipLeft = h != null ? X(h) / 640 * 100 : 0;
+
+    // movers
+    const dKey = primary === 'svar' ? 'sd' : 'vd';
+    const mv = [...inScope].sort((a, b) => Math.abs(b[dKey]) - Math.abs(a[dKey])).slice(0, 6);
+    const maxAbs = Math.max(...mv.map(r => Math.abs(r[dKey])), 0.01);
+    const movers = mv.map(r => ({ name: SHORT(r.name), diff: sgn(r[dKey]), color: dcol(r[dKey]), posW: r[dKey] > 0 ? r[dKey] / maxAbs * 100 : 0, negW: r[dKey] < 0 ? -r[dKey] / maxAbs * 100 : 0, bg: s.sel === r.i ? '#eaf0fc' : 'transparent', onClick: () => this.setState({ sel: s.sel === r.i ? null : r.i, hover: null }) }));
+
+    // kpis
+    const TR = { vc: sum(inScopeRaw, r => r.vc), vp: sum(inScopeRaw, r => r.vp), sc: sum(inScopeRaw, r => r.sc), sp: sum(inScopeRaw, r => r.sp) };
+    const tv = trend(TR.vc, 0.4, 30), ts = trend(TR.sc, 2.1, 30);
+    const spark = ser => { const a = Math.min(...ser), b = Math.max(...ser); return ser.map((v, i) => (i ? 'L' : 'M') + (i / (ser.length - 1) * 120).toFixed(1) + ' ' + (26 - (v - a) / ((b - a) || 1) * 24).toFixed(1)).join(' '); };
+    const pct = (a, b) => (b ? ((a - b) / b * 100) : 0);
+    const u = baseScopeVar / limitTotal;
+    const breachAll = all.filter(r => r.util >= 0.8).sort((a, b) => b.util - a.util);
+    const top = [...inScopeRaw].sort((a, b) => Math.abs(b[dKey]) - Math.abs(a[dKey]))[0];
+    const kpis = [
+      { label: 'Total VaR · ' + s.variant + ' ' + s.model, value: '$' + f2(TR.vc), delta: sgn(TR.vc - TR.vp) + ' (' + pct(TR.vc, TR.vp).toFixed(1) + '%)', deltaColor: dcol(TR.vc - TR.vp), hasSpark: true, spark: spark(tv), sparkColor: '#2f62c9', sub: 'vs ' + PCOB[s.compare] + ' · $MM' },
+      { label: 'Total SVaR · ' + s.variant + ' ' + s.model, value: '$' + f2(TR.sc), delta: sgn(TR.sc - TR.sp) + ' (' + pct(TR.sc, TR.sp).toFixed(1) + '%)', deltaColor: dcol(TR.sc - TR.sp), hasSpark: true, spark: spark(ts), sparkColor: '#12918a', sub: 'vs ' + PCOB[s.compare] + ' · $MM' },
+      { label: 'VaR limit used', value: (u * 100).toFixed(1) + '%', delta: '', deltaColor: MUTED, hasBar: true, bar: Math.min(100, u * 100), barColor: u >= 1 ? RED : u >= 0.8 ? '#d08a0e' : '#2f62c9', sub: '$' + f2(Math.max(0, limitTotal - baseScopeVar)) + 'MM headroom of $' + limitTotal + 'MM' },
+      { label: 'Desk limits at risk', value: String(breachAll.length), delta: '', deltaColor: MUTED, hasBar: false, sub: breachAll.filter(r => r.util >= 1).length + ' above 100% · ' + breachAll.filter(r => r.util >= 0.8 && r.util < 1).length + ' above 80%' },
+      { label: 'Largest ' + (primary === 'svar' ? 'SVaR' : 'VaR') + ' mover', value: top ? sgn(top[dKey]) : '—', delta: '', deltaColor: MUTED, sub: top ? SHORT(top.name) : '' },
+    ];
+    kpis[3].deltaColor = MUTED;
+
+
+    // ---- cross-filter helpers
+    const svarAllB = sum(DESKS, d => d[4]), svarAllP = sum(DESKS, d => d[5]);
+    const limAll = LIMITS.map((L, li) => { const d = L[3], isV = L[4] === 'var'; const exp = d == null ? svarAllB : DESKS[d][isV ? 2 : 4]; const prev = d == null ? svarAllP : DESKS[d][isV ? 3 : 5]; return { li, id: L[0], name: L[1], tier: L[2], d, thr: L[5], exp, chg: exp - prev, util: exp / L[5], region: d == null ? 'Global' : DESKS[d][1] }; });
+    const fD = s.sel != null ? { label: 'desk ' + SHORT(allRaw[s.sel].name), reset: { sel: null } } : null;
+    const fF = s.selFs != null ? { label: 'FS type ' + FS[s.selFs], reset: { selFs: null } } : null;
+    const fL = s.selLimit != null ? { label: 'limit ' + limAll[s.selLimit].id, reset: { selLimit: null } } : null;
+    const pf = (...xs) => { const p = xs.filter(Boolean); return { on: p.length > 0, label: p.map(x => x.label).join(' + '), clear: () => this.setState(Object.assign({ hover: null, sHov: null, eHov: null }, ...p.map(x => x.reset))) }; };
+    const fsClick = FS.map((c, j) => () => this.setState(st => ({ selFs: st.selFs === j ? null : j, sHov: null, hover: null })));
+    const ntick = (ny, Yf) => { const o = []; for (let v = 0; v <= ny.top + 1e-9; v += ny.step) o.push({ y: Yf(v), ty: Yf(v) + 4, label: ny.step < 1 ? v.toFixed(1) : Math.round(v) }); return o; };
+    const tipPos = pctX => ({ tipLeft: pctX, tipTransform: pctX > 60 ? 'translateX(calc(-100% - 12px))' : 'translateX(12px)' });
+
+    // ---- FS grid
+    const scopeDesks = s.sel != null ? [allRaw[s.sel]] : inScopeRaw;
+    const fsRows = FS.map((code, j) => { let vc = 0, vp = 0, sc = 0, sp = 0; scopeDesks.forEach(r => { const q = SH[r.i]; vc += r.vc * q.v[j]; vp += r.vp * q.vp[j]; sc += r.sc * q.s[j]; sp += r.sp * q.sp[j]; }); return { j, code, vc, vp, sc, sp }; });
+    const pk = primary === 'svar' ? 'sc' : 'vc';
+    const fsTotP = sum(fsRows, r => r[pk]) || 1;
+    const fsMaxV = Math.max(...fsRows.map(r => Math.abs(r.vc)), .01), fsMaxS = Math.max(...fsRows.map(r => Math.abs(r.sc)), .01), fsMaxP = Math.max(...fsRows.map(r => r[pk]), .01);
+    const fsGridRows = [...fsRows].sort((a, b) => b[pk] - a[pk]).map(r => { const on = s.selFs === r.j; return { code: r.code, color: FS_COL[r.j], bg: on ? '#edf2fd' : 'transparent', sh: on ? 'inset 3px 0 0 #2f62c9' : 'none', fw: on ? 700 : 500,
+      varCob: f2(r.vc), varPcob: f2(r.vp), varDiff: sgn(r.vc - r.vp), varDiffColor: dcol(r.vc - r.vp), varBar: Math.max(1, Math.abs(r.vc) / fsMaxV * 100),
+      svarCob: f2(r.sc), svarPcob: f2(r.sp), svarDiff: sgn(r.sc - r.sp), svarDiffColor: dcol(r.sc - r.sp), svarBar: Math.max(1, Math.abs(r.sc) / fsMaxS * 100),
+      share: (r[pk] / fsTotP * 100).toFixed(1) + '%', shareW: Math.max(0, r[pk] / fsMaxP * 100), onClick: fsClick[r.j] }; });
+    const FT = { vc: sum(fsRows, r => r.vc), vp: sum(fsRows, r => r.vp), sc: sum(fsRows, r => r.sc), sp: sum(fsRows, r => r.sp) };
+    const fsTot = { varCob: f2(FT.vc), varPcob: f2(FT.vp), varDiff: sgn(FT.vc - FT.vp), varDiffColor: dcol(FT.vc - FT.vp), svarCob: f2(FT.sc), svarPcob: f2(FT.sp), svarDiff: sgn(FT.sc - FT.sp), svarDiffColor: dcol(FT.sc - FT.sp) };
+    const scopeName = s.sel != null ? allRaw[s.sel].name : (s.region === 'All' ? 'All desks' : s.region + ' desks');
+
+    // ---- stacked FS charts
+    const SL = 44, SR = 630, ST = 10, SB = 196, SW = SR - SL, SHt = SB - ST;
+    const mkStack = (ci, key, title, seed) => {
+      const total = sum(fsRows, r => r[key]);
+      let top = [...fsRows].sort((a, b) => b[key] - a[key]).slice(0, 6).map(r => r.j);
+      if (s.selFs != null && !top.includes(s.selFs)) top = [...top.slice(0, 5), s.selFs];
+      const base = top.map(j => Math.max(0, fsRows[j][key]) / (total || 1));
+      const ser = trend(total, seed, n);
+      const days = ser.map((tot, t) => { let sh = base.map((b, q) => b * (1 + 0.14 * Math.sin(t / 4.3 + q * 1.7 + seed))); const st = sh.reduce((a, b) => a + b, 0); if (st > 0.97) sh = sh.map(x => x * 0.97 / st); const segs = sh.map(x => x * tot); return { tot, parts: segs.map((v, q) => ({ v, j: top[q] })).concat([{ v: Math.max(0, tot - segs.reduce((a, b) => a + b, 0)), j: -1 }]) }; });
+      const ny = nice(Math.max(...ser) * 1.04); const Yb = v => SB - v / ny.top * SHt;
+      const cw = SW / n, bw = Math.max(1.5, cw * 0.66);
+      const hv = s.sHov && s.sHov.c === ci ? s.sHov.i : null;
+      const bars = [];
+      days.forEach((d, t) => { let acc = 0; const x = SL + t * cw + (cw - bw) / 2; d.parts.forEach(p => { const y0 = Yb(acc), y1 = Yb(acc + p.v); acc += p.v; const isSel = s.selFs != null && p.j === s.selFs; bars.push({ x, y: y1, w: bw, h: Math.max(0, y0 - y1 - 0.6), fill: p.j < 0 ? '#cfd5de' : FS_COL[p.j], op: s.selFs == null ? (hv == null || hv === t ? 1 : 0.55) : (isSel ? 1 : 0.16), onClick: p.j < 0 ? noop : fsClick[p.j] }); }); });
+      const xT = [0, 0.25, 0.5, 0.75, 1].map(p => { const i = Math.round(p * (n - 1)); return { x: SL + (i + 0.5) * cw, label: fmtDate(dates[i]) }; });
+      const legend = top.map(j => { const on = s.selFs === j; return { code: FS[j], color: FS_COL[j], op: s.selFs == null || on ? 1 : 0.5, fw: on ? 700 : 500, bd: on ? '#2f62c9' : '#e4e7ec', bg: on ? '#eef3fd' : '#fff', onClick: fsClick[j] }; }).concat([{ code: 'Other', color: '#cfd5de', op: s.selFs == null ? 1 : 0.5, fw: 500, bd: '#e4e7ec', bg: '#fff', onClick: noop }]);
+      const tp = hv != null ? tipPos((SL + (hv + 0.5) * cw) / 640 * 100) : { tipLeft: 0, tipTransform: 'none' };
+      return Object.assign({ title, sub: '$MM · ' + scopeName + ' · ' + n + ' business days · click a segment to filter', last: f2(ser[n - 1]), bars, yT: ntick(ny, Yb), xT, legend, pf: pf(fD),
+        hov: hv != null, bandX: hv != null ? SL + hv * cw : 0, bandW: cw,
+        tipDate: hv != null ? fmtDate(dates[hv]) + ', ' + dates[hv].slice(0, 4) : '', tipTotal: hv != null ? '$' + f2(days[hv].tot) : '',
+        tipItems: hv != null ? [...days[hv].parts].sort((a, b) => b.v - a.v).map(p => ({ name: p.j < 0 ? 'Other' : FS[p.j], color: p.j < 0 ? '#cfd5de' : FS_COL[p.j], val: f2(p.v), fg: s.selFs != null && p.j === s.selFs ? '#9dbaf5' : '#ffffff', fw: s.selFs != null && p.j === s.selFs ? 700 : 400 })) : [],
+        onMove: e => { const r = e.currentTarget.getBoundingClientRect(); const i = Math.max(0, Math.min(n - 1, Math.floor((e.clientX - r.left) / r.width * n))); const c = this.state.sHov; if (!c || c.c !== ci || c.i !== i) this.setState({ sHov: { c: ci, i } }); },
+        onLeave: () => this.setState({ sHov: null }) }, tp);
+    };
+    const stackCharts = [showVar && mkStack(0, 'vc', 'Component VaR by FS type', 0.8), showSvar && mkStack(1, 'sc', 'Component SVaR by FS type', 2.3)].filter(Boolean);
+
+    // ---- limits
+    const limList = limAll.filter(l => (s.region === 'All' || l.d == null || l.region === s.region) && (s.sel == null || l.d == null || l.d === s.sel)).sort((a, b) => b.util - a.util);
+    const E = limList.find(l => l.li === s.selLimit) || limList[0];
+    const limRows = limList.map(l => { const on = l.li === E.li; const uc = l.util >= 1 ? RED : l.util >= 0.8 ? '#d08a0e' : '#2f62c9'; return { id: l.id, name: l.name, tier: l.tier, thr: String(l.thr), exp: f2(l.exp), util: (l.util * 100).toFixed(1) + '%', utilW: Math.min(100, l.util * 100), utilColor: uc, utilText: l.util >= 0.8 ? uc : '#475467', utilFw: l.util >= 0.8 ? 600 : 400, chg: sgn(l.chg), chgColor: dcol(l.chg), bg: on ? '#edf2fd' : 'transparent', sh: on ? 'inset 3px 0 0 #2f62c9' : 'none', fw: on ? 600 : 400, onClick: () => this.setState(st => ({ selLimit: st.selLimit === l.li ? null : l.li, eHov: null })) }; });
+
+    // ---- exposure chart
+    const EN = 90, eDates = DATES;
+    const ep = shape(E.li * 1.7 + 0.3, EN), epl = ep[EN - 1];
+    const eh = ep.map(x => Math.max(E.exp * 0.08, E.exp * (1 + 3.2 * (x - epl) / epl)));
+    const lim = t => t < 45 ? E.thr * 0.85 : E.thr;
+    const eny = nice(Math.max(Math.max(...eh), E.thr) * 1.08); const Ye = v => SB - v / eny.top * SHt;
+    const ecw = SW / EN, ebw = Math.max(1.5, ecw * 0.62), eHv = s.eHov;
+    const exBars = eh.map((v, t) => { const y = Ye(v); return { x: SL + t * ecw + (ecw - ebw) / 2, y, w: ebw, h: SB - y, fill: v > lim(t) ? RED : v >= 0.8 * lim(t) ? '#d08a0e' : '#2f62c9', op: eHv == null || eHv === t ? 0.9 : 0.5 }; });
+    const exExcess = eh.map((v, t) => v > lim(t) ? { cx: SL + (t + 0.5) * ecw, cy: Ye(v) - 6 } : null).filter(Boolean);
+    const peakU = Math.max(...eh.map((v, t) => v / lim(t)));
+    const curU = E.util;
+    const uCol = u => u >= 1 ? RED : u >= 0.8 ? '#b7780a' : '#101828';
+    const etp = eHv != null ? tipPos((SL + (eHv + 0.5) * ecw) / 640 * 100) : { tipLeft: 0, tipTransform: 'none' };
+    const ex = Object.assign({ id: E.id, name: E.name, auto: s.selLimit == null || s.selLimit !== E.li,
+      stats: [{ label: 'Current utilisation', value: (curU * 100).toFixed(1) + '%', color: uCol(curU) }, { label: 'Peak (90d)', value: (peakU * 100).toFixed(1) + '%', color: uCol(peakU) }, { label: 'Days in excess', value: String(exExcess.length), color: exExcess.length ? RED : '#101828' }],
+      yT: ntick(eny, Ye), xT: [0, 0.2, 0.4, 0.6, 0.8, 1].map(p => { const i = Math.round(p * (EN - 1)); return { x: SL + (i + 0.5) * ecw, label: fmtDate(eDates[i]) }; }),
+      bars: exBars, excess: exExcess,
+      limPath: 'M' + SL + ' ' + Ye(E.thr * 0.85).toFixed(1) + ' H' + (SL + 45 * ecw).toFixed(1) + ' V' + Ye(E.thr).toFixed(1) + ' H' + SR,
+      warnPath: 'M' + SL + ' ' + Ye(E.thr * 0.68).toFixed(1) + ' H' + (SL + 45 * ecw).toFixed(1) + ' V' + Ye(E.thr * 0.8).toFixed(1) + ' H' + SR,
+      hov: eHv != null, bandX: eHv != null ? SL + eHv * ecw : 0, bandW: ecw,
+      tipDate: eHv != null ? fmtDate(eDates[eHv]) + ', ' + eDates[eHv].slice(0, 4) : '',
+      tipItems: eHv != null ? [{ name: 'Exposure', val: '$' + f2(eh[eHv]), color: '#ffffff' }, { name: 'Limit', val: '$' + f2(lim(eHv)), color: '#c9ced8' }, { name: 'Utilisation', val: (eh[eHv] / lim(eHv) * 100).toFixed(1) + '%', color: eh[eHv] > lim(eHv) ? '#f3b3ab' : eh[eHv] >= 0.8 * lim(eHv) ? '#f0cf85' : '#ffffff' }] : [],
+      onMove: e => { const r = e.currentTarget.getBoundingClientRect(); const i = Math.max(0, Math.min(EN - 1, Math.floor((e.clientX - r.left) / r.width * EN))); if (i !== this.state.eHov) this.setState({ eHov: i }); },
+      onLeave: () => this.setState({ eHov: null }) }, etp);
+
+    // ---- filter bar
+    const chips = [];
+    if (s.sel != null) chips.push({ kind: 'DESK', value: allRaw[s.sel].name, dot: '#2f62c9', clear: () => this.setState({ sel: null, hover: null }) });
+    if (s.selFs != null) chips.push({ kind: 'FS TYPE', value: FS[s.selFs], dot: FS_COL[s.selFs], clear: () => this.setState({ selFs: null, sHov: null }) });
+    if (s.selLimit != null) chips.push({ kind: 'LIMIT', value: limAll[s.selLimit].id + ' · ' + limAll[s.selLimit].name, dot: '#d08a0e', clear: () => this.setState({ selLimit: null }) });
+    const ap = []; const add = x => { if (!ap.includes(x)) ap.push(x); };
+    if (s.selFs != null) ['Desk grid', 'Trend', 'What moved', 'FS charts'].forEach(add);
+    if (s.sel != null) ['Trend', 'FS grid', 'FS charts', 'Limits'].forEach(add);
+    if (s.selLimit != null) add('Exposure chart');
+    const anyF = chips.length > 0;
+    const fb = { any: anyF, none: !anyF, count: chips.length, applies: ap.join(', '), bg: anyF ? 'linear-gradient(90deg,#e8f0fd,#f4f7fe 60%,rgba(255,255,255,.6))' : 'rgba(250,251,253,.6)', bd: anyF ? '#c7d6f5' : '#eef0f3', labelColor: anyF ? '#1d4596' : '#667085', countBg: anyF ? '#2f62c9' : '#e4e7ec', countFg: anyF ? '#ffffff' : '#475467' };
+
+    const arrow = key => s.sortKey === key ? (s.sortDir > 0 ? '↑' : '↓') : '';
+    const cur = VIEWS.find(v => Object.keys(v.s).every(x => v.s[x] === s[x]));
+
+    return {
+      cob: s.cob, onCob: e => { this.setState({ cob: e.target.value }); this.pulse('Loading COB ' + e.target.value); }, pcob: PCOB[s.compare], compare: s.compare,
+      views: VIEWS.map(v => { const a = cur === v; return { label: v.label, bg: a ? '#1a2b5c' : '#fff', fg: a ? '#fff' : '#344054', bd: a ? '#1a2b5c' : '#dde3ee', sh: a ? '0 6px 14px -6px rgba(26,43,92,.6)' : '0 1px 2px rgba(16,24,40,.05)', onClick: () => { this.setState({ ...v.s, sel: null, hover: null }); this.pulse('Applying ' + v.label); } }; }),
+      onShare: () => { try { navigator.clipboard && navigator.clipboard.writeText(location.href); } catch (e) {} this.flash('Link copied — opens with these filters'); },
+      onExport: () => this.flash('Exporting ' + rows.length + ' desks to Excel with current filters'),
+      compareOpts: this.seg('compare', ['DoD', 'WoW', 'MoM']),
+      regionOpts: this.seg('region', ['All', 'NA', 'EMEA', 'APAC', 'Latam', 'Global']),
+      variantOpts: this.seg('variant', ['1D', '10D']),
+      modelOpts: this.seg('model', [{ v: 'MC', label: 'Monte Carlo' }, { v: 'Hist', label: 'Historical' }]),
+      attrOpts: this.seg('attr', ['Trading', 'Economic', 'Volcker', 'Basel 3', 'Trading & Credit']),
+      measureOpts: this.seg('measure', ['VaR', 'SVaR', 'Both']),
+      daysOpts: this.seg('days', [{ v: 30, label: '30D' }, { v: 60, label: '60D' }, { v: 90, label: '90D' }]),
+      showAlert: s.alert, dismissAlert: () => this.setState({ alert: false }),
+      breaches: breachAll.map(r => ({ name: SHORT(r.name), util: Math.round(r.util * 100) + '%', color: r.util >= 1 ? RED : '#b7780a', onClick: () => this.setState({ sel: r.i, region: 'All', search: '', hover: null }) })),
+      kpis,
+      measureLabel: s.measure === 'Both' ? 'VaR / SVaR' : s.measure, variant: s.variant, model: s.model === 'MC' ? 'Monte Carlo' : 'Historical', attr: s.attr, rowCount: rows.length,
+      search: s.search, onSearch: e => this.setState({ search: e.target.value }), searchRef: this.searchRef,
+      rows, tot, rowPad, noRows: rows.length === 0, showVar, showSvar,
+      sortName: () => this.sortBy('name'), sortVar: () => this.sortBy('var'), sortSvar: () => this.sortBy('svar'), sortVarDiff: () => this.sortBy('vd'), sortSvarDiff: () => this.sortBy('sd'), sortUtil: () => this.sortBy('util'),
+      arrowName: arrow('name'), arrowVar: s.sortKey === 'cob' && primary === 'var' ? (s.sortDir > 0 ? '↑' : '↓') : arrow('var'), arrowSvar: s.sortKey === 'cob' && primary === 'svar' ? (s.sortDir > 0 ? '↑' : '↓') : arrow('svar'), arrowVarDiff: arrow('vd'), arrowSvarDiff: arrow('sd'), arrowUtil: arrow('util'),
+      chartScope: (selRow ? selRow.name : (s.region === 'All' ? 'All desks' : s.region + ' desks')) + ' · $MM · ' + n + ' business days',
+      hasSel: !!selRow, clearSel: () => this.setState({ sel: null, hover: null }),
+      lastVar: f2(vSeries[n - 1]), lastSvar: f2(sSeries[n - 1]),
+      yTicks, xTicks, varPath: path(vSeries), svarPath: path(sSeries), varArea: path(vSeries) + ` L${R} ${BOT} L${L} ${BOT} Z`,
+      hov: h != null, hx: h != null ? X(h) : 0, hVarY: h != null ? Y(vSeries[h]) : 0, hSvarY: h != null ? Y(sSeries[h]) : 0,
+      tipLeft, tipTransform: tipLeft > 60 ? 'translateX(calc(-100% - 12px))' : 'translateX(12px)',
+      tipDate: h != null ? fmtDate(dates[h]) + ', ' + dates[h].slice(0, 4) : '', tipVar: h != null ? '$' + f2(vSeries[h]) : '', tipSvar: h != null ? '$' + f2(sSeries[h]) : '',
+      onChartMove: e => { const r = e.currentTarget.getBoundingClientRect(); const i = Math.max(0, Math.min(n - 1, Math.round((e.clientX - r.left) / r.width * (n - 1)))); if (i !== s.hover) this.setState({ hover: i }); },
+      onChartLeave: () => this.setState({ hover: null }),
+      movers, primaryLabel: primary === 'svar' ? 'SVaR' : 'VaR',
+      showNotes: this.props.showNotes ?? true,
+      notes: NOTES.map((x, i) => ({ num: String(i + 1).padStart(2, '0'), title: x[0], body: x[1], tech: x[2] })),
+      hasToast: !!s.toast, toast: s.toast,
+      mainOp: s.loading ? 0.5 : 1, mainFilter: s.loading ? 'saturate(.7) blur(1.5px)' : 'none',
+      topBar: s.loading ? React.createElement('div', { style: { position: 'absolute', left: 0, right: 0, top: 0, height: 3, overflow: 'hidden', zIndex: 5 } },
+        React.createElement('div', { style: { width: '32%', height: '100%', borderRadius: 3, background: 'linear-gradient(90deg,rgba(91,134,245,0),#5b86f5,#2f5fd6,rgba(47,95,214,0))', animation: 'omBar 1.1s cubic-bezier(.45,.05,.35,1) infinite' } })) : null,
+      loader: s.loading ? React.createElement('div', { style: { position: 'fixed', top: '50%', left: 'calc(50% + ' + ((s.side !== false ? 260 : 76) / 2) + 'px)', zIndex: 40, pointerEvents: 'none', animation: 'omIn .28s cubic-bezier(.2,.8,.2,1) both', display: 'flex', alignItems: 'center', gap: 14, padding: '14px 20px 14px 16px', borderRadius: 18, background: 'rgba(255,255,255,.86)', backdropFilter: 'blur(14px) saturate(160%)', WebkitBackdropFilter: 'blur(14px) saturate(160%)', border: '1px solid rgba(228,234,244,.9)', boxShadow: '0 24px 48px -16px rgba(20,34,74,.35),0 2px 6px rgba(20,34,74,.08),inset 0 1px 0 #fff' } },
+        React.createElement('div', { style: { position: 'relative', width: 34, height: 34, flex: 'none' } },
+          React.createElement('div', { style: { position: 'absolute', inset: 0, borderRadius: '50%', border: '3.5px solid #e7edf8' } }),
+          React.createElement('div', { style: { position: 'absolute', inset: 0, borderRadius: '50%', background: 'conic-gradient(from 0deg,rgba(47,95,214,0) 0deg,rgba(47,95,214,.1) 60deg,#2f5fd6 300deg,#6f95f7 360deg)', WebkitMask: 'radial-gradient(farthest-side,transparent calc(100% - 3.5px),#000 calc(100% - 3.5px))', mask: 'radial-gradient(farthest-side,transparent calc(100% - 3.5px),#000 calc(100% - 3.5px))', animation: 'omSpin .8s linear infinite' } }),
+          React.createElement('div', { style: { position: 'absolute', inset: 0, animation: 'omSpin .8s linear infinite' } },
+            React.createElement('div', { style: { position: 'absolute', top: 0, left: '50%', width: 3.5, height: 3.5, marginLeft: -1.75, borderRadius: '50%', background: '#6f95f7', boxShadow: '0 0 6px 1px rgba(111,149,247,.8)' } }))),
+        React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: 2 } },
+          React.createElement('span', { style: { fontSize: 13.5, fontWeight: 600, color: '#101828', whiteSpace: 'nowrap' } }, s.loadMsg),
+          React.createElement('span', { style: { fontSize: 11.5, color: '#667085', whiteSpace: 'nowrap', animation: 'omPulse 1.4s ease-in-out infinite' } }, 'Recalculating grids & charts…'))) : null,
+      fsGridRows, fsTot, fsScope: scopeName, fsCols: 'minmax(110px,1fr)' + (showVar ? ' repeat(3,minmax(72px,1fr))' : '') + (showSvar ? ' repeat(3,minmax(72px,1fr))' : '') + ' minmax(130px,1.2fr)', fsMin: 250 + (showVar ? 216 : 0) + (showSvar ? 216 : 0),
+      stackCharts, limRows, limCount: limList.length + ' of ' + LIMITS.length + ' limits', limCols: 'minmax(170px,1.8fr) minmax(150px,1.5fr) minmax(78px,.7fr) minmax(78px,.7fr) minmax(140px,1.3fr) minmax(70px,.7fr)', limMin: 700, ex,
+      chips, fb, clearAll: () => this.setState({ sel: null, selFs: null, selLimit: null, hover: null, sHov: null, eHov: null }),
+      pfDesk: pf(fF), pfTrend: pf(fD, fF), pfMovers: pf(fF), pfFs: pf(fD), pfLim: pf(fD), pfExp: pf(fL),
+      gridCols: 'minmax(200px,2.4fr)' + (showVar ? ' repeat(3,minmax(72px,1fr))' : '') + (showSvar ? ' repeat(3,minmax(72px,1fr))' : '') + ' minmax(130px,1.3fr)',
+      gridMin: 330 + (showVar ? 216 : 0) + (showSvar ? 216 : 0),
+      sideOpen: s.side !== false, sideW: s.side !== false ? 248 : 64, sideArrow: s.side !== false ? '«' : '»',
+      toggleSide: () => this.setState({ side: s.side === false }),
+      nav: [
+        ['h', 'MANAGEMENT'],
+        ['i', 'Daily Risk', 'DR', 0], ['i', 'Equities', 'EQ', 1], ['i', 'VaR Summary', 'VS', 2, 'LIVE', true], ['i', 'VaR Drilldown', 'VD', 2, 'BETA'], ['i', 'FS Summary', 'FS', 2, 'SOON'],
+        ['i', 'Rates', 'RT', 1], ['i', 'Credit', 'CR', 1],
+        ['h', 'CONTROLS'],
+        ['i', 'Limit Central', 'LC', 0, String(breachAll.length)], ['i', 'Stress Testing', 'ST', 0], ['i', 'Backtesting', 'BT', 0],
+        ['h', 'REPORTING'],
+        ['i', 'Regulatory Reports', 'RR', 0], ['i', 'Subscriptions', 'SB', 0],
+      ].map(x => {
+        const open = s.side !== false;
+        if (x[0] === 'h') return { isHead: true, isItem: false, label: open ? x[1] : '', headH: open ? 'auto' : '8px' };
+        const act = !!x[5], lvl = x[3];
+        const bb = { LIVE: ['rgba(91,134,245,.22)', '#b9cdfb'], BETA: ['rgba(231,199,122,.16)', '#f0d48f'], SOON: ['rgba(255,255,255,.08)', '#9aa8cc'] }[x[4]] || ['#5b231e', '#f3b3ab'];
+        return { isHead: false, isItem: true, label: x[1], ico: x[2], padL: open ? 8 + lvl * 14 : 8, padR: 8,
+          bg: act ? 'linear-gradient(135deg,#5b86f5,#2f5fd6)' : 'transparent', sh: act ? '0 8px 20px -8px rgba(91,134,245,.85),inset 0 1px 0 rgba(255,255,255,.22)' : 'none', hov: act ? 'linear-gradient(135deg,#5b86f5,#2f5fd6)' : 'rgba(255,255,255,.06)', fg: act ? '#fff' : lvl === 2 ? '#b3bfdd' : '#e3e9f6', fw: act ? 600 : 500,
+          icoBg: act ? 'rgba(255,255,255,.18)' : 'rgba(255,255,255,.08)', icoFg: act ? '#fff' : '#b3bfdd',
+          hasBadge: !!x[4], badge: x[4], badgeBg: act ? 'rgba(255,255,255,.2)' : bb[0], badgeFg: act ? '#fff' : bb[1],
+          onClick: () => act ? null : this.flash(x[1] + ' — not in this mock') };
+      }),
+    };
+  }
+}
+</script>
+</body>
+</html>

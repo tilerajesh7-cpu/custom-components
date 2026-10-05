@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "1.0",
+  "dashboardId": "var-summary",
+  "charts": {
+    "standalone-trend-line": {
+      "type": "line",
+      "orientation": "timeSeries",
+      "categoryField": "cobDate",
+      "valueFields": [
+        "mcVar",
+        "histVar",
+        "mcSvar",
+        "histSvar"
+      ],
+      "seriesTones": {
+        "mcVar": "series1",
+        "histVar": "series2",
+        "mcSvar": "series3",
+        "histSvar": "series4"
+      },
+      "seriesStyle": {
+        "histVar": {
+          "dash": "Dash"
+        },
+        "histSvar": {
+          "dash": "Dash"
+        }
+      },
+      "areaFirstSeries": true,
+      "legend": {
+        "position": "top"
+      },
+      "height": 330,
+      "seriesLabels": {
+        "mcVar": "MC VaR",
+        "histVar": "Hist VaR",
+        "mcSvar": "MC SVaR",
+        "histSvar": "Hist SVaR"
+      },
+      "chartTooltip": {
+        "shared": true,
+        "groupingEnabled": true,
+        "separators": [
+          " "
+        ],
+        "groupedRowHeader": "Measure",
+        "rowHeader": "Type",
+        "namePattern": "column·row",
+        "columnLabels": {
+          "MC": "MC ($MM)",
+          "Hist": "Hist ($MM)"
+        },
+        "footerWhenGrouped": false
+      }
+    }
+  }
+}

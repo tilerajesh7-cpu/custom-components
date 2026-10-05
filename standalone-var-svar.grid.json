@@ -1,0 +1,1221 @@
+{
+ "schemaVersion": "2.0",
+ "gridId": "standalone-var-svar",
+ "meta": {
+  "queryId": "standalone-var-svar",
+  "requestId": "mock-1",
+  "asOf": "2026-09-11",
+  "source": "mock"
+ },
+ "rowMetadata": {
+  "row_1": {
+   "selectable": true
+  },
+  "row_2": {
+   "selectable": true
+  },
+  "row_3": {
+   "selectable": true
+  },
+  "row_4": {
+   "selectable": true
+  },
+  "row_5": {
+   "selectable": true
+  },
+  "row_6": {
+   "selectable": true
+  },
+  "row_7": {
+   "selectable": true
+  },
+  "row_8": {
+   "selectable": true
+  },
+  "row_9": {
+   "selectable": true
+  },
+  "row_10": {
+   "selectable": true
+  },
+  "row_11": {
+   "selectable": true
+  },
+  "row_12": {
+   "selectable": true
+  },
+  "row_13": {
+   "selectable": true
+  },
+  "row_14": {
+   "selectable": true
+  },
+  "row_15": {
+   "selectable": true
+  }
+ },
+ "cellMetadata": {},
+ "pinnedTopRows": [],
+ "pinnedBottomRows": [],
+ "gridMetaData": {
+  "defaultColDef": {
+   "sortable": true,
+   "filter": false,
+   "resizable": true,
+   "floatingFilter": false
+  },
+  "pagination": false,
+  "rowSelection": "single",
+  "getRowId": "id",
+  "masterDetail": false,
+  "pivotMode": false,
+  "title": "Standalone VaR/SVaR ($MM)",
+  "subtitle": "click a row to filter"
+ },
+ "columnDefs": [
+  {
+   "headerName": "Volcker Desk Name",
+   "field": "name",
+   "pinned": "left",
+   "width": 200,
+   "colType": "StringType"
+  },
+  {
+   "headerName": "Region",
+   "field": "region",
+   "hide": true,
+   "colType": "StringType"
+  },
+  {
+   "headerName": "Monte Carlo (VaR)",
+   "children": [
+    {
+     "headerName": "COB",
+     "field": "mcVarCob",
+     "width": 84,
+     "colType": "DoubleType"
+    },
+    {
+     "headerName": "PCOB",
+     "field": "mcVarPcob",
+     "width": 76,
+     "colType": "DoubleType"
+    },
+    {
+     "headerName": "Diff",
+     "field": "mcVarDiff",
+     "width": 96,
+     "colType": "DoubleType"
+    }
+   ]
+  },
+  {
+   "headerName": "Historical (VaR)",
+   "children": [
+    {
+     "headerName": "COB",
+     "field": "histVarCob",
+     "width": 84,
+     "colType": "DoubleType"
+    },
+    {
+     "headerName": "PCOB",
+     "field": "histVarPcob",
+     "width": 76,
+     "colType": "DoubleType"
+    },
+    {
+     "headerName": "Diff",
+     "field": "histVarDiff",
+     "width": 96,
+     "colType": "DoubleType"
+    }
+   ]
+  },
+  {
+   "headerName": "Monte Carlo (SVaR)",
+   "children": [
+    {
+     "headerName": "COB",
+     "field": "mcSvarCob",
+     "width": 84,
+     "colType": "DoubleType"
+    },
+    {
+     "headerName": "PCOB",
+     "field": "mcSvarPcob",
+     "width": 76,
+     "colType": "DoubleType"
+    },
+    {
+     "headerName": "Diff",
+     "field": "mcSvarDiff",
+     "width": 96,
+     "colType": "DoubleType"
+    }
+   ]
+  },
+  {
+   "headerName": "Historical (SVaR)",
+   "children": [
+    {
+     "headerName": "COB",
+     "field": "histSvarCob",
+     "width": 84,
+     "colType": "DoubleType"
+    },
+    {
+     "headerName": "PCOB",
+     "field": "histSvarPcob",
+     "width": 76,
+     "colType": "DoubleType"
+    },
+    {
+     "headerName": "Diff",
+     "field": "histSvarDiff",
+     "width": 96,
+     "colType": "DoubleType"
+    }
+   ]
+  }
+ ],
+ "columnMetadata": {
+  "name": {
+   "type": "text"
+  },
+  "mcVarCob": {
+   "type": "bar",
+   "bar": {
+    "mode": "magnitude"
+   },
+   "format": {
+    "style": "fixed",
+    "decimals": 2,
+    "negative": "minus"
+   },
+   "tooltip": {
+    "renderer": "cellInfoTooltip",
+    "facts": [
+     {
+      "label": "VaR Type",
+      "value": "VaR"
+     },
+     {
+      "label": "VaR Variant",
+      "value": "{filterLabel.variant}"
+     },
+     {
+      "label": "VaR Attribute",
+      "value": "{filter.attribute}"
+     },
+     {
+      "label": "Model",
+      "value": "Monte Carlo"
+     }
+    ],
+    "pathField": "path",
+    "kicker": "VaR EXPOSURE | DATA",
+    "values": [
+     {
+      "label": "COB",
+      "field": "mcVarCob"
+     },
+     {
+      "label": "PCOB",
+      "field": "mcVarPcob"
+     },
+     {
+      "label": "Chg",
+      "field": "mcVarDiff",
+      "format": {
+       "style": "fixed",
+       "decimals": 2,
+       "negative": "minus",
+       "showPlus": true
+      }
+     }
+    ],
+    "nodeField": "node",
+    "ntrField": "ntr"
+   }
+  },
+  "mcVarPcob": {
+   "type": "value",
+   "tone": "muted",
+   "format": {
+    "style": "fixed",
+    "decimals": 2,
+    "negative": "minus"
+   },
+   "tooltip": {
+    "renderer": "cellInfoTooltip",
+    "facts": [
+     {
+      "label": "VaR Type",
+      "value": "VaR"
+     },
+     {
+      "label": "VaR Variant",
+      "value": "{filterLabel.variant}"
+     },
+     {
+      "label": "VaR Attribute",
+      "value": "{filter.attribute}"
+     },
+     {
+      "label": "Model",
+      "value": "Monte Carlo"
+     }
+    ],
+    "pathField": "path",
+    "kicker": "VaR EXPOSURE | DATA",
+    "values": [
+     {
+      "label": "COB",
+      "field": "mcVarCob"
+     },
+     {
+      "label": "PCOB",
+      "field": "mcVarPcob"
+     },
+     {
+      "label": "Chg",
+      "field": "mcVarDiff",
+      "format": {
+       "style": "fixed",
+       "decimals": 2,
+       "negative": "minus",
+       "showPlus": true
+      }
+     }
+    ],
+    "nodeField": "node",
+    "ntrField": "ntr"
+   }
+  },
+  "mcVarDiff": {
+   "type": "bar",
+   "bar": {
+    "mode": "diverging"
+   },
+   "tone": "sign",
+   "format": {
+    "style": "fixed",
+    "decimals": 2,
+    "negative": "minus",
+    "showPlus": true
+   },
+   "tooltip": {
+    "renderer": "cellInfoTooltip",
+    "facts": [
+     {
+      "label": "VaR Type",
+      "value": "VaR"
+     },
+     {
+      "label": "VaR Variant",
+      "value": "{filterLabel.variant}"
+     },
+     {
+      "label": "VaR Attribute",
+      "value": "{filter.attribute}"
+     },
+     {
+      "label": "Model",
+      "value": "Monte Carlo"
+     }
+    ],
+    "pathField": "path",
+    "kicker": "VaR EXPOSURE | DATA",
+    "values": [
+     {
+      "label": "COB",
+      "field": "mcVarCob"
+     },
+     {
+      "label": "PCOB",
+      "field": "mcVarPcob"
+     },
+     {
+      "label": "Chg",
+      "field": "mcVarDiff",
+      "format": {
+       "style": "fixed",
+       "decimals": 2,
+       "negative": "minus",
+       "showPlus": true
+      }
+     }
+    ],
+    "nodeField": "node",
+    "ntrField": "ntr"
+   }
+  },
+  "histVarCob": {
+   "type": "bar",
+   "bar": {
+    "mode": "magnitude"
+   },
+   "format": {
+    "style": "fixed",
+    "decimals": 2,
+    "negative": "minus"
+   },
+   "tooltip": {
+    "renderer": "cellInfoTooltip",
+    "facts": [
+     {
+      "label": "VaR Type",
+      "value": "VaR"
+     },
+     {
+      "label": "VaR Variant",
+      "value": "{filterLabel.variant}"
+     },
+     {
+      "label": "VaR Attribute",
+      "value": "{filter.attribute}"
+     },
+     {
+      "label": "Model",
+      "value": "Historical"
+     }
+    ],
+    "pathField": "path",
+    "kicker": "VaR EXPOSURE | DATA",
+    "values": [
+     {
+      "label": "COB",
+      "field": "histVarCob"
+     },
+     {
+      "label": "PCOB",
+      "field": "histVarPcob"
+     },
+     {
+      "label": "Chg",
+      "field": "histVarDiff",
+      "format": {
+       "style": "fixed",
+       "decimals": 2,
+       "negative": "minus",
+       "showPlus": true
+      }
+     }
+    ],
+    "nodeField": "node",
+    "ntrField": "ntr"
+   }
+  },
+  "histVarPcob": {
+   "type": "value",
+   "tone": "muted",
+   "format": {
+    "style": "fixed",
+    "decimals": 2,
+    "negative": "minus"
+   },
+   "tooltip": {
+    "renderer": "cellInfoTooltip",
+    "facts": [
+     {
+      "label": "VaR Type",
+      "value": "VaR"
+     },
+     {
+      "label": "VaR Variant",
+      "value": "{filterLabel.variant}"
+     },
+     {
+      "label": "VaR Attribute",
+      "value": "{filter.attribute}"
+     },
+     {
+      "label": "Model",
+      "value": "Historical"
+     }
+    ],
+    "pathField": "path",
+    "kicker": "VaR EXPOSURE | DATA",
+    "values": [
+     {
+      "label": "COB",
+      "field": "histVarCob"
+     },
+     {
+      "label": "PCOB",
+      "field": "histVarPcob"
+     },
+     {
+      "label": "Chg",
+      "field": "histVarDiff",
+      "format": {
+       "style": "fixed",
+       "decimals": 2,
+       "negative": "minus",
+       "showPlus": true
+      }
+     }
+    ],
+    "nodeField": "node",
+    "ntrField": "ntr"
+   }
+  },
+  "histVarDiff": {
+   "type": "bar",
+   "bar": {
+    "mode": "diverging"
+   },
+   "tone": "sign",
+   "format": {
+    "style": "fixed",
+    "decimals": 2,
+    "negative": "minus",
+    "showPlus": true
+   },
+   "tooltip": {
+    "renderer": "cellInfoTooltip",
+    "facts": [
+     {
+      "label": "VaR Type",
+      "value": "VaR"
+     },
+     {
+      "label": "VaR Variant",
+      "value": "{filterLabel.variant}"
+     },
+     {
+      "label": "VaR Attribute",
+      "value": "{filter.attribute}"
+     },
+     {
+      "label": "Model",
+      "value": "Historical"
+     }
+    ],
+    "pathField": "path",
+    "kicker": "VaR EXPOSURE | DATA",
+    "values": [
+     {
+      "label": "COB",
+      "field": "histVarCob"
+     },
+     {
+      "label": "PCOB",
+      "field": "histVarPcob"
+     },
+     {
+      "label": "Chg",
+      "field": "histVarDiff",
+      "format": {
+       "style": "fixed",
+       "decimals": 2,
+       "negative": "minus",
+       "showPlus": true
+      }
+     }
+    ],
+    "nodeField": "node",
+    "ntrField": "ntr"
+   }
+  },
+  "mcSvarCob": {
+   "type": "bar",
+   "bar": {
+    "mode": "magnitude"
+   },
+   "format": {
+    "style": "fixed",
+    "decimals": 2,
+    "negative": "minus"
+   },
+   "tooltip": {
+    "renderer": "cellInfoTooltip",
+    "facts": [
+     {
+      "label": "VaR Type",
+      "value": "SVaR"
+     },
+     {
+      "label": "VaR Variant",
+      "value": "{filterLabel.variant}"
+     },
+     {
+      "label": "VaR Attribute",
+      "value": "{filter.attribute}"
+     },
+     {
+      "label": "Model",
+      "value": "Monte Carlo"
+     }
+    ],
+    "pathField": "path",
+    "kicker": "SVaR EXPOSURE | DATA",
+    "values": [
+     {
+      "label": "COB",
+      "field": "mcSvarCob"
+     },
+     {
+      "label": "PCOB",
+      "field": "mcSvarPcob"
+     },
+     {
+      "label": "Chg",
+      "field": "mcSvarDiff",
+      "format": {
+       "style": "fixed",
+       "decimals": 2,
+       "negative": "minus",
+       "showPlus": true
+      }
+     }
+    ],
+    "nodeField": "node",
+    "ntrField": "ntr"
+   }
+  },
+  "mcSvarPcob": {
+   "type": "value",
+   "tone": "muted",
+   "format": {
+    "style": "fixed",
+    "decimals": 2,
+    "negative": "minus"
+   },
+   "tooltip": {
+    "renderer": "cellInfoTooltip",
+    "facts": [
+     {
+      "label": "VaR Type",
+      "value": "SVaR"
+     },
+     {
+      "label": "VaR Variant",
+      "value": "{filterLabel.variant}"
+     },
+     {
+      "label": "VaR Attribute",
+      "value": "{filter.attribute}"
+     },
+     {
+      "label": "Model",
+      "value": "Monte Carlo"
+     }
+    ],
+    "pathField": "path",
+    "kicker": "SVaR EXPOSURE | DATA",
+    "values": [
+     {
+      "label": "COB",
+      "field": "mcSvarCob"
+     },
+     {
+      "label": "PCOB",
+      "field": "mcSvarPcob"
+     },
+     {
+      "label": "Chg",
+      "field": "mcSvarDiff",
+      "format": {
+       "style": "fixed",
+       "decimals": 2,
+       "negative": "minus",
+       "showPlus": true
+      }
+     }
+    ],
+    "nodeField": "node",
+    "ntrField": "ntr"
+   }
+  },
+  "mcSvarDiff": {
+   "type": "bar",
+   "bar": {
+    "mode": "diverging"
+   },
+   "tone": "sign",
+   "format": {
+    "style": "fixed",
+    "decimals": 2,
+    "negative": "minus",
+    "showPlus": true
+   },
+   "tooltip": {
+    "renderer": "cellInfoTooltip",
+    "facts": [
+     {
+      "label": "VaR Type",
+      "value": "SVaR"
+     },
+     {
+      "label": "VaR Variant",
+      "value": "{filterLabel.variant}"
+     },
+     {
+      "label": "VaR Attribute",
+      "value": "{filter.attribute}"
+     },
+     {
+      "label": "Model",
+      "value": "Monte Carlo"
+     }
+    ],
+    "pathField": "path",
+    "kicker": "SVaR EXPOSURE | DATA",
+    "values": [
+     {
+      "label": "COB",
+      "field": "mcSvarCob"
+     },
+     {
+      "label": "PCOB",
+      "field": "mcSvarPcob"
+     },
+     {
+      "label": "Chg",
+      "field": "mcSvarDiff",
+      "format": {
+       "style": "fixed",
+       "decimals": 2,
+       "negative": "minus",
+       "showPlus": true
+      }
+     }
+    ],
+    "nodeField": "node",
+    "ntrField": "ntr"
+   }
+  },
+  "histSvarCob": {
+   "type": "bar",
+   "bar": {
+    "mode": "magnitude"
+   },
+   "format": {
+    "style": "fixed",
+    "decimals": 2,
+    "negative": "minus"
+   },
+   "tooltip": {
+    "renderer": "cellInfoTooltip",
+    "facts": [
+     {
+      "label": "VaR Type",
+      "value": "SVaR"
+     },
+     {
+      "label": "VaR Variant",
+      "value": "{filterLabel.variant}"
+     },
+     {
+      "label": "VaR Attribute",
+      "value": "{filter.attribute}"
+     },
+     {
+      "label": "Model",
+      "value": "Historical"
+     }
+    ],
+    "pathField": "path",
+    "kicker": "SVaR EXPOSURE | DATA",
+    "values": [
+     {
+      "label": "COB",
+      "field": "histSvarCob"
+     },
+     {
+      "label": "PCOB",
+      "field": "histSvarPcob"
+     },
+     {
+      "label": "Chg",
+      "field": "histSvarDiff",
+      "format": {
+       "style": "fixed",
+       "decimals": 2,
+       "negative": "minus",
+       "showPlus": true
+      }
+     }
+    ],
+    "nodeField": "node",
+    "ntrField": "ntr"
+   }
+  },
+  "histSvarPcob": {
+   "type": "value",
+   "tone": "muted",
+   "format": {
+    "style": "fixed",
+    "decimals": 2,
+    "negative": "minus"
+   },
+   "tooltip": {
+    "renderer": "cellInfoTooltip",
+    "facts": [
+     {
+      "label": "VaR Type",
+      "value": "SVaR"
+     },
+     {
+      "label": "VaR Variant",
+      "value": "{filterLabel.variant}"
+     },
+     {
+      "label": "VaR Attribute",
+      "value": "{filter.attribute}"
+     },
+     {
+      "label": "Model",
+      "value": "Historical"
+     }
+    ],
+    "pathField": "path",
+    "kicker": "SVaR EXPOSURE | DATA",
+    "values": [
+     {
+      "label": "COB",
+      "field": "histSvarCob"
+     },
+     {
+      "label": "PCOB",
+      "field": "histSvarPcob"
+     },
+     {
+      "label": "Chg",
+      "field": "histSvarDiff",
+      "format": {
+       "style": "fixed",
+       "decimals": 2,
+       "negative": "minus",
+       "showPlus": true
+      }
+     }
+    ],
+    "nodeField": "node",
+    "ntrField": "ntr"
+   }
+  },
+  "histSvarDiff": {
+   "type": "bar",
+   "bar": {
+    "mode": "diverging"
+   },
+   "tone": "sign",
+   "format": {
+    "style": "fixed",
+    "decimals": 2,
+    "negative": "minus",
+    "showPlus": true
+   },
+   "tooltip": {
+    "renderer": "cellInfoTooltip",
+    "facts": [
+     {
+      "label": "VaR Type",
+      "value": "SVaR"
+     },
+     {
+      "label": "VaR Variant",
+      "value": "{filterLabel.variant}"
+     },
+     {
+      "label": "VaR Attribute",
+      "value": "{filter.attribute}"
+     },
+     {
+      "label": "Model",
+      "value": "Historical"
+     }
+    ],
+    "pathField": "path",
+    "kicker": "SVaR EXPOSURE | DATA",
+    "values": [
+     {
+      "label": "COB",
+      "field": "histSvarCob"
+     },
+     {
+      "label": "PCOB",
+      "field": "histSvarPcob"
+     },
+     {
+      "label": "Chg",
+      "field": "histSvarDiff",
+      "format": {
+       "style": "fixed",
+       "decimals": 2,
+       "negative": "minus",
+       "showPlus": true
+      }
+     }
+    ],
+    "nodeField": "node",
+    "ntrField": "ntr"
+   }
+  }
+ },
+ "rowData": [
+  {
+   "id": "row_1",
+   "name": "Equity Derivatives NA",
+   "region": "NA",
+   "mcVarCob": 28.17,
+   "mcVarPcob": 26.5,
+   "mcVarDiff": 1.67,
+   "histVarCob": 25.96,
+   "histVarPcob": 24.59,
+   "histVarDiff": 1.37,
+   "mcSvarCob": 37.42,
+   "mcSvarPcob": 33.93,
+   "mcSvarDiff": 3.49,
+   "histSvarCob": 34.56,
+   "histSvarPcob": 31.52,
+   "histSvarDiff": 3.04,
+   "path": [
+    "Equity Derivatives",
+    "NA",
+    "Equity Derivatives NA"
+   ],
+   "node": "L4Q-L67",
+   "ntr": "44474 / 1"
+  },
+  {
+   "id": "row_2",
+   "name": "Investment Strategies",
+   "region": "Global",
+   "mcVarCob": 21.98,
+   "mcVarPcob": 13.89,
+   "mcVarDiff": 8.09,
+   "histVarCob": 21.15,
+   "histVarPcob": 13.01,
+   "histVarDiff": 8.14,
+   "mcSvarCob": 26.99,
+   "mcSvarPcob": 19.78,
+   "mcSvarDiff": 7.21,
+   "histSvarCob": 24.95,
+   "histSvarPcob": 18.32,
+   "histSvarDiff": 6.63,
+   "path": [
+    "Investment Strategies",
+    "Global",
+    "Investment Strategies"
+   ],
+   "node": "L3Y-L5Z",
+   "ntr": "45046 / 2"
+  },
+  {
+   "id": "row_3",
+   "name": "Equity Client Financing NA",
+   "region": "NA",
+   "mcVarCob": 17.87,
+   "mcVarPcob": 13.46,
+   "mcVarDiff": 4.41,
+   "histVarCob": 16.67,
+   "histVarPcob": 12.54,
+   "histVarDiff": 4.13,
+   "mcSvarCob": 17.49,
+   "mcSvarPcob": 21.52,
+   "mcSvarDiff": -4.03,
+   "histSvarCob": 15.99,
+   "histSvarPcob": 20.11,
+   "histSvarDiff": -4.12,
+   "path": [
+    "Equity Client Financing",
+    "NA",
+    "Equity Client Financing NA"
+   ],
+   "node": "L4O-L6Q",
+   "ntr": "43310 / 3"
+  },
+  {
+   "id": "row_4",
+   "name": "Equity Derivatives EMEA",
+   "region": "EMEA",
+   "mcVarCob": 13.64,
+   "mcVarPcob": 13.8,
+   "mcVarDiff": -0.16,
+   "histVarCob": 12.42,
+   "histVarPcob": 12.71,
+   "histVarDiff": -0.29,
+   "mcSvarCob": 34.84,
+   "mcSvarPcob": 35.61,
+   "mcSvarDiff": -0.77,
+   "histSvarCob": 32.76,
+   "histSvarPcob": 32.76,
+   "histSvarDiff": 0,
+   "path": [
+    "Equity Derivatives",
+    "EMEA",
+    "Equity Derivatives EMEA"
+   ],
+   "node": "L4H-L6Y",
+   "ntr": "47267 / 1"
+  },
+  {
+   "id": "row_5",
+   "name": "Equity Cash Latam",
+   "region": "Latam",
+   "mcVarCob": 12.88,
+   "mcVarPcob": 12.96,
+   "mcVarDiff": -0.08,
+   "histVarCob": 11.35,
+   "histVarPcob": 11.34,
+   "histVarDiff": 0.01,
+   "mcSvarCob": 9.5,
+   "mcSvarPcob": 9.48,
+   "mcSvarDiff": 0.02,
+   "histSvarCob": 8.48,
+   "histSvarPcob": 8.4,
+   "histSvarDiff": 0.08,
+   "path": [
+    "Equity Cash",
+    "Latam",
+    "Equity Cash Latam"
+   ],
+   "node": "L4J-L62",
+   "ntr": "44441 / 2"
+  },
+  {
+   "id": "row_6",
+   "name": "Equity Client Financing EMEA",
+   "region": "EMEA",
+   "mcVarCob": 12.43,
+   "mcVarPcob": 15.19,
+   "mcVarDiff": -2.76,
+   "histVarCob": 11.56,
+   "histVarPcob": 14.21,
+   "histVarDiff": -2.65,
+   "mcSvarCob": 12.23,
+   "mcSvarPcob": 12.81,
+   "mcSvarDiff": -0.58,
+   "histSvarCob": 10.7,
+   "histSvarPcob": 11.27,
+   "histSvarDiff": -0.57,
+   "path": [
+    "Equity Client Financing",
+    "EMEA",
+    "Equity Client Financing EMEA"
+   ],
+   "node": "L5Z-L7D",
+   "ntr": "47247 / 3"
+  },
+  {
+   "id": "row_7",
+   "name": "Equity Client Financing APAC",
+   "region": "APAC",
+   "mcVarCob": 11.4,
+   "mcVarPcob": 5.05,
+   "mcVarDiff": 6.35,
+   "histVarCob": 10.38,
+   "histVarPcob": 4.69,
+   "histVarDiff": 5.69,
+   "mcSvarCob": 28.23,
+   "mcSvarPcob": 11.2,
+   "mcSvarDiff": 17.03,
+   "histSvarCob": 27.14,
+   "histSvarPcob": 10.95,
+   "histSvarDiff": 16.19,
+   "path": [
+    "Equity Client Financing",
+    "APAC",
+    "Equity Client Financing APAC"
+   ],
+   "node": "L5Y-L7F",
+   "ntr": "47844 / 1"
+  },
+  {
+   "id": "row_8",
+   "name": "Hybrid & Fund Derivatives",
+   "region": "Global",
+   "mcVarCob": 6.9,
+   "mcVarPcob": 7.92,
+   "mcVarDiff": -1.02,
+   "histVarCob": 6.2,
+   "histVarPcob": 7,
+   "histVarDiff": -0.8,
+   "mcSvarCob": 9.39,
+   "mcSvarPcob": 9.33,
+   "mcSvarDiff": 0.06,
+   "histSvarCob": 8.78,
+   "histSvarPcob": 8.47,
+   "histSvarDiff": 0.31,
+   "path": [
+    "Hybrid & Fund Derivatives",
+    "Global",
+    "Hybrid & Fund Derivatives"
+   ],
+   "node": "L5R-L7(",
+   "ntr": "42015 / 2"
+  },
+  {
+   "id": "row_9",
+   "name": "Equity Cash NA",
+   "region": "NA",
+   "mcVarCob": 6.18,
+   "mcVarPcob": 8.03,
+   "mcVarDiff": -1.85,
+   "histVarCob": 5.86,
+   "histVarPcob": 7.52,
+   "histVarDiff": -1.66,
+   "mcSvarCob": 6.95,
+   "mcSvarPcob": 10.37,
+   "mcSvarDiff": -3.42,
+   "histSvarCob": 6.79,
+   "histSvarPcob": 9.91,
+   "histSvarDiff": -3.12,
+   "path": [
+    "Equity Cash",
+    "NA",
+    "Equity Cash NA"
+   ],
+   "node": "L3H-L5J",
+   "ntr": "46477 / 3"
+  },
+  {
+   "id": "row_10",
+   "name": "Global Convertibles",
+   "region": "Global",
+   "mcVarCob": 6.07,
+   "mcVarPcob": 5.81,
+   "mcVarDiff": 0.26,
+   "histVarCob": 5.76,
+   "histVarPcob": 5.53,
+   "histVarDiff": 0.23,
+   "mcSvarCob": 4.31,
+   "mcSvarPcob": 4.29,
+   "mcSvarDiff": 0.02,
+   "histSvarCob": 3.89,
+   "histSvarPcob": 3.89,
+   "histSvarDiff": 0,
+   "path": [
+    "Global Convertibles",
+    "Global",
+    "Global Convertibles"
+   ],
+   "node": "L5V-L72",
+   "ntr": "48363 / 1"
+  },
+  {
+   "id": "row_11",
+   "name": "Equity Cash EMEA",
+   "region": "EMEA",
+   "mcVarCob": 3.87,
+   "mcVarPcob": 3.96,
+   "mcVarDiff": -0.09,
+   "histVarCob": 3.72,
+   "histVarPcob": 3.89,
+   "histVarDiff": -0.17,
+   "mcSvarCob": 3.49,
+   "mcSvarPcob": 3.59,
+   "mcSvarDiff": -0.1,
+   "histSvarCob": 3.06,
+   "histSvarPcob": 3.22,
+   "histSvarDiff": -0.16,
+   "path": [
+    "Equity Cash",
+    "EMEA",
+    "Equity Cash EMEA"
+   ],
+   "node": "L3K-L5*",
+   "ntr": "42982 / 2"
+  },
+  {
+   "id": "row_12",
+   "name": "Equity Derivatives APAC",
+   "region": "APAC",
+   "mcVarCob": 3.41,
+   "mcVarPcob": 11.84,
+   "mcVarDiff": -8.43,
+   "histVarCob": 3.09,
+   "histVarPcob": 10.43,
+   "histVarDiff": -7.34,
+   "mcSvarCob": 3.1,
+   "mcSvarPcob": 14.11,
+   "mcSvarDiff": -11.01,
+   "histSvarCob": 2.68,
+   "histSvarPcob": 12.47,
+   "histSvarDiff": -9.79,
+   "path": [
+    "Equity Derivatives",
+    "APAC",
+    "Equity Derivatives APAC"
+   ],
+   "node": "L4G-L6B",
+   "ntr": "47864 / 3"
+  },
+  {
+   "id": "row_13",
+   "name": "Equity Cash APAC",
+   "region": "APAC",
+   "mcVarCob": 2.59,
+   "mcVarPcob": 2.62,
+   "mcVarDiff": -0.03,
+   "histVarCob": 2.38,
+   "histVarPcob": 2.37,
+   "histVarDiff": 0.01,
+   "mcSvarCob": 3.42,
+   "mcSvarPcob": 3.28,
+   "mcSvarDiff": 0.14,
+   "histSvarCob": 3.16,
+   "histSvarPcob": 3.03,
+   "histSvarDiff": 0.13,
+   "path": [
+    "Equity Cash",
+    "APAC",
+    "Equity Cash APAC"
+   ],
+   "node": "L3J-L5-",
+   "ntr": "43579 / 1"
+  },
+  {
+   "id": "row_14",
+   "name": "Equity Client Financing Latam",
+   "region": "Latam",
+   "mcVarCob": 1.03,
+   "mcVarPcob": 1.01,
+   "mcVarDiff": 0.02,
+   "histVarCob": 0.98,
+   "histVarPcob": 0.97,
+   "histVarDiff": 0.01,
+   "mcSvarCob": 1.17,
+   "mcSvarPcob": 1.01,
+   "mcSvarDiff": 0.16,
+   "histSvarCob": 1.02,
+   "histSvarPcob": 0.85,
+   "histSvarDiff": 0.17,
+   "path": [
+    "Equity Client Financing",
+    "Latam",
+    "Equity Client Financing Latam"
+   ],
+   "node": "L4U-L6.",
+   "ntr": "45392 / 2"
+  },
+  {
+   "id": "row_15",
+   "name": "Equity Derivatives Latam",
+   "region": "Latam",
+   "mcVarCob": 0.6,
+   "mcVarPcob": 0.62,
+   "mcVarDiff": -0.02,
+   "histVarCob": 0.55,
+   "histVarPcob": 0.58,
+   "histVarDiff": -0.03,
+   "mcSvarCob": 0.84,
+   "mcSvarPcob": 0.96,
+   "mcSvarDiff": -0.12,
+   "histSvarCob": 0.79,
+   "histSvarPcob": 0.89,
+   "histSvarDiff": -0.1,
+   "path": [
+    "Equity Derivatives",
+    "Latam",
+    "Equity Derivatives Latam"
+   ],
+   "node": "L4Q-L6*",
+   "ntr": "44420 / 3"
+  }
+ ]
+}

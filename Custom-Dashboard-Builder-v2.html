@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Custom Dashboard Builder v2 · Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:radial-gradient(1100px 520px at 88% -8%,#e2ebff 0,rgba(226,235,255,0) 62%),linear-gradient(180deg,#eef2f9 0,#f4f6fa 520px);background-attachment:fixed;color:#101828;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+button,input,textarea{font-family:inherit}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#d4d9e1;border-radius:10px;border:3px solid transparent;background-clip:content-box}::-webkit-scrollbar-track{background:transparent}
+@keyframes omFade{from{opacity:0}to{opacity:1}}
+@keyframes omSlide{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes omPop{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #5b86f5;outline-offset:2px}
+::selection{background:#d6e2fb}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<template id="tpl">
+<div style="min-height:100vh;display:flex;flex-wrap:wrap">
+
+<aside style="position:sticky;top:12px;margin:12px 0 12px 12px;height:calc(100vh - 24px);border-radius:20px;flex:0 0 248px;background:radial-gradient(420px 260px at 0 0,rgba(79,124,240,.28) 0,rgba(79,124,240,0) 70%),linear-gradient(180deg,#1a2b5c 0,#14224a 45%,#0f1a3a 100%);color:#d3dbef;display:flex;flex-direction:column;border:1px solid rgba(255,255,255,.06);box-shadow:0 20px 40px -18px rgba(15,26,58,.55),0 2px 6px rgba(15,26,58,.18),inset 0 1px 0 rgba(255,255,255,.08);overflow:hidden;z-index:25">
+  <div style="display:flex;align-items:center;gap:10px;padding:18px 16px 14px;min-height:68px">
+    <div style="flex:none;width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#5b86f5,#2550ad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;box-shadow:0 4px 12px -2px rgba(47,98,201,.55),inset 0 1px 0 rgba(255,255,255,.25)">MR</div>
+    <div style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1">
+      <span style="font-size:14.5px;font-weight:700;color:#fff;white-space:nowrap">Risk Analytics</span>
+      <span style="align-self:flex-start;font-size:9.5px;font-weight:700;letter-spacing:.08em;color:#f0d48f;border:1px solid rgba(240,212,143,.4);background:rgba(240,212,143,.1);padding:1px 6px;border-radius:999px">UAT</span>
+    </div>
+  </div>
+  <nav aria-label="Dashboards" style="flex:1;overflow-y:auto;padding:6px 10px;display:flex;flex-direction:column;gap:2px">
+    <sc-for list="{{ nav }}" as="g" hint-placeholder-count="5">
+      <sc-if value="{{ g.isHead }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:14px 8px 6px;font-size:10.5px;font-weight:700;letter-spacing:.08em;color:#8392bb">{{ g.label }}</div>
+      </sc-if>
+      <sc-if value="{{ g.isItem }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ g.onClick }}" style="display:flex;align-items:center;gap:10px;width:100%;border:0;text-align:left;cursor:pointer;border-radius:11px;padding:7px 10px 7px 8px;background:{{ g.bg }};color:{{ g.fg }};font-size:13px;font-weight:{{ g.fw }};box-shadow:{{ g.sh }};transition:background .18s ease,color .18s ease" style-hover="background:{{ g.hov }};color:#ffffff">
+          <span style="flex:none;width:28px;height:28px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:{{ g.icoBg }};color:{{ g.icoFg }}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="{{ g.icon }}"></path></svg></span>
+          <span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ g.label }}</span>
+          <sc-if value="{{ g.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="flex:none;font-size:9px;font-weight:700;padding:2px 6px;border-radius:999px;background:{{ g.badgeBg }};color:{{ g.badgeFg }}">{{ g.badge }}</span></sc-if>
+        </button>
+      </sc-if>
+    </sc-for>
+  </nav>
+  <div style="padding:12px 16px;border-top:1px solid rgba(255,255,255,.07);font-size:11px;line-height:1.45;color:#8392bb">Figures in $MM. Intercompany exposures excluded.</div>
+</aside>
+
+<div style="flex:999 1 560px;min-width:0;display:flex;flex-direction:column;padding:0 20px 0 16px">
+
+<div style="position:sticky;top:0;z-index:40;margin:0 -20px 4px -16px;padding:12px 20px 10px 16px;display:flex;flex-direction:column;gap:10px;background:linear-gradient(180deg,rgba(238,242,249,.95),rgba(238,242,249,.86));backdrop-filter:saturate(170%) blur(14px);-webkit-backdrop-filter:saturate(170%) blur(14px)">
+<header style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
+  <div style="display:flex;flex-direction:column;gap:3px;min-width:220px;flex:1 1 260px">
+    <div style="display:flex;gap:6px;font-size:12px;color:#667085;white-space:nowrap"><span>My dashboards</span><span style="color:#b0b8c6">/</span><span>{{ crumb }}</span></div>
+    <div style="display:flex;align-items:center;gap:10px;min-width:0">
+      <sc-if value="{{ isView }}" hint-placeholder-val="{{ true }}">
+        <h1 style="margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:22px;font-weight:700;letter-spacing:-0.02em;color:#0f1a3a">{{ dashName }}</h1>
+        <button onClick="{{ openHistory }}" title="Version history" style="flex:none;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#475467;padding:3px 9px;border-radius:999px;background:#fff;border:1px solid #e2e8f2;cursor:pointer;font-family:'IBM Plex Mono',monospace" style-hover="border-color:#bcd0f5;color:#1d4596"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"></path></svg>{{ verLabel }}</button>
+      </sc-if>
+      <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ false }}">
+        <label style="display:flex;flex:1;min-width:0"><span class="vh">Dashboard name</span>
+          <input value="{{ dashName }}" onChange="{{ onName }}" style="flex:1;min-width:0;max-width:420px;height:36px;padding:0 12px;border:1px solid #bcd0f5;border-radius:10px;background:#fff;font-size:19px;font-weight:700;letter-spacing:-0.02em;color:#0f1a3a;box-shadow:0 0 0 3px rgba(91,134,245,.12)">
+        </label>
+        <span style="flex:none;font-size:9.5px;font-weight:700;letter-spacing:.1em;color:#2f62c9;background:#e8efff;border:1px solid #c9d7f5;padding:3px 8px;border-radius:999px">EDITING</span>
+      </sc-if>
+    </div>
+  </div>
+  <div style="flex:0 1 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px;margin-left:auto">
+    <div style="flex:none;display:flex;align-items:center;gap:9px;height:42px;padding:0 12px;background:#fff;border:1px solid #e2e8f2;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);color:#2f62c9">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" aria-hidden="true" style="flex:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M4 6h16v14H4zM4 10h16M8 3v4M16 3v4"></path></svg>
+      <span style="display:flex;flex-direction:column;gap:1px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.08em;color:#667085">COB</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:#101828">11-Sep-2026</span></span>
+    </div>
+    <sc-if value="{{ hasCompare }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:none;display:flex;align-items:center;gap:9px;height:42px;padding:0 12px;background:#fff;border:1px solid #e2e8f2;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05);color:#2f62c9">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" aria-hidden="true" style="flex:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M7 7h13M17 4l3 3-3 3M17 17H4M7 14l-3 3 3 3"></path></svg>
+        <span style="display:flex;flex-direction:column;gap:1px"><span style="font-size:9.5px;font-weight:700;letter-spacing:.08em;color:#667085">PCOB</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;color:#101828">{{ pcob }}</span></span>
+      </div>
+      <div style="flex:none;display:flex;gap:2px;padding:3px;background:#fff;border:1px solid #e2e8f2;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05)">
+        <sc-for list="{{ compareOpts }}" as="o" hint-placeholder-count="3">
+          <button onClick="{{ o.onClick }}" style="border:0;height:34px;padding:0 14px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }};transition:all .18s ease">{{ o.label }}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isView }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ openJson }}" title="Show the saved document and merged filters" style="display:flex;align-items:center;gap:7px;flex:none;height:42px;padding:0 12px;border:1px solid #e2e8f2;background:#fff;color:#475467;border-radius:12px;cursor:pointer;box-shadow:0 1px 2px rgba(16,24,40,.05);font-size:12.5px;font-weight:600" style-hover="color:#2f62c9;border-color:#bcd0f5"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px">{ }</span>JSON</button>
+      <button onClick="{{ startEdit }}" disabled="{{ isPreview }}" style="display:flex;align-items:center;gap:8px;height:42px;padding:0 16px;border:0;border-radius:12px;background:linear-gradient(180deg,#2c4ea3,#1a2b5c);color:#fff;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;opacity:{{ editOp }};box-shadow:0 8px 18px -8px rgba(26,43,92,.7)" style-hover="filter:brightness(1.08)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>Edit dashboard</button>
+    </sc-if>
+    <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:none;display:flex;gap:2px;padding:3px;background:#fff;border:1px solid #e2e8f2;border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.05)">
+        <button onClick="{{ undo }}" disabled="{{ noUndo }}" aria-label="Undo" title="Undo" style="width:36px;height:34px;border:0;border-radius:9px;background:transparent;color:#475467;cursor:pointer;opacity:{{ undoOp }};display:flex;align-items:center;justify-content:center" style-hover="background:#f3f6fc"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><path d="M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"></path></svg></button>
+        <button onClick="{{ redo }}" disabled="{{ noRedo }}" aria-label="Redo" title="Redo" style="width:36px;height:34px;border:0;border-radius:9px;background:transparent;color:#475467;cursor:pointer;opacity:{{ redoOp }};display:flex;align-items:center;justify-content:center" style-hover="background:#f3f6fc"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><path d="m15 14 5-5-5-5M20 9H9a5 5 0 0 0 0 10h3"></path></svg></button>
+      </div>
+      <span style="font-size:12px;color:#667085;white-space:nowrap">{{ draftNote }}</span>
+      <button onClick="{{ openAdd }}" style="display:flex;align-items:center;gap:7px;height:42px;padding:0 14px;border:1px solid #bcd0f5;border-radius:12px;background:#eef3fd;color:#1d4596;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap" style-hover="background:#e1eafc"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.2;stroke-linecap:round"><path d="M12 5v14M5 12h14"></path></svg>Add widget</button>
+      <button onClick="{{ cancelEdit }}" style="height:42px;padding:0 14px;border:1px solid #e2e8f2;border-radius:12px;background:#fff;color:#344054;font-size:13px;font-weight:600;cursor:pointer" style-hover="border-color:#bcd0f5">Cancel</button>
+      <button onClick="{{ save }}" style="display:flex;align-items:center;gap:7px;height:42px;padding:0 18px;border:0;border-radius:12px;background:linear-gradient(180deg,#2c4ea3,#1a2b5c);color:#fff;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 8px 18px -8px rgba(26,43,92,.7)" style-hover="filter:brightness(1.08)"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"></path></svg>Save</button>
+    </sc-if>
+  </div>
+</header>
+
+<sc-if value="{{ isPreview }}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:#fff7e6;border:1px solid #fedf89;color:#93370d;font-size:13px">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"></path></svg>
+    <b>Previewing {{ previewLabel }}</b><span>Read-only. The current version is unchanged until you restore.</span>
+    <span style="flex:1"></span>
+    <button onClick="{{ exitPreview }}" style="height:32px;padding:0 12px;border:1px solid #fedf89;border-radius:9px;background:#fff;color:#93370d;font-size:12.5px;font-weight:600;cursor:pointer">Back to current</button>
+    <button onClick="{{ restorePreview }}" style="height:32px;padding:0 14px;border:0;border-radius:9px;background:#b54708;color:#fff;font-size:12.5px;font-weight:600;cursor:pointer">Restore this version</button>
+  </div>
+</sc-if>
+
+<sc-if value="{{ hasBar }}" hint-placeholder-val="{{ true }}">
+<div style="background:radial-gradient(600px 120px at 0 0,rgba(91,134,245,.22) 0,rgba(91,134,245,0) 70%),linear-gradient(180deg,#1a2b5c,#101c40);border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:10px 12px;display:flex;flex-direction:column;gap:10px;box-shadow:0 18px 36px -18px rgba(15,26,58,.75),0 2px 4px rgba(15,26,58,.12),inset 0 1px 0 rgba(255,255,255,.08)">
+  <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px">
+    <sc-for list="{{ barSecs }}" as="sec" hint-placeholder-count="4">
+      <div style="display:flex;align-items:center;gap:10px;padding:3px 10px 3px 3px;min-height:38px;border-radius:12px;background:{{ sec.secBg }};border:1px solid {{ sec.secBd }}">
+        <button onClick="{{ sec.onScope }}" title="{{ sec.tip }}" style="align-self:stretch;display:flex;align-items:center;gap:6px;padding:0 8px;border:0;border-radius:9px;background:rgba(91,134,245,.16);font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#a9c0ff;white-space:nowrap;cursor:{{ sec.cur }}">{{ sec.label }}<sc-if value="{{ sec.showCount }}" hint-placeholder-val="{{ false }}"><span style="min-width:17px;height:17px;padding:0 5px;border-radius:999px;background:{{ sec.cntBg }};color:#fff;font-size:10px;letter-spacing:0;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace">{{ sec.count }}</span></sc-if><sc-if value="{{ sec.isEditable }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="M6 9l6 6 6-6"></path></svg></sc-if></button>
+        <div style="display:flex;flex-wrap:wrap;gap:2px;padding:2px;background:rgba(6,14,38,.38);border:1px solid rgba(255,255,255,.07);border-radius:10px">
+          <sc-for list="{{ sec.items }}" as="it" hint-placeholder-count="3">
+            <button onClick="{{ it.onPick }}" style="border:0;height:28px;padding:0 11px;border-radius:9px;font-size:12.5px;font-weight:600;white-space:nowrap;cursor:pointer;background:{{ it.bg }};color:{{ it.fg }};box-shadow:{{ it.sh }};transition:background .2s ease,color .2s ease" style-hover="color:#ffffff">{{ it.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+    <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto;font-size:11.5px;color:#8fa0cc;padding:0 6px">Click a filter name to choose which widgets it applies to</span></sc-if>
+  </div>
+  <sc-if value="{{ scopeOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:#fff;color:#101828;animation:omFade .15s ease both">
+      <div style="display:flex;align-items:center;gap:8px"><b style="font-size:13px">{{ scope.label }} applies to</b><span style="font-size:12px;color:#667085">{{ scope.summary }}</span><span style="flex:1"></span><button onClick="{{ scope.all }}" style="border:0;background:transparent;color:#2f62c9;font-size:12px;font-weight:600;cursor:pointer">All widgets</button><button onClick="{{ scope.close }}" aria-label="Close scoping" style="width:28px;height:28px;border:1px solid #e6ebf3;border-radius:8px;background:#fff;color:#475467;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2;stroke-linecap:round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <sc-for list="{{ scope.items }}" as="it" hint-placeholder-count="4"><button onClick="{{ it.onClick }}" disabled="{{ it.locked }}" title="{{ it.tip }}" style="display:flex;align-items:center;gap:7px;height:32px;padding:0 12px 0 8px;border-radius:999px;border:1px solid {{ it.bd }};background:{{ it.bg }};color:{{ it.fg }};font-size:12px;font-weight:600;cursor:pointer"><span style="flex:none;width:16px;height:16px;border-radius:5px;display:flex;align-items:center;justify-content:center;background:{{ it.boxBg }};border:1.5px solid {{ it.boxBd }};color:#fff"><svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"></path></svg></span>{{ it.label }}<span style="font-size:10.5px;color:#667085;font-weight:500">{{ it.tab }}</span></button></sc-for>
+      </div>
+      <span style="font-size:11.5px;color:#667085">Widgets left out keep the default ({{ scope.def }}). Pinned widgets are set in their own Data tab.</span>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+<sc-if value="{{ hasXf }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-height:30px;padding:8px 12px;background:linear-gradient(180deg,rgba(26,43,92,.96),rgba(16,28,64,.96));border:1px solid rgba(255,255,255,.06);border-radius:14px;box-shadow:0 14px 28px -16px rgba(15,26,58,.7),inset 0 1px 0 rgba(255,255,255,.08)">
+  <span style="display:flex;align-items:center;gap:7px;font-size:10px;font-weight:700;letter-spacing:.09em;color:#8fa6e0;white-space:nowrap"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" aria-hidden="true" style="flex:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M4 5h16l-6 8v6l-4-2v-4L4 5z"></path></svg>CROSS-FILTERS</span>
+  <sc-if value="{{ noChips }}" hint-placeholder-val="{{ true }}"><span style="font-size:12px;color:#8fa0cc">Click a desk, limit or Greek region row to filter the rest of the dashboard</span></sc-if>
+  <sc-for list="{{ chips }}" as="c" hint-placeholder-count="0">
+    <div title="{{ c.tip }}" style="display:flex;align-items:center;gap:8px;height:30px;padding:0 4px 0 10px;background:#fff;border-radius:999px;box-shadow:0 6px 14px -6px rgba(0,0,0,.45);animation:omFade .2s ease both">
+      <span style="width:8px;height:8px;border-radius:3px;background:{{ c.dot }}"></span>
+      <span style="font-size:10px;color:#2f62c9;font-weight:700;letter-spacing:.06em">{{ c.kind }}</span>
+      <span style="font-size:12.5px;font-weight:600;color:#0f1a3a;white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis">{{ c.value }}</span>
+      <span style="font-size:11px;color:#667085;white-space:nowrap">→ {{ c.applies }}</span>
+      <button onClick="{{ c.clear }}" aria-label="Remove filter" style="width:22px;height:22px;border-radius:50%;border:0;background:#eef3fd;color:#2f62c9;cursor:pointer;font-size:13px;line-height:1" style-hover="background:#dbe6fb">×</button>
+    </div>
+  </sc-for>
+  <sc-if value="{{ hasChips }}" hint-placeholder-val="{{ false }}"><span style="flex:1"></span><button onClick="{{ clearXf }}" style="border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#dbe4fb;font-size:12px;font-weight:600;cursor:pointer;height:28px;padding:0 12px;border-radius:999px">Clear all</button></sc-if>
+</div>
+</sc-if>
+</div>
+
+<nav aria-label="Dashboard tabs" style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:4px;margin:6px 0 0;border-bottom:1px solid #dfe5ef">
+  <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="2">
+    <div onDragOver="{{ tb.onOver }}" onDrop="{{ tb.onDrop }}" style="display:flex;align-items:center;gap:6px;margin-bottom:-1px;padding:0 4px;border-radius:12px 12px 0 0;border:1px solid {{ tb.bd }};border-bottom-color:{{ tb.bdb }};background:{{ tb.bg }};box-shadow:{{ tb.sh }}">
+      <sc-if value="{{ tb.editing }}" hint-placeholder-val="{{ false }}">
+        <label style="display:flex"><span class="vh">Tab name</span><input value="{{ tb.name }}" onChange="{{ tb.onName }}" style="width:150px;height:30px;margin:5px 0 5px 6px;padding:0 8px;border:1px solid #bcd0f5;border-radius:8px;font-size:13px;font-weight:600;color:#0f1a3a"></label>
+      </sc-if>
+      <sc-if value="{{ tb.plain }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ tb.onClick }}" style="height:40px;padding:0 10px;border:0;background:transparent;font-size:13.5px;font-weight:{{ tb.fw }};color:{{ tb.fg }};cursor:pointer;white-space:nowrap">{{ tb.name }}</button>
+      </sc-if>
+      <span style="font-size:10.5px;font-weight:700;font-family:'IBM Plex Mono',monospace;color:{{ tb.cntFg }};background:{{ tb.cntBg }};border-radius:999px;padding:1px 7px;margin-right:6px">{{ tb.count }}</span>
+      <sc-if value="{{ tb.canDel }}" hint-placeholder-val="{{ false }}"><button onClick="{{ tb.onDel }}" aria-label="Delete tab" title="Delete tab (widgets move to the first tab)" style="width:24px;height:24px;margin-right:4px;border:0;border-radius:7px;background:transparent;color:#98a2b3;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:#fdeceb;color:#b42318"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.2;stroke-linecap:round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></sc-if>
+    </div>
+  </sc-for>
+  <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ addTab }}" style="display:flex;align-items:center;gap:6px;height:36px;margin:0 0 4px 4px;padding:0 12px;border:1px dashed #bcd0f5;border-radius:10px;background:transparent;color:#2f62c9;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="background:#fff"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.4;stroke-linecap:round"><path d="M12 5v14M5 12h14"></path></svg>Tab</button>
+    <span style="flex:1"></span>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#667085">LAYOUT</span>
+      <div role="group" aria-label="Tab layout" style="display:flex;gap:2px;padding:3px;background:#fff;border:1px solid #e2e8f2;border-radius:11px">
+        <sc-for list="{{ layoutOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" title="{{ o.tip }}" style="height:28px;padding:0 11px;border:0;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button></sc-for>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ isView }}" hint-placeholder-val="{{ true }}"><span style="flex:1"></span><span style="font-size:11.5px;color:#667085;margin-bottom:10px">{{ hiddenNote }}</span></sc-if>
+</nav>
+
+<main style="display:flex;flex-direction:column;gap:14px;padding:{{ mainPad }};margin:12px 0 24px;border-radius:20px;background:{{ mainBg }};border:{{ mainBd }}">
+
+  <sc-if value="{{ isEmptyEdit }}" hint-placeholder-val="{{ false }}">
+    <section style="display:flex;flex-direction:column;align-items:center;gap:18px;padding:48px 20px;text-align:center">
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><h2 style="margin:0;font-size:20px;font-weight:700;color:#0f1a3a">Start your dashboard</h2><span style="font-size:13.5px;color:#475467;max-width:520px;line-height:1.5">Pick widgets from any existing dashboard. They load live data with your filters, and the filter bar builds itself from what you add.</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;width:100%;max-width:820px">
+        <sc-for list="{{ starts }}" as="s" hint-placeholder-count="3">
+          <button onClick="{{ s.onClick }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:18px;border-radius:16px;border:1px solid #e6ebf3;background:#fff;cursor:pointer;text-align:left;box-shadow:0 1px 2px rgba(16,24,40,.04),0 10px 28px -16px rgba(20,34,74,.25)" style-hover="border-color:#bcd0f5">
+            <span style="width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#eef3fd;color:#2f62c9"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><path d="{{ s.icon }}"></path></svg></span>
+            <b style="font-size:14px;color:#101828">{{ s.title }}</b>
+            <span style="font-size:12.5px;color:#475467;line-height:1.45">{{ s.sub }}</span>
+          </button>
+        </sc-for>
+      </div>
+    </section>
+  </sc-if>
+  <sc-if value="{{ isEmptyTab }}" hint-placeholder-val="{{ false }}">
+    <section style="padding:40px 20px;text-align:center;font-size:13.5px;color:#475467">{{ emptyTabNote }}</section>
+  </sc-if>
+
+  <sc-for list="{{ rows }}" as="row" hint-placeholder-count="3">
+    <sc-if value="{{ dragging }}" hint-placeholder-val="{{ false }}">
+      <div onDragOver="{{ row.zone.onOver }}" onDrop="{{ row.zone.onDrop }}" style="height:42px;border:2px dashed {{ row.zone.bd }};border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#2f62c9;background:{{ row.zone.bg }}">Drop here for a new row</div>
+    </sc-if>
+    <section style="display:flex;flex-wrap:wrap;gap:14px;align-items:stretch">
+      <sc-for list="{{ row.cards }}" as="c" hint-placeholder-count="2">
+        <div draggable="{{ c.dragAttr }}" onDragStart="{{ c.onDragStart }}" onDragEnd="{{ onDragEnd }}" onDragOver="{{ c.onOver }}" onDrop="{{ c.onDrop }}" style="position:relative;flex:{{ c.flex }};min-width:{{ c.minW }}px;max-width:100%;background:{{ c.bg }};border:1px {{ c.bdStyle }} {{ c.bd }};border-radius:16px;box-shadow:{{ c.sh }};display:flex;flex-direction:column;overflow:hidden;opacity:{{ c.op }};transition:box-shadow .15s ease,opacity .15s ease">
+          <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 8px;background:#f5f8ff;border-bottom:1px dashed #c9d7f5">
+              <span title="Drag to move, or drop on a tab name" style="display:flex;align-items:center;justify-content:center;width:26px;height:28px;border-radius:7px;color:#5b7fc9;cursor:grab"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="9" cy="6" r="1.6"></circle><circle cx="15" cy="6" r="1.6"></circle><circle cx="9" cy="12" r="1.6"></circle><circle cx="15" cy="12" r="1.6"></circle><circle cx="9" cy="18" r="1.6"></circle><circle cx="15" cy="18" r="1.6"></circle></svg></span>
+              <button onClick="{{ c.onLeft }}" aria-label="Move left" title="Move left" style="width:28px;height:28px;border:1px solid #dbe4f6;border-radius:8px;background:#fff;color:#475467;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><path d="M15 6l-6 6 6 6"></path></svg></button>
+              <button onClick="{{ c.onRight }}" aria-label="Move right" title="Move right" style="width:28px;height:28px;border:1px solid #dbe4f6;border-radius:8px;background:#fff;color:#475467;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><path d="M9 6l6 6-6 6"></path></svg></button>
+              <sc-if value="{{ c.showSpans }}" hint-placeholder-val="{{ true }}">
+                <div role="group" aria-label="Width" style="display:flex;gap:1px;padding:2px;background:#fff;border:1px solid #dbe4f6;border-radius:9px">
+                  <sc-for list="{{ c.spans }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.onClick }}" title="{{ o.tip }}" style="min-width:30px;height:24px;padding:0 6px;border:0;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button></sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ c.autoNote }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;color:#5b7fc9">Auto grid sizes this tab</span></sc-if>
+              <sc-if value="{{ c.canH }}" hint-placeholder-val="{{ true }}">
+                <div role="group" aria-label="Height" style="display:flex;gap:1px;padding:2px;background:#fff;border:1px solid #dbe4f6;border-radius:9px">
+                  <sc-for list="{{ c.hs }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" title="{{ o.tip }}" style="min-width:26px;height:24px;padding:0 6px;border:0;border-radius:7px;font-size:11.5px;font-weight:700;cursor:pointer;background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button></sc-for>
+                </div>
+              </sc-if>
+              <span style="flex:1"></span>
+              <button onClick="{{ c.onCfg }}" style="display:flex;align-items:center;gap:6px;height:28px;padding:0 10px;border:1px solid #bcd0f5;border-radius:8px;background:#fff;color:#1d4596;font-size:12px;font-weight:600;cursor:pointer" style-hover="background:#eef3fd"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"></path></svg>{{ c.cfgLabel }}</button>
+              <sc-if value="{{ c.canSaveMine }}" hint-placeholder-val="{{ true }}"><button onClick="{{ c.onMine }}" aria-label="Save as my widget" title="Save as my widget" style="width:28px;height:28px;border:1px solid #dbe4f6;border-radius:8px;background:#fff;color:#475467;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="color:#2f62c9;border-color:#bcd0f5"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><path d="M6 3h12v18l-6-4-6 4z"></path></svg></button></sc-if>
+              <button onClick="{{ c.onDup }}" aria-label="Duplicate" title="Duplicate" style="width:28px;height:28px;border:1px solid #dbe4f6;border-radius:8px;background:#fff;color:#475467;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="color:#2f62c9;border-color:#bcd0f5"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><path d="M9 9h11v11H9zM5 15H4V4h11v1"></path></svg></button>
+              <button onClick="{{ c.onDel }}" aria-label="Remove widget" title="Remove" style="width:28px;height:28px;border:1px solid #f1d6d2;border-radius:8px;background:#fff;color:#b42318;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="background:#fdeceb"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg></button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ c.isHeader }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:12px;padding:{{ c.hdrPad }}">
+              <h2 style="margin:0;font-size:17px;font-weight:700;color:#0f1a3a;letter-spacing:-0.01em;white-space:nowrap">{{ c.title }}</h2>
+              <span style="flex:1;height:1px;background:linear-gradient(90deg,#c9d4e8,rgba(201,212,232,0))"></span>
+              <sc-if value="{{ c.hasChips }}" hint-placeholder-val="{{ false }}"><sc-for list="{{ c.chips }}" as="ch" hint-placeholder-count="1"><span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:{{ ch.bg }};color:{{ ch.fg }};border:1px solid {{ ch.bd }}">{{ ch.label }}</span></sc-for></sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ c.isCard }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px;padding:14px 16px 10px">
+            <div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><h2 style="margin:0;font-size:15px;font-weight:600;color:#101828;letter-spacing:-0.005em">{{ c.title }}</h2><sc-if value="{{ c.hasTag }}" hint-placeholder-val="{{ true }}"><span style="font-size:10px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:999px;background:{{ c.tagBg }};color:{{ c.tagFg }}">{{ c.tag }}</span></sc-if></div>
+              <sc-if value="{{ c.hasSub }}" hint-placeholder-val="{{ true }}"><span style="font-size:12px;color:#667085">{{ c.sub }}</span></sc-if>
+              <sc-if value="{{ c.hasChips }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-wrap:wrap;gap:5px">
+                  <sc-for list="{{ c.chips }}" as="ch" hint-placeholder-count="1"><span title="{{ ch.tip }}" style="display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;background:{{ ch.bg }};color:{{ ch.fg }};border:1px solid {{ ch.bd }};white-space:nowrap"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><path d="{{ ch.icon }}"></path></svg>{{ ch.label }}</span></sc-for>
+                </div>
+              </sc-if>
+            </div>
+            <sc-if value="{{ c.showExport }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ c.onExport }}" aria-label="Export data" title="Export data" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:10px;border:1px solid #e6ebf3;background:#fff;color:#667085;cursor:pointer" style-hover="color:#2f62c9;border-color:#bcd0f5;background:#f3f6fc"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"></path></svg></button>
+            </sc-if>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ c.isText }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:0 16px 16px;font-size:13.5px;line-height:1.6;color:#344054;white-space:pre-line">{{ c.text }}</div>
+          </sc-if>
+
+          <sc-if value="{{ c.isGrid }}" hint-placeholder-val="{{ false }}">
+            <div style="height:{{ c.bodyH }};overflow:auto;border-top:1px solid #eef1f6">
+              <div style="min-width:{{ c.g.minW }}px">
+                <div style="position:sticky;top:0;z-index:3;background:#f8fafd;border-bottom:1px solid #e6ebf3">
+                  <sc-if value="{{ c.g.hasBands }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:grid;grid-template-columns:{{ c.g.gtc }}">
+                      <sc-for list="{{ c.g.bands }}" as="b" hint-placeholder-count="4"><div style="grid-column:span {{ b.span }};position:{{ b.pos }};left:0;z-index:{{ b.z }};background:#f8fafd;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 8px 2px;font-size:11.5px;font-weight:700;color:{{ b.color }};white-space:nowrap;border-left:{{ b.bl }};box-shadow:{{ b.sh }}"><sc-if value="{{ b.hasDot }}" hint-placeholder-val="{{ true }}"><span style="width:7px;height:7px;border-radius:2px;background:{{ b.color }}"></span></sc-if>{{ b.label }}</div></sc-for>
+                    </div>
+                  </sc-if>
+                  <div style="display:grid;grid-template-columns:{{ c.g.gtc }}">
+                    <sc-for list="{{ c.g.heads }}" as="h" hint-placeholder-count="8"><button onClick="{{ h.onSort }}" style="position:{{ h.pos }};left:0;z-index:{{ h.z }};display:flex;align-items:flex-end;justify-content:{{ h.just }};gap:4px;padding:7px 10px 8px {{ h.pl }}px;border:0;border-left:{{ h.bl }};background:#f8fafd;font-size:11px;font-weight:600;color:{{ h.fg }};white-space:nowrap;cursor:pointer;text-align:left">{{ h.label }}<span style="color:#98a2b3">{{ h.arrow }}</span></button></sc-for>
+                  </div>
+                </div>
+                <sc-for list="{{ c.g.rows }}" as="r" hint-placeholder-count="10">
+                  <div onClick="{{ r.onClick }}" style="display:grid;grid-template-columns:{{ c.g.gtc }};font-size:13px;border-bottom:1px solid #f1f3f7;cursor:{{ r.cur }};background:{{ r.bg }};box-shadow:{{ r.sh }}" style-hover="background:#f5f8fd">
+                    <sc-for list="{{ r.cells }}" as="x" hint-placeholder-count="8">
+                      <div style="position:{{ x.pos }};left:0;z-index:{{ x.z }};background:{{ x.bg }};display:flex;align-items:center;justify-content:{{ x.just }};gap:8px;padding:{{ rowPad }} 10px {{ rowPad }} {{ x.pl }}px;font-family:{{ x.ff }};color:{{ x.color }};font-weight:{{ x.fw }};white-space:nowrap;min-width:0;border-left:{{ x.bl }};border-right:{{ x.br }}">
+                        <sc-if value="{{ x.hasBar }}" hint-placeholder-val="{{ false }}"><span style="position:relative;flex:none;width:56px;height:6px;border-radius:4px;background:#eef1f6;overflow:hidden"><span style="position:absolute;left:0;top:0;bottom:0;width:{{ x.barW }}%;background:{{ x.barC }};border-radius:4px"></span></span></sc-if>
+                        <sc-if value="{{ x.isBadge }}" hint-placeholder-val="{{ false }}"><span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;background:#eef1f6;color:#344054">{{ x.text }}</span></sc-if>
+                        <sc-if value="{{ x.plain }}" hint-placeholder-val="{{ true }}"><span title="{{ x.text }}" style="overflow:hidden;text-overflow:ellipsis">{{ x.text }}</span></sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ c.g.empty }}" hint-placeholder-val="{{ false }}"><div style="padding:28px 18px;font-size:13px;color:#667085">No rows for these filters.</div></sc-if>
+                <sc-if value="{{ c.g.hasTot }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:sticky;bottom:0;z-index:3;display:grid;grid-template-columns:{{ c.g.gtc }};background:#f5f8fc;border-top:1px solid #d9e0ea;box-shadow:0 -8px 16px -12px rgba(16,24,40,.2);font-size:13px">
+                    <sc-for list="{{ c.g.tot }}" as="x" hint-placeholder-count="8"><div style="position:{{ x.pos }};left:0;z-index:{{ x.z }};background:#f5f8fc;display:flex;align-items:center;justify-content:{{ x.just }};padding:9px 10px 9px {{ x.pl }}px;font-family:{{ x.ff }};color:{{ x.color }};font-weight:700;white-space:nowrap;border-left:{{ x.bl }};border-right:{{ x.br }}">{{ x.text }}</div></sc-for>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ c.isChart }}" hint-placeholder-val="{{ false }}">
+            <div style="height:{{ c.bodyH }};padding:0 16px 14px;display:flex;flex-direction:column;gap:10px">
+              <sc-if value="{{ c.ch.hasStats }}" hint-placeholder-val="{{ false }}">
+                <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+                  <sc-for list="{{ c.ch.stats }}" as="st" hint-placeholder-count="2"><div style="display:flex;flex-direction:column;gap:2px;padding:8px 12px;border-radius:12px;background:{{ st.bg }};border:1px solid {{ st.bd }}"><span style="font-size:10px;font-weight:700;letter-spacing:.08em;color:#667085">{{ st.label }}</span><span style="display:flex;align-items:baseline;gap:8px"><b style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#101828">{{ st.val }}</b><span style="font-size:11.5px;font-weight:600;color:{{ st.noteFg }}">{{ st.note }}</span></span></div></sc-for>
+                </div>
+              </sc-if>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <sc-for list="{{ c.ch.legend }}" as="lg" hint-placeholder-count="4"><span style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:#475467;border:1px solid #e6ebf3;border-radius:999px;padding:3px 10px;background:#fff"><span style="width:8px;height:8px;border-radius:2px;background:{{ lg.color }}"></span>{{ lg.label }}<b style="font-family:'IBM Plex Mono',monospace;font-weight:600;color:#101828">{{ lg.val }}</b></span></sc-for>
+              </div>
+              <div style="position:relative;flex:1;min-height:150px">
+                <svg viewBox="0 0 640 250" preserveAspectRatio="none" role="img" aria-label="{{ c.title }}" style="position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible">
+                  <sc-for list="{{ c.ch.grid }}" as="t" hint-placeholder-count="5"><line x1="44" x2="630" y1="{{ t.y }}" y2="{{ t.y }}" stroke="#eef1f6" vector-effect="non-scaling-stroke"></line></sc-for>
+                  <sc-for list="{{ c.ch.bars }}" as="b" hint-placeholder-count="0"><rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" rx="1.2" fill="{{ b.fill }}"></rect></sc-for>
+                  <sc-for list="{{ c.ch.paths }}" as="p" hint-placeholder-count="0"><path d="{{ p.d }}" fill="none" stroke="{{ p.color }}" vector-effect="non-scaling-stroke" style="stroke-width:{{ p.sw }};stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:{{ p.dash }}"></path></sc-for>
+                </svg>
+                <div style="position:absolute;inset:0;pointer-events:none">
+                  <sc-for list="{{ c.ch.yLab }}" as="t" hint-placeholder-count="0"><span style="position:absolute;left:{{ t.lp }}%;top:{{ t.tp }}%;transform:translate(-100%,-50%);font-size:11px;font-family:'IBM Plex Mono',monospace;color:#667085;white-space:nowrap;padding-right:6px">{{ t.label }}</span></sc-for>
+                  <sc-for list="{{ c.ch.xLab }}" as="t" hint-placeholder-count="0"><span style="position:absolute;left:{{ t.lp }}%;top:{{ t.tp }}%;transform:translate(-50%,-50%);font-size:11px;color:#667085;white-space:nowrap">{{ t.label }}</span></sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ c.isKpi }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;padding:0 16px 16px">
+              <sc-for list="{{ c.kpis }}" as="k" hint-placeholder-count="4">
+                <div style="display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:14px;background:linear-gradient(180deg,#fbfcfe,#f5f8fc);border:1px solid #e6ebf3;box-shadow:inset 0 2px 0 {{ k.accent }}">
+                  <span style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:#667085">{{ k.label }}</span>
+                  <b style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:#0f1a3a">{{ k.val }}</b>
+                  <span style="font-size:12px;font-weight:600;color:{{ k.subFg }}">{{ k.sub }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ c.isAlerts }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 14px">
+              <sc-if value="{{ c.noAlerts }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#067647;font-weight:600">No limits above 80% for these filters.</span></sc-if>
+              <sc-for list="{{ c.alerts }}" as="a" hint-placeholder-count="2">
+                <button onClick="{{ a.onClick }}" title="{{ a.tip }}" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 8px;border-radius:999px;border:1px solid {{ a.bd }};background:{{ a.bg }};cursor:pointer;text-align:left">
+                  <span style="font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:{{ a.tagBg }};color:{{ a.tagFg }}">{{ a.status }}</span>
+                  <b style="font-size:12.5px;color:#101828;white-space:nowrap">{{ a.name }}</b>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#667085">{{ a.id }}</span>
+                  <b style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:{{ a.tagFg }}">{{ a.util }}</b>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ c.isList }}" hint-placeholder-val="{{ false }}">
+            <div style="height:{{ c.bodyH }};overflow:auto;border-top:1px solid #eef1f6;padding:4px 0">
+              <sc-for list="{{ c.list }}" as="li" hint-placeholder-count="5">
+                <div style="display:flex;flex-direction:column;gap:5px;padding:8px 16px;border-bottom:1px solid #f4f6f9">
+                  <div style="display:flex;align-items:baseline;gap:8px"><span style="flex:1;min-width:0;font-size:12.5px;font-weight:600;color:#101828;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ li.name }}</span><b style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:{{ li.color }}">{{ li.val }}</b><sc-if value="{{ li.hasDiff }}" hint-placeholder-val="{{ false }}"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:{{ li.dFg }}">{{ li.diff }}</span></sc-if></div>
+                  <span style="height:5px;border-radius:4px;background:#eef1f6;overflow:hidden;display:block"><span style="display:block;height:100%;width:{{ li.w }}%;background:{{ li.barC }};border-radius:4px"></span></span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </section>
+  </sc-for>
+  <sc-if value="{{ dragging }}" hint-placeholder-val="{{ false }}">
+    <div onDragOver="{{ endZone.onOver }}" onDrop="{{ endZone.onDrop }}" style="height:56px;border:2px dashed {{ endZone.bd }};border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#2f62c9;background:{{ endZone.bg }}">Drop here for a new row at the bottom</div>
+  </sc-if>
+  <sc-if value="{{ showAddTile }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ openAdd }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:64px;border:2px dashed #bcd0f5;border-radius:16px;background:rgba(255,255,255,.6);color:#2f62c9;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:#fff;border-color:#5b86f5"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.2;stroke-linecap:round"><path d="M12 5v14M5 12h14"></path></svg>Add widget to “{{ tabName }}”</button>
+  </sc-if>
+</main>
+</div>
+
+<sc-if value="{{ drawerAdd }}" hint-placeholder-val="{{ false }}">
+<aside aria-label="Add widget" style="position:fixed;top:12px;right:12px;bottom:12px;width:min(440px,calc(100vw - 24px));z-index:80;display:flex;flex-direction:column;background:#fff;border:1px solid #e6ebf3;border-radius:20px;box-shadow:0 30px 60px -20px rgba(15,26,58,.45),0 2px 8px rgba(15,26,58,.1);animation:omSlide .2s ease both;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:10px;padding:16px 16px 10px">
+    <div style="display:flex;flex-direction:column;gap:2px;flex:1"><b style="font-size:16px;color:#0f1a3a">Add widget</b><span style="font-size:12px;color:#667085">Adds to “{{ tabName }}”. Click Add, or drag onto the page or a tab name.</span></div>
+    <button onClick="{{ closeDrawer }}" aria-label="Close" style="width:34px;height:34px;border:1px solid #e6ebf3;border-radius:10px;background:#fff;color:#475467;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2;stroke-linecap:round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;padding:0 16px 12px;border-bottom:1px solid #eef1f6">
+    <label style="display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid #e2e8f2;border-radius:12px;background:#f8fafd;color:#667085"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" aria-hidden="true" style="flex:none;stroke-width:2;stroke-linecap:round"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"></path></svg><span class="vh">Search widgets</span><input value="{{ q }}" onChange="{{ onQ }}" placeholder="Search widgets, e.g. limits, delta" style="flex:1;min-width:0;border:0;background:transparent;font-size:13px;color:#101828;outline:none"></label>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <sc-for list="{{ cats }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.onClick }}" style="height:30px;padding:0 12px;border-radius:999px;border:1px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};font-size:12px;font-weight:600;cursor:pointer">{{ o.label }}</button></sc-for>
+    </div>
+  </div>
+  <div style="flex:1;overflow:auto;padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px">
+    <sc-if value="{{ noTpl }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#667085;padding:20px 0;text-align:center">No widgets match.</span></sc-if>
+    <sc-for list="{{ tpls }}" as="t" hint-placeholder-count="6">
+      <sc-if value="{{ t.head }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-weight:700;letter-spacing:.09em;color:#667085;padding:6px 2px 0">{{ t.headLabel }}</span></sc-if>
+      <sc-if value="{{ t.item }}" hint-placeholder-val="{{ true }}">
+        <div draggable="true" onDragStart="{{ t.onDragStart }}" onDragEnd="{{ onDragEnd }}" style="display:flex;gap:12px;padding:12px;border:1px solid {{ t.bd }};border-radius:14px;background:{{ t.bg }};cursor:grab" style-hover="border-color:#bcd0f5;box-shadow:0 10px 24px -16px rgba(20,34,74,.4)">
+          <span style="flex:none;width:64px;height:48px;border-radius:10px;background:linear-gradient(180deg,#f3f6fc,#e8eefb);display:flex;align-items:center;justify-content:center;color:#3a6ae6"><svg viewBox="0 0 64 48" width="52" height="38" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><path d="{{ t.glyph }}"></path></svg></span>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><b style="font-size:13.5px;color:#101828">{{ t.title }}</b><span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;background:#eef1f6;color:#475467">{{ t.kind }}</span></div>
+            <span style="font-size:12px;color:#475467;line-height:1.4">{{ t.desc }}</span>
+            <span style="font-size:11px;color:#667085">{{ t.uses }}</span>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
+              <button onClick="{{ t.onAdd }}" style="display:flex;align-items:center;gap:5px;height:28px;padding:0 12px;border:0;border-radius:8px;background:linear-gradient(180deg,#2c4ea3,#1a2b5c);color:#fff;font-size:12px;font-weight:600;cursor:pointer"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.6;stroke-linecap:round"><path d="M12 5v14M5 12h14"></path></svg>Add</button>
+              <sc-if value="{{ t.onDash }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;font-weight:600;color:#067647">{{ t.onDashLabel }}</span></sc-if>
+              <sc-if value="{{ t.isMine }}" hint-placeholder-val="{{ false }}"><span style="flex:1"></span><button onClick="{{ t.onForget }}" style="border:0;background:transparent;color:#b42318;font-size:11.5px;font-weight:600;cursor:pointer">Remove</button></sc-if>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </sc-for>
+  </div>
+</aside>
+</sc-if>
+
+<sc-if value="{{ drawerCfg }}" hint-placeholder-val="{{ false }}">
+<aside aria-label="Configure widget" style="position:fixed;top:12px;right:12px;bottom:12px;width:min(440px,calc(100vw - 24px));z-index:80;display:flex;flex-direction:column;background:#fff;border:1px solid #e6ebf3;border-radius:20px;box-shadow:0 30px 60px -20px rgba(15,26,58,.45),0 2px 8px rgba(15,26,58,.1);animation:omSlide .2s ease both;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:10px;padding:16px 16px 10px">
+    <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0"><span style="font-size:10.5px;font-weight:700;letter-spacing:.09em;color:#667085">CONFIGURE</span><b style="font-size:16px;color:#0f1a3a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cfg.title }}</b></div>
+    <button onClick="{{ closeDrawer }}" aria-label="Close" style="width:34px;height:34px;border:1px solid #e6ebf3;border-radius:10px;background:#fff;color:#475467;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2;stroke-linecap:round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+  </div>
+  <div role="tablist" style="display:flex;gap:2px;margin:0 16px;padding:3px;background:#f3f6fc;border-radius:12px">
+    <sc-for list="{{ cfg.tabs }}" as="o" hint-placeholder-count="3"><button role="tab" onClick="{{ o.onClick }}" style="flex:1;height:32px;border:0;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ o.bg }};color:{{ o.fg }};box-shadow:{{ o.sh }}">{{ o.label }}</button></sc-for>
+  </div>
+  <div style="flex:1;overflow:auto;padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px">
+    <sc-if value="{{ cfg.isCols }}" hint-placeholder-val="{{ true }}">
+      <label style="display:flex;align-items:center;gap:8px;height:38px;padding:0 12px;border:1px solid #e2e8f2;border-radius:11px;background:#f8fafd;color:#667085"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" aria-hidden="true" style="flex:none;stroke-width:2;stroke-linecap:round"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"></path></svg><span class="vh">Search columns</span><input value="{{ cfg.colQ }}" onChange="{{ cfg.onColQ }}" placeholder="Search columns" style="flex:1;min-width:0;border:0;background:transparent;font-size:13px;color:#101828;outline:none"></label>
+      <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:10.5px;font-weight:700;letter-spacing:.09em;color:#667085">SHOWN · {{ cfg.shownCount }}</span><button onClick="{{ cfg.onReset }}" style="border:0;background:transparent;color:#2f62c9;font-size:12px;font-weight:600;cursor:pointer;padding:4px">Reset to default</button></div>
+      <div style="display:flex;flex-direction:column;border:1px solid #e6ebf3;border-radius:12px;overflow:hidden">
+        <sc-for list="{{ cfg.shown }}" as="col" hint-placeholder-count="6">
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 8px 6px 10px;border-bottom:1px solid #f1f3f7;background:#fff">
+            <button onClick="{{ col.onToggle }}" aria-label="Hide column" title="Hide column" style="flex:none;width:20px;height:20px;border-radius:6px;border:0;background:#2f62c9;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:3;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"></path></svg></button>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:12.5px;font-weight:600;color:#101828;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ col.label }}</span><sc-if value="{{ col.hasGroup }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;color:#667085">{{ col.group }}</span></sc-if></div>
+            <sc-if value="{{ col.hidden }}" hint-placeholder-val="{{ false }}"><span title="Hidden by the Display filter" style="font-size:10px;font-weight:700;color:#b54708;background:#fef6ee;border-radius:999px;padding:1px 6px">FILTERED</span></sc-if>
+            <button onClick="{{ col.onPin }}" aria-label="Pin column" title="{{ col.pinTip }}" style="width:26px;height:26px;border:1px solid {{ col.pinBd }};border-radius:7px;background:{{ col.pinBg }};color:{{ col.pinFg }};cursor:pointer;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M12 17v5M9 3h6l-1 6 4 4H6l4-4z"></path></svg></button>
+            <button onClick="{{ col.onUp }}" disabled="{{ col.noUp }}" aria-label="Move up" style="width:26px;height:26px;border:1px solid #e6ebf3;border-radius:7px;background:#fff;color:#475467;cursor:pointer;opacity:{{ col.upOp }};display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 15l6-6 6 6"></path></svg></button>
+            <button onClick="{{ col.onDown }}" disabled="{{ col.noDown }}" aria-label="Move down" style="width:26px;height:26px;border:1px solid #e6ebf3;border-radius:7px;background:#fff;color:#475467;cursor:pointer;opacity:{{ col.downOp }};display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 9l6 6 6-6"></path></svg></button>
+          </div>
+        </sc-for>
+      </div>
+      <span style="font-size:10.5px;font-weight:700;letter-spacing:.09em;color:#667085;padding-top:4px">AVAILABLE TO ADD · {{ cfg.availCount }}</span>
+      <sc-if value="{{ cfg.noAvail }}" hint-placeholder-val="{{ false }}"><span style="font-size:12.5px;color:#667085">Every column the service offers for this grid is already shown.</span></sc-if>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <sc-for list="{{ cfg.avail }}" as="col" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:8px;padding:7px 8px 7px 12px;border:1px dashed #d0d9ea;border-radius:11px;background:#fbfcfe">
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:12.5px;font-weight:600;color:#344054">{{ col.label }}</span><sc-if value="{{ col.hasGroup }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;color:#667085">{{ col.group }}</span></sc-if></div>
+            <button onClick="{{ col.onToggle }}" style="display:flex;align-items:center;gap:4px;height:28px;padding:0 10px;border:1px solid #bcd0f5;border-radius:8px;background:#eef3fd;color:#1d4596;font-size:12px;font-weight:600;cursor:pointer"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2.6;stroke-linecap:round"><path d="M12 5v14M5 12h14"></path></svg>Add column</button>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ cfg.isData }}" hint-placeholder-val="{{ false }}">
+      <span style="font-size:10.5px;font-weight:700;letter-spacing:.09em;color:#667085">FILTERS</span>
+      <sc-if value="{{ cfg.noFilters }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;line-height:1.5;color:#475467;padding:10px 12px;border-radius:12px;background:#f8fafd;border:1px solid #e6ebf3">{{ cfg.noFiltersNote }}</div></sc-if>
+      <sc-for list="{{ cfg.filters }}" as="f" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:12px;border:1px solid {{ f.bd }};background:{{ f.bg }}">
+          <div style="display:flex;align-items:center;gap:8px"><b style="flex:1;font-size:12.5px;color:#101828">{{ f.label }}</b><span style="font-size:11px;font-weight:600;color:{{ f.stFg }}">{{ f.status }}</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px">
+            <sc-for list="{{ f.opts }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" style="height:28px;padding:0 10px;border-radius:8px;border:1px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};font-size:12px;font-weight:600;cursor:pointer">{{ o.label }}</button></sc-for>
+          </div>
+        </div>
+      </sc-for>
+      <span style="font-size:10.5px;font-weight:700;letter-spacing:.09em;color:#667085;padding-top:6px">CROSS-FILTERS</span>
+      <button onClick="{{ cfg.onXf }}" role="switch" aria-checked="{{ cfg.xfAria }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;border:1px solid #e6ebf3;background:#fff;cursor:pointer;text-align:left">
+        <span style="flex:none;width:36px;height:20px;border-radius:999px;background:{{ cfg.xfTrack }};position:relative;transition:background .15s ease"><span style="position:absolute;top:2px;left:{{ cfg.xfKnob }}px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s ease"></span></span>
+        <span style="display:flex;flex-direction:column;gap:2px"><b style="font-size:12.5px;color:#101828">Respond to cross-filters</b><span style="font-size:11.5px;color:#667085">{{ cfg.xfNote }}</span></span>
+      </button>
+      <sc-if value="{{ cfg.hasLink }}" hint-placeholder-val="{{ false }}">
+        <span style="font-size:10.5px;font-weight:700;letter-spacing:.09em;color:#667085;padding-top:6px">DRILL FROM ROW CLICKS IN</span>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{ cfg.links }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:11px;border:1px solid {{ o.bd }};background:{{ o.bg }};color:#101828;font-size:12.5px;font-weight:600;cursor:pointer;text-align:left"><span style="flex:none;width:14px;height:14px;border-radius:50%;border:2px solid {{ o.dot }};box-shadow:inset 0 0 0 2px #fff;background:{{ o.fill }}"></span>{{ o.label }}</button></sc-for>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ cfg.isDisp }}" hint-placeholder-val="{{ false }}">
+      <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:10.5px;font-weight:700;letter-spacing:.09em;color:#667085">TITLE</span><input value="{{ cfg.titleVal }}" onChange="{{ cfg.onTitle }}" style="height:40px;padding:0 12px;border:1px solid #e2e8f2;border-radius:11px;font-size:13.5px;color:#101828"></label>
+      <sc-if value="{{ cfg.isText }}" hint-placeholder-val="{{ false }}">
+        <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:10.5px;font-weight:700;letter-spacing:.09em;color:#667085">TEXT</span><textarea value="{{ cfg.textVal }}" onChange="{{ cfg.onText }}" rows="7" style="padding:10px 12px;border:1px solid #e2e8f2;border-radius:11px;font-size:13px;line-height:1.5;color:#101828;resize:vertical"></textarea></label>
+      </sc-if>
+      <span style="font-size:10.5px;font-weight:700;letter-spacing:.09em;color:#667085;padding-top:4px">TAB</span>
+      <div style="display:flex;flex-wrap:wrap;gap:4px"><sc-for list="{{ cfg.tabOpts }}" as="o" hint-placeholder-count="2"><button onClick="{{ o.onClick }}" style="height:32px;padding:0 12px;border-radius:9px;border:1px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};font-size:12.5px;font-weight:600;cursor:pointer">{{ o.label }}</button></sc-for></div>
+      <span style="font-size:10.5px;font-weight:700;letter-spacing:.09em;color:#667085;padding-top:4px">WIDTH</span>
+      <div style="display:flex;flex-wrap:wrap;gap:4px"><sc-for list="{{ cfg.spans }}" as="o" hint-placeholder-count="5"><button onClick="{{ o.onClick }}" style="height:32px;padding:0 12px;border-radius:9px;border:1px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};font-size:12.5px;font-weight:600;cursor:pointer">{{ o.label }}</button></sc-for></div>
+      <sc-if value="{{ cfg.canH }}" hint-placeholder-val="{{ true }}">
+        <span style="font-size:10.5px;font-weight:700;letter-spacing:.09em;color:#667085;padding-top:4px">HEIGHT</span>
+        <div style="display:flex;flex-wrap:wrap;gap:4px"><sc-for list="{{ cfg.hs }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" style="height:32px;padding:0 12px;border-radius:9px;border:1px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};font-size:12.5px;font-weight:600;cursor:pointer">{{ o.label }}</button></sc-for></div>
+      </sc-if>
+      <span style="font-size:10.5px;font-weight:700;letter-spacing:.09em;color:#667085;padding-top:8px">SHOW THIS WIDGET</span>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{ cfg.ruleKinds }}" as="o" hint-placeholder-count="3"><button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:11px;border:1px solid {{ o.bd }};background:{{ o.bg }};color:#101828;font-size:12.5px;font-weight:600;cursor:pointer;text-align:left"><span style="flex:none;width:14px;height:14px;border-radius:50%;border:2px solid {{ o.dot }};box-shadow:inset 0 0 0 2px #fff;background:{{ o.fill }}"></span>{{ o.label }}</button></sc-for>
+      </div>
+      <sc-if value="{{ cfg.ruleIsFilter }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid #e6ebf3;background:#f8fafd">
+          <span style="font-size:12px;color:#475467">Show only when</span>
+          <div style="display:flex;flex-wrap:wrap;gap:4px"><sc-for list="{{ cfg.ruleFilters }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.onClick }}" style="height:28px;padding:0 10px;border-radius:8px;border:1px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};font-size:12px;font-weight:600;cursor:pointer">{{ o.label }}</button></sc-for></div>
+          <span style="font-size:12px;color:#475467">is one of</span>
+          <div style="display:flex;flex-wrap:wrap;gap:4px"><sc-for list="{{ cfg.ruleVals }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.onClick }}" style="height:28px;padding:0 10px;border-radius:8px;border:1px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};font-size:12px;font-weight:600;cursor:pointer">{{ o.label }}</button></sc-for></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ cfg.hasSrc }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:4px;margin-top:6px;padding:10px 12px;border-radius:12px;background:#f8fafd;border:1px solid #e6ebf3;font-size:12px;color:#475467;line-height:1.5"><b style="color:#101828">Source</b><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;word-break:break-all">{{ cfg.src }}</span></div>
+      </sc-if>
+    </sc-if>
+  </div>
+  <div style="padding:12px 16px;border-top:1px solid #eef1f6;font-size:11.5px;color:#667085">Changes show live on the dashboard. Use Undo in the header to step back.</div>
+</aside>
+</sc-if>
+
+<sc-if value="{{ drawerHist }}" hint-placeholder-val="{{ false }}">
+<aside aria-label="Version history" style="position:fixed;top:12px;right:12px;bottom:12px;width:min(420px,calc(100vw - 24px));z-index:80;display:flex;flex-direction:column;background:#fff;border:1px solid #e6ebf3;border-radius:20px;box-shadow:0 30px 60px -20px rgba(15,26,58,.45),0 2px 8px rgba(15,26,58,.1);animation:omSlide .2s ease both;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:10px;padding:16px">
+    <div style="display:flex;flex-direction:column;gap:2px;flex:1"><b style="font-size:16px;color:#0f1a3a">Version history</b><span style="font-size:12px;color:#667085">Each save is a version. Preview any of them, then restore.</span></div>
+    <button onClick="{{ closeDrawer }}" aria-label="Close" style="width:34px;height:34px;border:1px solid #e6ebf3;border-radius:10px;background:#fff;color:#475467;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2;stroke-linecap:round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+  </div>
+  <div style="flex:1;overflow:auto;padding:0 16px 16px;display:flex;flex-direction:column;gap:0">
+    <sc-if value="{{ noVersions }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:#667085">No saved versions yet.</span></sc-if>
+    <sc-for list="{{ versions }}" as="v" hint-placeholder-count="3">
+      <div style="display:flex;gap:12px">
+        <div style="display:flex;flex-direction:column;align-items:center;width:14px"><span style="flex:none;width:12px;height:12px;margin-top:16px;border-radius:50%;background:{{ v.dot }};box-shadow:0 0 0 3px {{ v.ring }}"></span><span style="flex:1;width:2px;background:#e6ebf3"></span></div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;margin:8px 0;padding:12px;border-radius:14px;border:1px solid {{ v.bd }};background:{{ v.bg }}">
+          <div style="display:flex;align-items:center;gap:8px"><b style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#0f1a3a">v{{ v.v }}</b><sc-if value="{{ v.isCurrent }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:700;padding:1px 7px;border-radius:999px;background:#dcfae6;color:#067647">CURRENT</span></sc-if><span style="flex:1"></span><span style="font-size:11.5px;color:#667085">{{ v.when }} · {{ v.who }}</span></div>
+          <span style="font-size:12.5px;font-weight:600;color:#344054">{{ v.note }}</span>
+          <div style="display:flex;flex-direction:column;gap:2px"><sc-for list="{{ v.changes }}" as="ch" hint-placeholder-count="2"><span style="font-size:12px;color:{{ ch.fg }};font-family:'IBM Plex Mono',monospace">{{ ch.text }}</span></sc-for></div>
+          <sc-if value="{{ v.canAct }}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:6px;margin-top:2px"><button onClick="{{ v.onPreview }}" style="height:28px;padding:0 10px;border:1px solid #e2e8f2;border-radius:8px;background:#fff;color:#344054;font-size:12px;font-weight:600;cursor:pointer">Preview</button><button onClick="{{ v.onRestore }}" style="height:28px;padding:0 10px;border:1px solid #bcd0f5;border-radius:8px;background:#eef3fd;color:#1d4596;font-size:12px;font-weight:600;cursor:pointer">Restore</button></div></sc-if>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</aside>
+</sc-if>
+
+<sc-if value="{{ drawerJson }}" hint-placeholder-val="{{ false }}">
+<aside aria-label="Dashboard JSON" style="position:fixed;top:12px;right:12px;bottom:12px;width:min(560px,calc(100vw - 24px));z-index:80;display:flex;flex-direction:column;background:#0f1a3a;color:#d3dbef;border:1px solid rgba(255,255,255,.08);border-radius:20px;box-shadow:0 30px 60px -20px rgba(15,26,58,.6);animation:omSlide .2s ease both;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:10px;padding:16px">
+    <div style="display:flex;flex-direction:column;gap:2px;flex:1"><b style="font-size:15px;color:#fff">What gets saved</b><span style="font-size:12px;color:#8fa0cc">PUT /custom-dashboards/{{ dashId }} · compiled on load into a normal definition</span></div>
+    <button onClick="{{ closeDrawer }}" aria-label="Close" style="width:34px;height:34px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(255,255,255,.05);color:#d3dbef;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" aria-hidden="true" style="stroke-width:2;stroke-linecap:round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+  </div>
+  <div role="tablist" style="display:flex;gap:2px;margin:0 16px;padding:3px;background:rgba(255,255,255,.06);border-radius:12px">
+    <sc-for list="{{ jsonTabs }}" as="o" hint-placeholder-count="2"><button role="tab" onClick="{{ o.onClick }}" style="flex:1;height:32px;border:0;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;background:{{ o.bg }};color:{{ o.fg }}">{{ o.label }}</button></sc-for>
+  </div>
+  <pre style="flex:1;overflow:auto;margin:12px 16px 16px;padding:14px;border-radius:12px;background:rgba(6,14,38,.6);border:1px solid rgba(255,255,255,.06);font-family:'IBM Plex Mono',monospace;font-size:11.5px;line-height:1.55;color:#c9d6f5;white-space:pre">{{ jsonText }}</pre>
+</aside>
+</sc-if>
+
+<sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+  <div role="status" style="position:fixed;left:50%;bottom:24px;z-index:90;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:12px;background:#14224a;color:#fff;font-size:13px;font-weight:600;box-shadow:0 16px 32px -12px rgba(15,26,58,.6);animation:omPop .18s ease both;white-space:nowrap"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#8fb0fb" aria-hidden="true" style="stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round"><path d="M20 6 9 17l-5-5"></path></svg>{{ toast }}</div>
+</sc-if>
+</div>
+</template>
+<script>
+/* Minimal runtime: renders the <template id="tpl"> markup ({{ holes }}, sc-for, sc-if, onX events,
+   style-hover) against Component.renderVals(), and patches the DOM in place so scroll and focus survive. */
+var ROOT = document.getElementById('root');
+var TPL = document.getElementById('tpl').content;
+var HOLE = /\{\{\s*([^}]+?)\s*\}\}/g;
+var EV = { onclick: 'click', onchange: 'input', oninput: 'input', ondragstart: 'dragstart', ondragend: 'dragend', ondragover: 'dragover', ondrop: 'drop' };
+var hoverMap = {}, hoverN = 0, hoverSheet = document.createElement('style');
+document.head.appendChild(hoverSheet);
+
+function look(path, scope) {
+  path = path.trim();
+  if (path === 'true') return true;
+  if (path === 'false') return false;
+  if (path === 'null') return null;
+  if (/^-?\d+(\.\d+)?$/.test(path)) return +path;
+  var parts = path.split('.');
+  for (var i = scope.length - 1; i >= 0; i--) {
+    var s = scope[i];
+    if (s && Object.prototype.hasOwnProperty.call(s, parts[0])) {
+      var v = s[parts[0]];
+      for (var k = 1; k < parts.length; k++) { if (v == null) return undefined; v = v[parts[k]]; }
+      return v;
+    }
+  }
+  return undefined;
+}
+function whole(s) { var m = s && s.match(/^\s*\{\{\s*([^}]+?)\s*\}\}\s*$/); return m ? m[1] : null; }
+function interp(s, scope) { return s.replace(HOLE, function (_, p) { var v = look(p, scope); return v == null ? '' : String(v); }); }
+function hoverClass(css) {
+  if (!css.trim()) return '';
+  if (hoverMap[css]) return hoverMap[css];
+  var c = 'hv' + (++hoverN); hoverMap[css] = c;
+  var decl = css.split(';').map(function (x) { return x.trim(); }).filter(Boolean).map(function (x) { return x + ' !important'; }).join(';');
+  hoverSheet.appendChild(document.createTextNode('.' + c + ':hover{' + decl + '}'));
+  return c;
+}
+function build(node, scope, out) {
+  if (node.nodeType === 3) { out.push(document.createTextNode(node.data.indexOf('{{') >= 0 ? interp(node.data, scope) : node.data)); return; }
+  if (node.nodeType !== 1) return;
+  var tag = node.localName;
+  if (tag === 'sc-for') {
+    var list = look(whole(node.getAttribute('list')), scope) || [];
+    var as = node.getAttribute('as');
+    list.forEach(function (it, i) { var o = { $index: i }; o[as] = it; var sc = scope.concat([o]); node.childNodes.forEach(function (ch) { build(ch, sc, out); }); });
+    return;
+  }
+  if (tag === 'sc-if') { if (look(whole(node.getAttribute('value')), scope)) node.childNodes.forEach(function (ch) { build(ch, scope, out); }); return; }
+  var el = document.createElementNS(node.namespaceURI, tag), h = {}, props = {};
+  Array.prototype.forEach.call(node.attributes, function (a) {
+    var n = a.name, v = a.value;
+    if (n.indexOf('hint-') === 0) return;
+    if (EV[n]) { var fp = whole(v); var fn = fp ? look(fp, scope) : null; if (typeof fn === 'function') h[EV[n]] = fn; return; }
+    if (n === 'style-hover') { var c = hoverClass(interp(v, scope)); if (c) el.setAttribute('class', c); return; }
+    var p = whole(v); var val = p != null ? look(p, scope) : (v.indexOf('{{') >= 0 ? interp(v, scope) : v);
+    if (n === 'disabled') { props.disabled = !!val; return; }
+    if (n === 'value' && (tag === 'input' || tag === 'textarea')) { props.value = val == null ? '' : String(val); return; }
+    if (val == null || val === false) return;
+    el.setAttribute(n, String(val));
+  });
+  el.__h = h; el.__p = props;
+  var kids = []; node.childNodes.forEach(function (ch) { build(ch, scope, kids); });
+  kids.forEach(function (k) { el.appendChild(k); });
+  out.push(el);
+}
+function applyProps(el, p) {
+  if (!p) return;
+  if ('disabled' in p) el.disabled = p.disabled;
+  if ('value' in p && el.value !== p.value) el.value = p.value;
+}
+function finalize(n) { if (n.nodeType !== 1) return; applyProps(n, n.__p); Array.prototype.forEach.call(n.childNodes, finalize); }
+function patch(parent, news) {
+  var olds = Array.prototype.slice.call(parent.childNodes);
+  news.forEach(function (n, i) {
+    var o = olds[i];
+    if (!o) { parent.appendChild(n); finalize(n); return; }
+    if (o.nodeType !== n.nodeType || (n.nodeType === 1 && (o.localName !== n.localName || o.namespaceURI !== n.namespaceURI))) { parent.replaceChild(n, o); finalize(n); return; }
+    if (n.nodeType === 3) { if (o.data !== n.data) o.data = n.data; return; }
+    for (var k = o.attributes.length - 1; k >= 0; k--) { var nm = o.attributes[k].name; if (!n.hasAttribute(nm)) o.removeAttribute(nm); }
+    Array.prototype.forEach.call(n.attributes, function (a) { if (o.getAttribute(a.name) !== a.value) o.setAttribute(a.name, a.value); });
+    o.__h = n.__h; applyProps(o, n.__p);
+    patch(o, Array.prototype.slice.call(n.childNodes));
+  });
+  for (var j = olds.length - 1; j >= news.length; j--) parent.removeChild(olds[j]);
+}
+function render() {
+  var vals = window.__comp.renderVals(); var out = [];
+  TPL.childNodes.forEach(function (ch) { build(ch, [vals], out); });
+  patch(ROOT, out);
+}
+['click', 'input', 'dragstart', 'dragend', 'dragover', 'drop'].forEach(function (t) {
+  ROOT.addEventListener(t, function (e) {
+    var el = e.target, hs = [];
+    while (el && el !== ROOT) { if (el.__h && el.__h[t]) hs.push([el, el.__h[t]]); el = el.parentNode; }
+    hs.forEach(function (x) { Object.defineProperty(e, 'currentTarget', { value: x[0], configurable: true }); x[1](e); });
+  });
+});
+class DCLogic {
+  constructor(props) { this.props = props || {}; this.state = {}; this._q = []; this._s = false; }
+  setState(u) {
+    this._q.push(u);
+    if (this._s) return;
+    this._s = true;
+    var self = this;
+    Promise.resolve().then(function () {
+      self._s = false; var st = self.state, q = self._q; self._q = [];
+      q.forEach(function (x) { var r = typeof x === 'function' ? x(st, self.props) : x; if (r) st = Object.assign({}, st, r); });
+      self.state = st; render();
+    });
+  }
+}
+
+</script>
+<script>
+const PACK = {"T":[{"id":"var.kpi","cat":"VaR Summary","kind":"kpi","title":"VaR at a glance","desc":"Firm-wide MC and historical VaR / SVaR totals, plus limits in breach.","filters":["region","variant","attribute"],"span":12,"h":"xs","src":"/grids/standalone-var-svar"},{"id":"var.alerts","cat":"VaR Summary","kind":"alerts","title":"Limit alerts","desc":"Limits in breach or above 80% utilisation, as one strip.","filters":["region","attribute"],"span":12,"h":"xs","src":"/grids/limit-alerts"},{"id":"var.standalone","cat":"VaR Summary","kind":"grid","data":"sa","title":"Standalone VaR/SVaR ($MM)","sub":"Click a row to filter linked widgets","desc":"Desk-level MC and historical VaR/SVaR, COB vs PCOB.","filters":["compare","region","variant","attribute","display"],"provides":"desk","chip":"DESK","span":7,"h":"l","total":true,"cols":[{"f":"name","h":"Volcker Desk Name","t":"text","on":true,"pin":true},{"f":"region","h":"Region","t":"badge","on":false},{"f":"mcVarCob","h":"COB","g":"Monte Carlo (VaR)","t":"num","on":true},{"f":"mcVarPcob","h":"PCOB","g":"Monte Carlo (VaR)","t":"num","on":true},{"f":"mcVarDiff","h":"Diff","g":"Monte Carlo (VaR)","t":"diff","on":true},{"f":"histVarCob","h":"COB","g":"Historical (VaR)","t":"num","on":true},{"f":"histVarPcob","h":"PCOB","g":"Historical (VaR)","t":"num","on":true},{"f":"histVarDiff","h":"Diff","g":"Historical (VaR)","t":"diff","on":true},{"f":"mcSvarCob","h":"COB","g":"Monte Carlo (SVaR)","t":"num","on":true},{"f":"mcSvarPcob","h":"PCOB","g":"Monte Carlo (SVaR)","t":"num","on":true},{"f":"mcSvarDiff","h":"Diff","g":"Monte Carlo (SVaR)","t":"diff","on":true},{"f":"histSvarCob","h":"COB","g":"Historical (SVaR)","t":"num","on":true},{"f":"histSvarPcob","h":"PCOB","g":"Historical (SVaR)","t":"num","on":true},{"f":"histSvarDiff","h":"Diff","g":"Historical (SVaR)","t":"diff","on":true}],"src":"/grids/standalone-var-svar"},{"id":"var.standalone-trend","cat":"VaR Summary","kind":"line","data":"satr","title":"Standalone VaR/SVaR Trend ($MM)","desc":"Daily trend of the four VaR measures.","filters":["region","variant","attribute","display","days"],"consumes":"desk","span":5,"h":"l","src":"/series/standalone-var-svar-trend"},{"id":"var.component","cat":"VaR Summary","kind":"grid","data":"comp","title":"Component VaR/SVaR ($MM)","desc":"Component (marginal) VaR/SVaR by desk.","filters":["compare","region","variant","attribute","display"],"consumes":"desk","span":7,"h":"l","total":true,"cols":[{"f":"name","h":"Volcker Desk Name","t":"text","on":true,"pin":true},{"f":"region","h":"Region","t":"badge","on":false},{"f":"mcVarCob","h":"COB","g":"Monte Carlo (CVaR)","t":"num","on":true},{"f":"mcVarPcob","h":"PCOB","g":"Monte Carlo (CVaR)","t":"num","on":true},{"f":"mcVarDiff","h":"Diff","g":"Monte Carlo (CVaR)","t":"diff","on":true},{"f":"histVarCob","h":"COB","g":"Historical (CVaR)","t":"num","on":true},{"f":"histVarPcob","h":"PCOB","g":"Historical (CVaR)","t":"num","on":true},{"f":"histVarDiff","h":"Diff","g":"Historical (CVaR)","t":"diff","on":true},{"f":"mcSvarCob","h":"COB","g":"Monte Carlo (CSVaR)","t":"num","on":true},{"f":"mcSvarPcob","h":"PCOB","g":"Monte Carlo (CSVaR)","t":"num","on":true},{"f":"mcSvarDiff","h":"Diff","g":"Monte Carlo (CSVaR)","t":"diff","on":true},{"f":"histSvarCob","h":"COB","g":"Historical (CSVaR)","t":"num","on":true},{"f":"histSvarPcob","h":"PCOB","g":"Historical (CSVaR)","t":"num","on":true},{"f":"histSvarDiff","h":"Diff","g":"Historical (CSVaR)","t":"diff","on":true}],"src":"/grids/component-var-svar"},{"id":"var.component-trend","cat":"VaR Summary","kind":"stack","data":"comptr","title":"Component VaR Trend ($MM)","desc":"Stacked component VaR by risk factor over time.","filters":["region","variant","attribute","display","days"],"consumes":"desk","span":5,"h":"l","src":"/series/component-var-svar-trend"},{"id":"var.limits","cat":"VaR Summary","kind":"grid","data":"lim","title":"VaR/SVaR Limits","sub":"Sorted by utilization % · click a row to chart","desc":"Limit utilisation with thresholds and 1D / 5D change.","filters":["region","attribute"],"provides":"limit","chip":"LIMIT","defaultSel":"first","sort":{"f":"utilization","d":-1},"span":7,"h":"l","cols":[{"f":"tier","h":"Tier Description","t":"text","on":true,"pin":true},{"f":"limitId","h":"Limit Id","t":"mono","on":true},{"f":"name","h":"Limit Name","t":"text","on":true},{"f":"unit","h":"Unit","t":"badge","on":false},{"f":"region","h":"Region","t":"badge","on":false},{"f":"threshold","h":"Threshold","t":"num","on":true},{"f":"exposure","h":"Exposure","t":"num","on":true},{"f":"utilization","h":"Utilization %","t":"util","on":true},{"f":"headroom","h":"Headroom","t":"num","on":false},{"f":"chg1d","h":"1D Change","t":"diff","on":true},{"f":"chg5d","h":"5D Change","t":"diff","on":false}],"src":"/grids/limit-utilization"},{"id":"var.limit-exposure","cat":"VaR Summary","kind":"exposure","data":"limh","title":"Limit exposure","desc":"Exposure vs threshold history for the selected limit.","filters":["attribute","days"],"consumes":"limit","span":5,"h":"l","src":"/series/limit-history"},{"id":"greek.daily-greek","cat":"Greek Dashboard","kind":"grid","data":"dgr","title":"Daily Greek by Region","desc":"Delta, gamma, vega and other Greeks by region.","filters":[],"local":"PCOB −7d","span":12,"h":"s","total":true,"cols":[{"f":"region","h":"Region","t":"text","on":true,"pin":true},{"f":"delta","h":"Delta","t":"sign","on":true},{"f":"gamma","h":"Gamma","t":"sign","on":true},{"f":"vega","h":"Vega","t":"sign","on":true},{"f":"stock_vega","h":"Stock Vega","t":"sign","on":true},{"f":"wtd_vega","h":"Wtd Vega","t":"sign","on":true},{"f":"stock_gamma","h":"Stock Gamma","t":"sign","on":true},{"f":"skew","h":"Skew","t":"sign","on":true},{"f":"dividend","h":"Dividend","t":"sign","on":true},{"f":"borrow","h":"Borrow","t":"sign","on":true},{"f":"a_c_delta","h":"A/C Delta","t":"sign","on":false},{"f":"opt_theta","h":"Opt Theta","t":"sign","on":false},{"f":"fx_delta","h":"FX Delta","t":"sign","on":false},{"f":"ir_delta","h":"IR Delta","t":"sign","on":false},{"f":"cr01","h":"CR01","t":"sign","on":false},{"f":"cb_delta","h":"CB Delta","t":"sign","on":false}],"src":"/grids/daily-greek-region"},{"id":"greek.daily-stress","cat":"Greek Dashboard","kind":"grid","data":"dsr","title":"Daily Stress by Region","desc":"Spot shock P&L from +10% to −30%.","filters":[],"local":"PCOB −7d","span":6,"h":"s","total":true,"cols":[{"f":"region","h":"Region","t":"text","on":true,"pin":true},{"f":"s_p10","h":"S+10","g":"Spot shock","t":"int","on":true},{"f":"s_p5","h":"S+5","g":"Spot shock","t":"int","on":true},{"f":"s_m5","h":"S-5","g":"Spot shock","t":"int","on":true},{"f":"s_m10","h":"S-10","g":"Spot shock","t":"int","on":true},{"f":"s_m20","h":"S-20","g":"Spot shock","t":"int","on":true},{"f":"s_m30","h":"S-30","g":"Spot shock","t":"int","on":true}],"src":"/grids/daily-stress-region"},{"id":"greek.conc-delta","cat":"Greek Dashboard","kind":"list","data":"csd","title":"Stock concentration · Delta","desc":"Largest single-stock delta exposures.","filters":["topN"],"local":"PCOB −7d","span":3,"h":"m","src":"/grids/concentration-stock-delta","vf":"exposure"},{"id":"greek.top-jtd","cat":"Greek Dashboard","kind":"list","data":"jtd","title":"Top name JTD risk","desc":"Largest jump-to-default exposures by issuer.","filters":["topN"],"local":"PCOB −7d","span":3,"h":"m","src":"/grids/single-name-top-jtd","vf":"value"}],"D":{"sa":[{"id":"row_1","name":"Equity Derivatives NA","region":"NA","mcVarCob":28.17,"mcVarPcob":26.5,"mcVarDiff":1.67,"histVarCob":25.96,"histVarPcob":24.59,"histVarDiff":1.37,"mcSvarCob":37.42,"mcSvarPcob":33.93,"mcSvarDiff":3.49,"histSvarCob":34.56,"histSvarPcob":31.52,"histSvarDiff":3.04},{"id":"row_2","name":"Investment Strategies","region":"Global","mcVarCob":21.98,"mcVarPcob":13.89,"mcVarDiff":8.09,"histVarCob":21.15,"histVarPcob":13.01,"histVarDiff":8.14,"mcSvarCob":26.99,"mcSvarPcob":19.78,"mcSvarDiff":7.21,"histSvarCob":24.95,"histSvarPcob":18.32,"histSvarDiff":6.63},{"id":"row_3","name":"Equity Client Financing NA","region":"NA","mcVarCob":17.87,"mcVarPcob":13.46,"mcVarDiff":4.41,"histVarCob":16.67,"histVarPcob":12.54,"histVarDiff":4.13,"mcSvarCob":17.49,"mcSvarPcob":21.52,"mcSvarDiff":-4.03,"histSvarCob":15.99,"histSvarPcob":20.11,"histSvarDiff":-4.12},{"id":"row_4","name":"Equity Derivatives EMEA","region":"EMEA","mcVarCob":13.64,"mcVarPcob":13.8,"mcVarDiff":-0.16,"histVarCob":12.42,"histVarPcob":12.71,"histVarDiff":-0.29,"mcSvarCob":34.84,"mcSvarPcob":35.61,"mcSvarDiff":-0.77,"histSvarCob":32.76,"histSvarPcob":32.76,"histSvarDiff":0},{"id":"row_5","name":"Equity Cash Latam","region":"Latam","mcVarCob":12.88,"mcVarPcob":12.96,"mcVarDiff":-0.08,"histVarCob":11.35,"histVarPcob":11.34,"histVarDiff":0.01,"mcSvarCob":9.5,"mcSvarPcob":9.48,"mcSvarDiff":0.02,"histSvarCob":8.48,"histSvarPcob":8.4,"histSvarDiff":0.08},{"id":"row_6","name":"Equity Client Financing EMEA","region":"EMEA","mcVarCob":12.43,"mcVarPcob":15.19,"mcVarDiff":-2.76,"histVarCob":11.56,"histVarPcob":14.21,"histVarDiff":-2.65,"mcSvarCob":12.23,"mcSvarPcob":12.81,"mcSvarDiff":-0.58,"histSvarCob":10.7,"histSvarPcob":11.27,"histSvarDiff":-0.57},{"id":"row_7","name":"Equity Client Financing APAC","region":"APAC","mcVarCob":11.4,"mcVarPcob":5.05,"mcVarDiff":6.35,"histVarCob":10.38,"histVarPcob":4.69,"histVarDiff":5.69,"mcSvarCob":28.23,"mcSvarPcob":11.2,"mcSvarDiff":17.03,"histSvarCob":27.14,"histSvarPcob":10.95,"histSvarDiff":16.19},{"id":"row_8","name":"Hybrid & Fund Derivatives","region":"Global","mcVarCob":6.9,"mcVarPcob":7.92,"mcVarDiff":-1.02,"histVarCob":6.2,"histVarPcob":7,"histVarDiff":-0.8,"mcSvarCob":9.39,"mcSvarPcob":9.33,"mcSvarDiff":0.06,"histSvarCob":8.78,"histSvarPcob":8.47,"histSvarDiff":0.31},{"id":"row_9","name":"Equity Cash NA","region":"NA","mcVarCob":6.18,"mcVarPcob":8.03,"mcVarDiff":-1.85,"histVarCob":5.86,"histVarPcob":7.52,"histVarDiff":-1.66,"mcSvarCob":6.95,"mcSvarPcob":10.37,"mcSvarDiff":-3.42,"histSvarCob":6.79,"histSvarPcob":9.91,"histSvarDiff":-3.12},{"id":"row_10","name":"Global Convertibles","region":"Global","mcVarCob":6.07,"mcVarPcob":5.81,"mcVarDiff":0.26,"histVarCob":5.76,"histVarPcob":5.53,"histVarDiff":0.23,"mcSvarCob":4.31,"mcSvarPcob":4.29,"mcSvarDiff":0.02,"histSvarCob":3.89,"histSvarPcob":3.89,"histSvarDiff":0},{"id":"row_11","name":"Equity Cash EMEA","region":"EMEA","mcVarCob":3.87,"mcVarPcob":3.96,"mcVarDiff":-0.09,"histVarCob":3.72,"histVarPcob":3.89,"histVarDiff":-0.17,"mcSvarCob":3.49,"mcSvarPcob":3.59,"mcSvarDiff":-0.1,"histSvarCob":3.06,"histSvarPcob":3.22,"histSvarDiff":-0.16},{"id":"row_12","name":"Equity Derivatives APAC","region":"APAC","mcVarCob":3.41,"mcVarPcob":11.84,"mcVarDiff":-8.43,"histVarCob":3.09,"histVarPcob":10.43,"histVarDiff":-7.34,"mcSvarCob":3.1,"mcSvarPcob":14.11,"mcSvarDiff":-11.01,"histSvarCob":2.68,"histSvarPcob":12.47,"histSvarDiff":-9.79},{"id":"row_13","name":"Equity Cash APAC","region":"APAC","mcVarCob":2.59,"mcVarPcob":2.62,"mcVarDiff":-0.03,"histVarCob":2.38,"histVarPcob":2.37,"histVarDiff":0.01,"mcSvarCob":3.42,"mcSvarPcob":3.28,"mcSvarDiff":0.14,"histSvarCob":3.16,"histSvarPcob":3.03,"histSvarDiff":0.13},{"id":"row_14","name":"Equity Client Financing Latam","region":"Latam","mcVarCob":1.03,"mcVarPcob":1.01,"mcVarDiff":0.02,"histVarCob":0.98,"histVarPcob":0.97,"histVarDiff":0.01,"mcSvarCob":1.17,"mcSvarPcob":1.01,"mcSvarDiff":0.16,"histSvarCob":1.02,"histSvarPcob":0.85,"histSvarDiff":0.17},{"id":"row_15","name":"Equity Derivatives Latam","region":"Latam","mcVarCob":0.6,"mcVarPcob":0.62,"mcVarDiff":-0.02,"histVarCob":0.55,"histVarPcob":0.58,"histVarDiff":-0.03,"mcSvarCob":0.84,"mcSvarPcob":0.96,"mcSvarDiff":-0.12,"histSvarCob":0.79,"histSvarPcob":0.89,"histSvarDiff":-0.1}],"comp":[{"id":"row_1","name":"Equity Derivatives NA","region":"NA","mcVarCob":14.4,"mcVarPcob":14.35,"mcVarDiff":0.05,"histVarCob":12.54,"histVarPcob":12.61,"histVarDiff":-0.07,"mcSvarCob":16.03,"mcSvarPcob":14.87,"mcSvarDiff":1.16,"histSvarCob":13.92,"histSvarPcob":12.74,"histSvarDiff":1.18},{"id":"row_2","name":"Investment Strategies","region":"Global","mcVarCob":7.47,"mcVarPcob":-0.85,"mcVarDiff":8.32,"histVarCob":6.71,"histVarPcob":-0.76,"histVarDiff":7.47,"mcSvarCob":2.73,"mcSvarPcob":-3.8,"mcSvarDiff":6.53,"histSvarCob":2.42,"histSvarPcob":-3.47,"histSvarDiff":5.89},{"id":"row_3","name":"Equity Client Financing NA","region":"NA","mcVarCob":5.95,"mcVarPcob":4.56,"mcVarDiff":1.39,"histVarCob":5.71,"histVarPcob":4.43,"histVarDiff":1.28,"mcSvarCob":5.38,"mcSvarPcob":7.67,"mcSvarDiff":-2.29,"histSvarCob":4.63,"histSvarPcob":6.47,"histSvarDiff":-1.84},{"id":"row_4","name":"Equity Client Financing EMEA","region":"EMEA","mcVarCob":2.98,"mcVarPcob":0.8,"mcVarDiff":2.18,"histVarCob":2.59,"histVarPcob":0.71,"histVarDiff":1.88,"mcSvarCob":9.71,"mcSvarPcob":1.24,"mcSvarDiff":8.47,"histSvarCob":9.5,"histSvarPcob":1.21,"histSvarDiff":8.29},{"id":"row_5","name":"Equity Cash Latam","region":"Latam","mcVarCob":2.89,"mcVarPcob":2.94,"mcVarDiff":-0.05,"histVarCob":2.74,"histVarPcob":2.78,"histVarDiff":-0.04,"mcSvarCob":1.69,"mcSvarPcob":1.49,"mcSvarDiff":0.2,"histSvarCob":1.46,"histSvarPcob":1.31,"histSvarDiff":0.15},{"id":"row_6","name":"Equity Client Financing APAC","region":"APAC","mcVarCob":2.53,"mcVarPcob":2.54,"mcVarDiff":-0.01,"histVarCob":2.48,"histVarPcob":2.54,"histVarDiff":-0.06,"mcSvarCob":1.09,"mcSvarPcob":0.78,"mcSvarDiff":0.31,"histSvarCob":0.97,"histSvarPcob":0.68,"histSvarDiff":0.29},{"id":"row_7","name":"Equity Derivatives EMEA","region":"EMEA","mcVarCob":2.39,"mcVarPcob":2.57,"mcVarDiff":-0.18,"histVarCob":2.11,"histVarPcob":2.22,"histVarDiff":-0.11,"mcSvarCob":14.62,"mcSvarPcob":16.09,"mcSvarDiff":-1.47,"histSvarCob":13.95,"histSvarPcob":15.56,"histSvarDiff":-1.61},{"id":"row_8","name":"Equity Cash NA","region":"NA","mcVarCob":0.61,"mcVarPcob":1.87,"mcVarDiff":-1.26,"histVarCob":0.55,"histVarPcob":1.74,"histVarDiff":-1.19,"mcSvarCob":0.58,"mcSvarPcob":2.11,"mcSvarDiff":-1.53,"histSvarCob":0.53,"histSvarPcob":1.98,"histSvarDiff":-1.45},{"id":"row_9","name":"Global Convertibles","region":"Global","mcVarCob":0.2,"mcVarPcob":-0.05,"mcVarDiff":0.25,"histVarCob":0.19,"histVarPcob":-0.05,"histVarDiff":0.24,"mcSvarCob":-0.35,"mcSvarPcob":-0.4,"mcSvarDiff":0.05,"histSvarCob":-0.34,"histSvarPcob":-0.4,"histSvarDiff":0.06},{"id":"row_10","name":"Equity Cash EMEA","region":"EMEA","mcVarCob":0.2,"mcVarPcob":0.43,"mcVarDiff":-0.23,"histVarCob":0.19,"histVarPcob":0.4,"histVarDiff":-0.21,"mcSvarCob":-0.11,"mcSvarPcob":0.05,"mcSvarDiff":-0.16,"histSvarCob":-0.1,"histSvarPcob":0.04,"histSvarDiff":-0.14},{"id":"row_11","name":"Hybrid & Fund Derivatives","region":"Global","mcVarCob":0.19,"mcVarPcob":0.66,"mcVarDiff":-0.47,"histVarCob":0.18,"histVarPcob":0.65,"histVarDiff":-0.47,"mcSvarCob":-2.05,"mcSvarPcob":-3.87,"mcSvarDiff":1.82,"histSvarCob":-2,"histSvarPcob":-3.8,"histSvarDiff":1.8},{"id":"row_12","name":"Equity Cash APAC","region":"APAC","mcVarCob":0.05,"mcVarPcob":0.21,"mcVarDiff":-0.16,"histVarCob":0.04,"histVarPcob":0.18,"histVarDiff":-0.14,"mcSvarCob":0.07,"mcSvarPcob":0.11,"mcSvarDiff":-0.04,"histSvarCob":0.07,"histSvarPcob":0.11,"histSvarDiff":-0.04},{"id":"row_13","name":"FX Prime Brokerage","region":"Global","mcVarCob":0,"mcVarPcob":0.03,"mcVarDiff":-0.03,"histVarCob":0,"histVarPcob":0.03,"histVarDiff":-0.03,"mcSvarCob":-0.01,"mcSvarPcob":0.29,"mcSvarDiff":-0.3,"histSvarCob":-0.01,"histSvarPcob":0.26,"histSvarDiff":-0.27},{"id":"row_14","name":"Global Equity – Non Reporting","region":"Global","mcVarCob":0,"mcVarPcob":0,"mcVarDiff":0,"histVarCob":0,"histVarPcob":0,"histVarDiff":0,"mcSvarCob":0,"mcSvarPcob":0,"mcSvarDiff":0,"histSvarCob":0,"histSvarPcob":0,"histSvarDiff":0}],"lim":[{"id":"lim_504875","tier":"Global Equity – AMER","limitId":"504875","name":"D1 – NAM VaR","unit":"$MM","region":"NA","threshold":15,"exposure":17.82,"utilization":1.19,"chg1d":4.43,"chg5d":3.5,"headroom":-2.82},{"id":"lim_41382","tier":"Cross Asset Derivatives","limitId":"41382","name":"VaR","unit":"$MM","region":"Global","threshold":25,"exposure":21.98,"utilization":0.88,"chg1d":8.09,"chg5d":10.47,"headroom":3.02},{"id":"lim_505041","tier":"Global Equity – ASIA","limitId":"505041","name":"VaR – DELTA1","unit":"$MM","region":"APAC","threshold":17,"exposure":12.43,"utilization":0.73,"chg1d":-2.7,"chg5d":2.06,"headroom":4.57},{"id":"lim_504353","tier":"Global Equity – EUR","limitId":"504353","name":"D1 – VaR","unit":"$MM","region":"EMEA","threshold":17,"exposure":11.44,"utilization":0.67,"chg1d":6.39,"chg5d":5.41,"headroom":5.56},{"id":"lim_504876","tier":"Global Equity – AMER","limitId":"504876","name":"Cash – LATAM VaR","unit":"$MM","region":"NA","threshold":20,"exposure":12.88,"utilization":0.64,"chg1d":-0.08,"chg5d":-1.52,"headroom":7.12},{"id":"lim_504357","tier":"Global Equity – EUR","limitId":"504357","name":"D1 – SVaR","unit":"$MM","region":"EMEA","threshold":47,"exposure":28.21,"utilization":0.6,"chg1d":17.17,"chg5d":16.34,"headroom":18.79},{"id":"lim_1493","tier":"Equity Division","limitId":"1493","name":"VaR – Global","unit":"$MM","region":"Global","threshold":65,"exposure":36.59,"utilization":0.56,"chg1d":8.18,"chg5d":13.06,"headroom":28.41},{"id":"lim_505040","tier":"Global Equity – ASIA","limitId":"505040","name":"VaR – CASH","unit":"$MM","region":"APAC","threshold":5,"exposure":2.59,"utilization":0.52,"chg1d":-0.03,"chg5d":-0.02,"headroom":2.41},{"id":"lim_504874","tier":"Global Equity – AMER","limitId":"504874","name":"Deriv – NAM VaR","unit":"$MM","region":"NA","threshold":55,"exposure":28.17,"utilization":0.51,"chg1d":1.68,"chg5d":2.39,"headroom":26.83},{"id":"lim_505044","tier":"Global Equity – ASIA","limitId":"505044","name":"Stressed VaR","unit":"$MM","region":"APAC","threshold":25,"exposure":12.28,"utilization":0.49,"chg1d":-0.55,"chg5d":2.91,"headroom":12.72},{"id":"lim_504208","tier":"Global Equity – AMER","limitId":"504208","name":"D1 – NAM SVaR","unit":"$MM","region":"NA","threshold":35,"exposure":16.98,"utilization":0.49,"chg1d":-4.31,"chg5d":-0.82,"headroom":18.02},{"id":"lim_504156","tier":"Cross Asset Derivatives","limitId":"504156","name":"SVaR","unit":"$MM","region":"Global","threshold":65,"exposure":26.99,"utilization":0.42,"chg1d":7.21,"chg5d":13.28,"headroom":38.01},{"id":"lim_19582344","tier":"Equities – Global Convertibles","limitId":"19582344","name":"CB – VaR","unit":"$MM","region":"Global","threshold":15,"exposure":6.07,"utilization":0.4,"chg1d":0.26,"chg5d":0.62,"headroom":8.93},{"id":"lim_504356","tier":"Global Equity – EUR","limitId":"504356","name":"Deriv – SVaR","unit":"$MM","region":"EMEA","threshold":90,"exposure":34.84,"utilization":0.39,"chg1d":-0.77,"chg5d":-3.13,"headroom":55.16},{"id":"lim_504870","tier":"Global Equity – AMER","limitId":"504870","name":"Cash – LATAM SVaR","unit":"$MM","region":"NA","threshold":25,"exposure":9.5,"utilization":0.38,"chg1d":0.02,"chg5d":-0.93,"headroom":15.5},{"id":"lim_504207","tier":"Global Equity – AMER","limitId":"504207","name":"Deriv – NAM SVaR","unit":"$MM","region":"NA","threshold":100,"exposure":37.42,"utilization":0.37,"chg1d":3.49,"chg5d":0.09,"headroom":62.58},{"id":"lim_504352","tier":"Global Equity – EUR","limitId":"504352","name":"Cash – VaR","unit":"$MM","region":"EMEA","threshold":12,"exposure":3.87,"utilization":0.32,"chg1d":-0.09,"chg5d":-0.78,"headroom":8.13}],"satr":[["2026-05-11",144.35,140.29,191.77,187.38],["2026-05-12",143.84,138.21,193.41,188.2],["2026-05-13",142.53,138.54,193.53,189.28],["2026-05-14",139.83,136.93,194.09,189.6],["2026-05-15",139.39,136.58,191.12,189.87],["2026-05-18",139.48,135.82,189.49,188.84],["2026-05-19",138.89,134.78,191.73,191.7],["2026-05-20",135.21,133.99,194.16,190.37],["2026-05-21",137.07,131.81,194.1,186.64],["2026-05-22",136.16,133.24,194.39,183.97],["2026-05-25",134.38,133.76,192.87,182.31],["2026-05-26",133.48,131.05,195.22,179.36],["2026-05-27",135.92,130.71,190.24,178.97],["2026-05-28",139.07,133.33,192.02,179.5],["2026-05-29",139.9,134.45,194.44,178.49],["2026-06-01",140.46,133.38,195.33,179.21],["2026-06-02",141.18,132.39,193.89,175.15],["2026-06-03",142.52,133.78,191.65,177.13],["2026-06-04",144.96,134.5,196.08,179.44],["2026-06-05",144.16,135.05,196.01,176.74],["2026-06-08",143.45,133.52,194.33,176.09],["2026-06-09",144.27,135.28,193.65,174.37],["2026-06-10",143.65,136.24,192.78,176.78],["2026-06-11",144.43,135,188.77,178.28],["2026-06-12",144.32,135.13,191.38,176.17],["2026-06-15",143.19,134,190.3,175.17],["2026-06-16",144.5,134.11,189.38,172.99],["2026-06-17",143.88,131.54,190.66,175.54],["2026-06-18",147.4,132.07,192.89,178.11],["2026-06-19",143.47,132.32,189.75,178.74],["2026-06-22",144.14,133.15,191.72,178.19],["2026-06-23",145.68,135.04,191.04,178.11],["2026-06-24",146.23,134.17,192.32,180.28],["2026-06-25",145.79,134.65,191.4,180.2],["2026-06-26",144.69,132.13,190.13,179.59],["2026-06-29",143.76,132.34,190.03,177.9],["2026-06-30",144.72,132.09,191.27,177.42],["2026-07-01",142.78,134.2,189.85,176.73],["2026-07-02",141.41,134.59,188.59,179.08],["2026-07-03",141.74,134.92,189.28,180.26],["2026-07-06",144.04,138.34,188.33,179.65],["2026-07-07",143.71,137.32,187.62,180.24],["2026-07-08",145.12,139.25,189.32,179.66],["2026-07-09",145.93,139.11,186.56,182.04],["2026-07-10",146.18,139.95,185.38,182.99],["2026-07-13",147.28,140.51,187.08,183.15],["2026-07-14",146.6,139.91,188.93,182.62],["2026-07-15",147.55,141.44,186.56,182.64],["2026-07-16",147.11,140,187.34,184.14],["2026-07-17",149.27,139.54,187.33,182.52],["2026-07-20",147.9,137.75,188.18,182.83],["2026-07-21",147.39,138.35,187.71,183.9],["2026-07-22",145.67,136.31,189.39,183.75],["2026-07-23",144.67,137.81,193.26,185.29],["2026-07-24",146.73,138.38,194.72,184.53],["2026-07-27",144.7,137.81,193.47,184.95],["2026-07-28",144.45,136.03,194.73,187.59],["2026-07-29",143.54,134.44,193.67,185.17],["2026-07-30",144.69,135.58,193.98,183.13],["2026-07-31",144.86,135.91,195.67,184.14],["2026-08-03",147.66,135.17,192.43,185.35],["2026-08-04",147.99,136.08,193.69,187.01],["2026-08-05",145.81,134.57,194.03,189.59],["2026-08-06",146.16,133.59,195.52,188.17],["2026-08-07",147.49,134.21,195.16,185.52],["2026-08-10",146.54,135.98,194.51,185.2],["2026-08-11",149.76,136.86,195.25,183.45],["2026-08-12",151.11,137.21,197.62,185.89],["2026-08-13",150.24,136.91,197.59,184.86],["2026-08-14",148.36,135.58,197.39,185.39],["2026-08-17",148.14,134.79,195.05,183.98],["2026-08-18",146.81,134.93,195.2,183.08],["2026-08-19",145.86,136.05,197.19,181.63],["2026-08-20",149.26,134.55,197.27,177.67],["2026-08-21",149.49,134.4,196.42,176.88],["2026-08-24",149.11,135.21,196.13,179.29],["2026-08-25",148.73,134.28,194.52,177.77],["2026-08-26",148.62,135.55,195.51,177.82],["2026-08-27",147.26,137.67,196.95,178.78],["2026-08-28",146.43,134.95,193.93,178.86],["2026-08-31",145.5,133.51,189.81,176.83],["2026-09-01",142.93,133.02,191.23,174.43],["2026-09-02",142.5,134.4,189.98,173.73],["2026-09-03",142.42,135.15,191.92,172.29],["2026-09-04",143.75,132.92,187.22,174.35],["2026-09-07",144.97,130.47,189.08,176.58],["2026-09-08",144.41,130.34,186.02,179.54],["2026-09-09",142.75,130.52,187.67,180.99],["2026-09-10",142.66,131.38,191.27,176.06],["2026-09-11",149.02,138.03,199.37,184.75]],"comptr":[["2026-05-11",16.48,8.1,4.29,1.57,1.55,3.15,14.83,8.38,4.17,1.26,1.2,2.93],["2026-05-12",17.43,7.86,3.94,1.62,1.61,2.97,16.66,8.16,3.62,1.25,1.31,2.92],["2026-05-13",18.47,7.58,3.7,1.73,1.67,2.8,18.51,7.73,3.19,1.31,1.44,2.86],["2026-05-14",19.14,7.15,3.53,1.85,1.68,2.59,19.75,7.01,2.86,1.43,1.55,2.69],["2026-05-15",19.7,6.72,3.49,2,1.67,2.42,20.48,6.24,2.71,1.61,1.63,2.5],["2026-05-18",19.96,6.3,3.58,2.15,1.65,2.27,20.44,5.49,2.72,1.84,1.68,2.29],["2026-05-19",19.94,5.94,3.78,2.29,1.6,2.18,19.7,4.86,2.9,2.09,1.66,2.1],["2026-05-20",19.27,5.56,4.02,2.37,1.51,2.11,18.07,4.34,3.21,2.29,1.57,1.92],["2026-05-21",18.81,5.45,4.44,2.47,1.44,2.16,16.57,4.15,3.75,2.49,1.46,1.84],["2026-05-22",18.17,5.51,4.92,2.54,1.38,2.29,15.03,4.22,4.43,2.63,1.34,1.84],["2026-05-25",17.65,5.82,5.49,2.59,1.34,2.52,13.86,4.61,5.25,2.69,1.23,1.94],["2026-05-26",16.88,6.23,5.97,2.56,1.3,2.78,12.88,5.21,5.99,2.61,1.12,2.11],["2026-05-27",16.41,6.87,6.43,2.52,1.31,3.11,12.52,6.12,6.64,2.47,1.06,2.4],["2026-05-28",15.46,7.31,6.49,2.33,1.28,3.3,12.15,6.93,6.75,2.16,0.99,2.66],["2026-05-29",15.03,7.83,6.46,2.15,1.31,3.49,12.44,7.8,6.61,1.87,1,2.98],["2026-06-01",15.01,8.31,6.28,1.98,1.36,3.63,13.23,8.55,6.2,1.62,1.05,3.31],["2026-06-02",15.16,8.57,5.9,1.82,1.42,3.65,14.22,8.91,5.53,1.42,1.13,3.53],["2026-06-03",15.67,8.7,5.45,1.71,1.49,3.6,15.49,8.94,4.79,1.3,1.26,3.64],["2026-06-04",16.16,8.55,4.9,1.62,1.54,3.44,16.56,8.51,4.05,1.24,1.39,3.56],["2026-06-05",16.61,8.19,4.35,1.58,1.57,3.19,17.27,7.75,3.41,1.25,1.5,3.31],["2026-06-08",17.32,7.84,3.93,1.61,1.6,2.97,17.87,6.97,3,1.35,1.61,3.02],["2026-06-09",18.61,7.67,3.75,1.74,1.68,2.83,18.64,6.4,2.86,1.55,1.73,2.77],["2026-06-10",19.45,7.29,3.59,1.87,1.71,2.65,18.58,5.76,2.82,1.77,1.78,2.45],["2026-06-11",19.87,6.81,3.52,2.01,1.69,2.45,17.87,5.21,2.92,2,1.73,2.13],["2026-06-12",20.44,6.47,3.66,2.19,1.69,2.33,17.24,4.93,3.23,2.25,1.67,1.9],["2026-06-15",20.34,6.07,3.85,2.33,1.63,2.23,16.21,4.74,3.62,2.42,1.53,1.74],["2026-06-16",19.86,5.74,4.13,2.44,1.55,2.18,15.25,4.71,4.09,2.51,1.36,1.66],["2026-06-17",19.25,5.58,4.52,2.53,1.48,2.21,14.64,4.87,4.63,2.52,1.22,1.69],["2026-06-18",18.81,5.69,5.07,2.62,1.43,2.36,14.6,5.29,5.27,2.48,1.12,1.87],["2026-06-19",17.58,5.77,5.44,2.58,1.34,2.5,14.28,5.66,5.61,2.29,1.02,2.09],["2026-06-22",16.4,6.02,5.77,2.49,1.27,2.68,14.16,6.14,5.78,2.08,0.97,2.39],["2026-06-23",15.66,6.53,6.12,2.4,1.25,2.95,14.41,6.78,5.84,1.9,0.98,2.8],["2026-06-24",15.08,7.1,6.32,2.27,1.25,3.21,14.68,7.34,5.68,1.74,1.04,3.2],["2026-06-25",14.24,7.39,6.12,2.04,1.24,3.3,14.45,7.45,5.16,1.55,1.1,3.4],["2026-06-26",14.07,7.78,5.9,1.87,1.28,3.4,14.59,7.49,4.7,1.46,1.2,3.54],["2026-06-29",14.13,7.98,5.51,1.7,1.32,3.41,14.65,7.25,4.23,1.4,1.31,3.5],["2026-06-30",14.27,7.94,4.99,1.56,1.36,3.29,14.47,6.76,3.79,1.36,1.39,3.27],["2026-07-01",14.81,7.86,4.52,1.49,1.41,3.16,14.39,6.31,3.51,1.39,1.47,2.98],["2026-07-02",15.41,7.62,4.06,1.47,1.45,2.97,14.14,5.87,3.3,1.44,1.5,2.64],["2026-07-03",16.38,7.44,3.74,1.52,1.52,2.82,14.1,5.65,3.23,1.55,1.52,2.35],["2026-07-06",17.08,7.07,3.45,1.6,1.54,2.61,13.85,5.46,3.18,1.66,1.47,2.06],["2026-07-07",18.27,6.87,3.38,1.76,1.6,2.5,14.16,5.53,3.29,1.82,1.44,1.91],["2026-07-08",18.87,6.49,3.35,1.9,1.61,2.33,14.35,5.55,3.4,1.91,1.36,1.77],["2026-07-09",19.15,6.08,3.42,2.05,1.58,2.19,14.72,5.54,3.55,1.97,1.26,1.71],["2026-07-10",19.53,5.84,3.68,2.23,1.57,2.14,15.6,5.64,3.81,2.02,1.2,1.76],["2026-07-13",19.3,5.58,3.99,2.36,1.51,2.11,16.32,5.63,4.04,2.01,1.15,1.85],["2026-07-14",18.87,5.46,4.41,2.47,1.45,2.16,17.01,5.65,4.28,1.98,1.13,2.01],["2026-07-15",18.22,5.5,4.88,2.53,1.38,2.28,17.44,5.71,4.47,1.95,1.12,2.24],["2026-07-16",17.41,5.69,5.36,2.55,1.32,2.46,17.47,5.8,4.61,1.94,1.14,2.51],["2026-07-17",16.4,6,5.74,2.49,1.26,2.67,16.93,5.88,4.65,1.92,1.16,2.77],["2026-07-20",15.73,6.52,6.12,2.41,1.25,2.95,16.35,6.04,4.74,1.94,1.22,3.05],["2026-07-21",14.9,6.98,6.23,2.25,1.23,3.15,15.25,6.07,4.74,1.93,1.25,3.17],["2026-07-22",14.31,7.4,6.15,2.06,1.24,3.31,14.12,6.05,4.73,1.88,1.29,3.18],["2026-07-23",14.02,7.73,5.89,1.87,1.27,3.39,13.12,6.02,4.71,1.81,1.32,3.07],["2026-07-24",14.45,8.16,5.66,1.75,1.35,3.49,12.7,6.21,4.79,1.77,1.37,2.97],["2026-07-27",15.07,8.4,5.3,1.66,1.43,3.48,12.44,6.43,4.78,1.72,1.39,2.79],["2026-07-28",15.97,8.49,4.9,1.61,1.52,3.42,12.53,6.73,4.69,1.67,1.39,2.63],["2026-07-29",16.6,8.23,4.39,1.58,1.57,3.22,12.66,6.89,4.41,1.61,1.35,2.45],["2026-07-30",17.21,7.84,3.95,1.6,1.6,2.98,13.14,7,4.08,1.57,1.29,2.3],["2026-07-31",17.61,7.31,3.58,1.64,1.59,2.71,13.85,6.94,3.72,1.52,1.23,2.19],["2026-08-03",17.94,6.78,3.33,1.72,1.58,2.46,14.87,6.76,3.41,1.49,1.2,2.11],["2026-08-04",18.66,6.44,3.31,1.88,1.59,2.31,16.47,6.63,3.26,1.54,1.22,2.11],["2026-08-05",18.76,5.97,3.35,2,1.55,2.15,17.63,6.21,3.13,1.56,1.24,2.08],["2026-08-06",18.89,5.66,3.55,2.15,1.52,2.07,18.7,5.82,3.12,1.64,1.29,2.09],["2026-08-07",18.76,5.43,3.87,2.29,1.47,2.05,19.23,5.4,3.19,1.75,1.33,2.12],["2026-08-10",17.86,5.17,4.15,2.33,1.37,2.04,18.57,4.88,3.25,1.85,1.31,2.12],["2026-08-11",17.25,5.19,4.59,2.39,1.31,2.15,17.79,4.61,3.5,2,1.32,2.19],["2026-08-12",16.53,5.39,5.06,2.41,1.25,2.32,16.54,4.49,3.86,2.15,1.29,2.27],["2026-08-13",15.33,5.58,5.34,2.32,1.18,2.48,14.62,4.41,4.2,2.2,1.23,2.29],["2026-08-14",14.69,6.06,5.7,2.25,1.17,2.74,13.19,4.63,4.73,2.25,1.2,2.38],["2026-08-17",13.64,6.36,5.69,2.06,1.13,2.87,11.49,4.84,5.03,2.12,1.11,2.34],["2026-08-18",12.93,6.67,5.55,1.86,1.12,2.98,10.29,5.21,5.22,1.93,1.05,2.32],["2026-08-19",13.09,7.21,5.51,1.75,1.18,3.16,10.04,5.92,5.46,1.8,1.04,2.4],["2026-08-20",13.48,7.61,5.3,1.64,1.26,3.26,10.25,6.65,5.44,1.63,1.04,2.5],["2026-08-21",13.61,7.59,4.81,1.5,1.29,3.15,10.57,7.07,5,1.42,1.01,2.5],["2026-08-24",14.41,7.68,4.45,1.46,1.37,3.1,11.72,7.55,4.59,1.3,1.04,2.6],["2026-08-25",15.17,7.55,4.04,1.45,1.43,2.95,13.12,7.71,4.04,1.21,1.09,2.64],["2026-08-26",16.12,7.37,3.72,1.5,1.5,2.8,14.85,7.66,3.54,1.18,1.18,2.66],["2026-08-27",17,7.08,3.47,1.59,1.54,2.63,16.57,7.32,3.11,1.22,1.28,2.63],["2026-08-28",17.37,6.59,3.24,1.67,1.53,2.39,17.64,6.63,2.73,1.27,1.35,2.46],["2026-08-31",17.52,6.07,3.12,1.76,1.5,2.18,18.18,5.84,2.48,1.38,1.41,2.27],["2026-09-01",17.61,5.62,3.14,1.87,1.46,2.03,18.25,5.1,2.41,1.54,1.45,2.08],["2026-09-02",17.72,5.32,3.32,2.01,1.43,1.95,17.95,4.52,2.53,1.76,1.47,1.94],["2026-09-03",17.69,5.12,3.63,2.15,1.39,1.93,17.17,4.11,2.82,2,1.45,1.82],["2026-09-04",17.18,4.97,3.97,2.24,1.32,1.96,15.74,3.83,3.23,2.2,1.36,1.74],["2026-09-07",16.32,4.9,4.32,2.26,1.24,2.02,14.03,3.72,3.74,2.31,1.24,1.68],["2026-09-08",15.19,4.93,4.62,2.22,1.15,2.12,12.3,3.81,4.26,2.31,1.09,1.67],["2026-09-09",14.51,5.25,5.03,2.19,1.12,2.33,11.24,4.24,4.91,2.26,1,1.78],["2026-09-10",13.57,5.57,5.24,2.08,1.07,2.51,10.32,4.77,5.33,2.09,0.9,1.91],["2026-09-11",17.15,7.96,7.14,2.59,1.41,3.6,13.19,7.27,7.41,2.49,1.12,2.82]],"limh":[["2026-05-11",16.97],["2026-05-12",16.88],["2026-05-13",16.54],["2026-05-14",16.26],["2026-05-15",15.64],["2026-05-18",16.7],["2026-05-19",16.65],["2026-05-20",15.58],["2026-05-21",16.7],["2026-05-22",15.96],["2026-05-25",15],["2026-05-26",13.85],["2026-05-27",14.46],["2026-05-28",15.03],["2026-05-29",15.7],["2026-06-01",15.61],["2026-06-02",16.54],["2026-06-03",16.3],["2026-06-04",16.18],["2026-06-05",16.38],["2026-06-08",15.37],["2026-06-09",14.98],["2026-06-10",15.94],["2026-06-11",15.68],["2026-06-12",15.34],["2026-06-15",16.05],["2026-06-16",16.35],["2026-06-17",15.34],["2026-06-18",15.1],["2026-06-19",15.64],["2026-06-22",15.64],["2026-06-23",16.48],["2026-06-24",16.18],["2026-06-25",16.09],["2026-06-26",16.46],["2026-06-29",16.66],["2026-06-30",16.51],["2026-07-01",16.78],["2026-07-02",16.16],["2026-07-03",16.1],["2026-07-06",17.28],["2026-07-07",17.44],["2026-07-08",17.07],["2026-07-09",17.2],["2026-07-10",17.17],["2026-07-13",16.34],["2026-07-14",16.37],["2026-07-15",17.35],["2026-07-16",16.56],["2026-07-17",16.3],["2026-07-20",15.69],["2026-07-21",15.13],["2026-07-22",16],["2026-07-23",16.62],["2026-07-24",16.35],["2026-07-27",16.8],["2026-07-28",17.68],["2026-07-29",18.56],["2026-07-30",18.09],["2026-07-31",17.26],["2026-08-03",17.34],["2026-08-04",16.81],["2026-08-05",16.81],["2026-08-06",16.65],["2026-08-07",15.81],["2026-08-10",15.06],["2026-08-11",14.13],["2026-08-12",15.07],["2026-08-13",14.41],["2026-08-14",14.28],["2026-08-17",15.04],["2026-08-18",14.24],["2026-08-19",15.24],["2026-08-20",14.96],["2026-08-21",14.43],["2026-08-24",13.7],["2026-08-25",13.26],["2026-08-26",14.01],["2026-08-27",12.9],["2026-08-28",13.64],["2026-08-31",13.5],["2026-09-01",13.85],["2026-09-02",14.73],["2026-09-03",15.63],["2026-09-04",14.57],["2026-09-07",13.6],["2026-09-08",13.76],["2026-09-09",13.06],["2026-09-10",13.39],["2026-09-11",17.82]],"dgr":[{"id":"amer","region":"AMER","delta":18.11,"gamma":-18.14,"vega":0,"stock_vega":45.78,"wtd_vega":23.16,"stock_gamma":28.35,"skew":10.7,"dividend":10.18,"borrow":-24.16,"a_c_delta":0,"opt_theta":20.52,"fx_delta":-12.63,"ir_delta":-19.52,"cr01":-7.24,"cb_delta":-12.48},{"id":"emea","region":"EMEA","delta":-19.29,"gamma":-8.38,"vega":4.87,"stock_vega":-19.16,"wtd_vega":19.5,"stock_gamma":46.88,"skew":3.77,"dividend":9.89,"borrow":12.87,"a_c_delta":4.36,"opt_theta":43.81,"fx_delta":-9.75,"ir_delta":3.94,"cr01":-5.63,"cb_delta":-31.49},{"id":"apac","region":"APAC","delta":-20.05,"gamma":7.63,"vega":-17.89,"stock_vega":8.32,"wtd_vega":37.75,"stock_gamma":-25.44,"skew":12.64,"dividend":8.76,"borrow":-27.22,"a_c_delta":-8.25,"opt_theta":-27.33,"fx_delta":-5.57,"ir_delta":12.23,"cr01":-7.76,"cb_delta":-15.46},{"id":"x_regions","region":"X-regions","delta":-13.02,"gamma":9.1,"vega":5.35,"stock_vega":17.64,"wtd_vega":37.04,"stock_gamma":46.49,"skew":11.56,"dividend":15.78,"borrow":-28.6,"a_c_delta":-26.75,"opt_theta":44.37,"fx_delta":-15.09,"ir_delta":0,"cr01":2.73,"cb_delta":-4.4}],"dsr":[{"id":"amer","region":"AMER","s_p10":277,"s_p5":74,"s_m5":76,"s_m10":380,"s_m20":1574,"s_m30":2058},{"id":"emea","region":"EMEA","s_p10":19,"s_p5":-7,"s_m5":30,"s_m10":84,"s_m20":168,"s_m30":299},{"id":"apac","region":"APAC","s_p10":79,"s_p5":30,"s_m5":13,"s_m10":57,"s_m20":181,"s_m30":297},{"id":"x_regions","region":"X-regions","s_p10":159,"s_p5":36,"s_m5":33,"s_m10":79,"s_m20":337,"s_m30":372}],"csd":[{"id":"mbrf3-sa","name":"MBRF3.SA","exposure":176,"diff":-5},{"id":"arkk-z","name":"ARKK.Z","exposure":166,"diff":8},{"id":"pfe-n","name":"PFE.N","exposure":69,"diff":70},{"id":"aapl-o","name":"AAPL.O","exposure":62,"diff":10},{"id":"msft-o","name":"MSFT.O","exposure":-56,"diff":-12},{"id":"amzn-o","name":"AMZN.O","exposure":50,"diff":-10},{"id":"tsla-o","name":"TSLA.O","exposure":-43,"diff":-6},{"id":"jpm-n","name":"JPM.N","exposure":37,"diff":3},{"id":"005930-ks","name":"005930.KS","exposure":31,"diff":-1},{"id":"nesn-s","name":"NESN.S","exposure":25,"diff":1},{"id":"asml-as","name":"ASML.AS","exposure":19,"diff":2},{"id":"7203-t","name":"7203.T","exposure":-12,"diff":-1}],"jtd":[{"id":"mbrf-global-foods-co-sa","name":"MBRF GLOBAL FOODS CO SA","value":354},{"id":"samsung-electronics-co-ltd","name":"SAMSUNG ELECTRONICS CO LTD","value":333},{"id":"xcel-energy-inc","name":"XCEL ENERGY INC","value":212},{"id":"bayer-ag","name":"BAYER AG","value":188},{"id":"vale-sa","name":"VALE SA","value":171}]}};
+const T = PACK.T, D = PACK.D, TM = {};
+T.push({ id: 'layout.header', cat: 'Layout', kind: 'header', title: 'Section header', desc: 'A full-width heading that groups the widgets below it.', filters: [], span: 12, h: 'xs' });
+T.push({ id: 'layout.text', cat: 'Layout', kind: 'text', title: 'Notes', desc: 'Commentary or context for readers, such as COB notes or how to read a grid.', filters: [], span: 4, h: 'xs' });
+T.forEach(function (t) { TM[t.id] = t; });
+const FDEF = {
+  compare: { label: 'Compare', opts: [['DoD', 'DoD'], ['WoW', 'WoW'], ['MoM', 'MoM']] },
+  region: { label: 'Region by desk', opts: [['All', 'ALL'], ['NA', 'NA'], ['EMEA', 'EMEA'], ['APAC', 'APAC'], ['Latam', 'LATAM'], ['Global', 'GLOBAL']] },
+  variant: { label: 'Variant', opts: [['1D', '1DAY'], ['10D', '10DAY']] },
+  attribute: { label: 'Attribute', opts: [['Trading', 'Trading'], ['Economic', 'Economic'], ['Volcker', 'Volcker'], ['Basel 3', 'Basel 3']] },
+  display: { label: 'Display', opts: [['Both', 'Both'], ['MC', 'MC VaR'], ['Hist', 'Hist VaR']] },
+  days: { label: 'Days in trend', opts: [[30, '30 Days'], [60, '60 Days'], [90, '90 Days']] },
+  topN: { label: 'Top names', opts: [[3, 'Top 3'], [5, 'Top 5'], [10, 'Top 10'], ['All', 'All']] }
+};
+const DEF = { compare: 'DoD', region: 'All', variant: '1D', attribute: 'Trading', display: 'Both', days: 30, topN: 5 };
+const BAR_ORDER = ['region', 'variant', 'attribute', 'display', 'days', 'topN'];
+const RULE_FILTERS = ['region', 'variant', 'attribute', 'display', 'compare'];
+const ATTR = { Trading: 1, Economic: 1.07, Volcker: 0.92, 'Basel 3': 1.12 };
+const PCOB = { DoD: '10-Sep-2026', WoW: '04-Sep-2026', MoM: '11-Aug-2026' };
+const XMAP = { AMER: 'NA', EMEA: 'EMEA', APAC: 'APAC', 'X-regions': 'Global' };
+const XPROV = { 'greek.daily-greek': 1, 'greek.daily-stress': 1 };
+const TONES = ['#3a6ae6', '#7a5af8', '#0e9384', '#f79009', '#e04f8e', '#667085'];
+const HPX = { s: 300, m: 420, l: 540 };
+const SPANS = [[3, '¼', 'Quarter width'], [4, '⅓', 'Third width'], [6, '½', 'Half width'], [8, '⅔', 'Two-thirds width'], [12, 'Full', 'Full width']];
+const HS = [['s', 'S', 'Short'], ['m', 'M', 'Medium'], ['l', 'L', 'Tall']];
+const KIND = { grid: 'Grid', line: 'Line chart', stack: 'Stacked chart', exposure: 'Bar chart', kpi: 'KPI tiles', alerts: 'Alert strip', list: 'Top list', header: 'Section header', text: 'Text block' };
+const GLYPH = {
+  grid: 'M8 10h48v30H8zM8 18h48M8 26h48M8 34h48M22 10v30', line: 'M8 38l12-10 10 4 12-14 14 6M8 40h48',
+  stack: 'M12 40V26M22 40V18M32 40V22M42 40V12M52 40V20M8 40h48', exposure: 'M12 40V24M22 40V20M32 40V16M42 40V22M52 40V14M8 18h48',
+  kpi: 'M8 12h20v24H8zM36 12h20v24H36zM12 28l4-4 4 2 4-6M40 28l4-6 4 3 4-5', alerts: 'M8 18h48v12H8zM14 24h6M26 24h18',
+  list: 'M10 14h30M10 24h22M10 34h14M44 14h10M44 24h10M44 34h10', header: 'M8 20h22M8 28h48', text: 'M10 12h44M10 20h44M10 28h36M10 36h28'
+};
+const ICON = {
+  dash: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z', greek: 'M5 19V9a4 4 0 0 1 8 0v10M5 14h8M16 5l4 14',
+  star: 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.5 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z', plus: 'M12 5v14M5 12h14',
+  blank: 'M5 4h10l4 4v12H5zM15 4v4h4M12 11v6M9 14h6', pin: 'M12 17v5M9 3h6l-1 6 4 4H6l4-4z',
+  link: 'M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7',
+  clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2', filter: 'M4 5h16l-6 8v6l-4-2v-4L4 5z',
+  eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z', off: 'M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6 0 10 7 10 7a17 17 0 0 1-3.2 3.9M6.6 6.6C3.8 8.4 2 12 2 12s4 7 10 7a9.7 9.7 0 0 0 5.4-1.6'
+};
+const MINUS = '−';
+let SEQ = 100;
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+function f2(v) { if (v == null || isNaN(v)) return '–'; return (v < 0 ? MINUS : '') + Math.abs(v).toFixed(2); }
+function fd(v) { if (v == null || isNaN(v)) return '–'; const a = Math.abs(v).toFixed(2); return (+a === 0 ? '' : v > 0 ? '+' : MINUS) + a; }
+function fi(v) { if (v == null || isNaN(v)) return '–'; return (v < 0 ? MINUS : '') + Math.round(Math.abs(v)).toLocaleString('en-US'); }
+function fp(v) { return (v * 100).toFixed(0) + '%'; }
+function dcol(v) { return v > 0.004 ? '#b54708' : v < -0.004 ? '#175cd3' : '#667085'; }
+function ncol(v) { return v < 0 ? '#b42318' : '#101828'; }
+function utone(u) { return u >= 1 ? '#d92d20' : u >= 0.8 ? '#f79009' : '#3a6ae6'; }
+function dlabel(s) { const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; const p = s.split('-'); return p[2] + '-' + m[+p[1] - 1]; }
+function niceMax(v) { if (v <= 0) return 1; const e = Math.pow(10, Math.floor(Math.log10(v))); const n = v / e; const s = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10; return s * e; }
+function optLabel(f, v) { const o = FDEF[f].opts.find(function (x) { return x[0] === v; }); return o ? o[1] : String(v); }
+function titleOf(w) { return w.title || TM[w.t].title; }
+function mkInst(tid) {
+  const t = TM[tid];
+  const w = { id: 'w' + (++SEQ), t: tid, title: null, span: t.span, h: t.h, pins: {}, link: null, xf: true, rule: { kind: 'always' }, cols: t.cols ? t.cols.map(function (c) { return { f: c.f, on: c.on, pin: !!c.pin }; }) : null };
+  if (t.kind === 'text') w.text = 'Write a note for readers here.';
+  return w;
+}
+function findPos(d, id) { for (let a = 0; a < d.tabs.length; a++) { const rs = d.tabs[a].rows; for (let i = 0; i < rs.length; i++) { const j = rs[i].indexOf(id); if (j >= 0) return [a, i, j]; } } return null; }
+function cleanRows(d) { d.tabs.forEach(function (t) { t.rows = t.rows.map(function (r) { return r.filter(function (x) { return x != null; }); }).filter(function (r) { return r.length; }); }); }
+function wOf(d, id) { return d.widgets.find(function (x) { return x.id === id; }); }
+function appendTo(d, tab, w) {
+  const last = tab.rows[tab.rows.length - 1];
+  const used = last ? last.reduce(function (a, id) { const x = wOf(d, id); return a + (x ? x.span : 0); }, 0) : 12;
+  if (last && used + w.span <= 12) last.push(w.id); else tab.rows.push([w.id]);
+}
+function autoLink(d, w) {
+  const t = TM[w.t];
+  if (t.consumes) { const p = d.widgets.find(function (x) { return x.id !== w.id && TM[x.t].provides === t.consumes; }); w.link = p ? p.id : null; }
+  if (t.provides) d.widgets.forEach(function (x) { if (TM[x.t].consumes === t.provides && !x.link) x.link = w.id; });
+}
+function oneTabDoc(kind) {
+  const d = { tabs: [{ id: 't' + (++SEQ), name: 'Overview', layout: 'manual', rows: [] }], widgets: [], scopes: {} };
+  const add = function (tid, o) { const w = mkInst(tid); Object.assign(w, o || {}); autoLink(d, w); d.widgets.push(w); return w; };
+  if (kind === 'var') {
+    const a = add('var.alerts', { rule: { kind: 'data' } }); const s = add('var.standalone'); const tr = add('var.standalone-trend');
+    const c = add('var.component'); const ct = add('var.component-trend'); const l = add('var.limits'); const e = add('var.limit-exposure');
+    d.tabs[0].rows = [[a.id], [s.id, tr.id], [c.id, ct.id], [l.id, e.id]];
+  } else {
+    const g = add('greek.daily-greek'); const s = add('greek.daily-stress'); const c = add('greek.conc-delta'); const j = add('greek.top-jtd');
+    d.tabs[0].name = 'Greeks'; d.tabs[0].rows = [[g.id], [s.id, c.id, j.id]];
+  }
+  return d;
+}
+function seedVersions() {
+  const W = {};
+  const mk = function (id, tid, o) { const w = mkInst(tid); w.id = id; Object.assign(w, o || {}); W[id] = w; };
+  mk('w1', 'var.kpi', { span: 8 }); mk('w2', 'layout.text', { title: 'COB notes', text: 'D1 – NAM VaR is in breach at 119% after the NA derivatives roll. A temporary limit increase is under review.\n\nGreeks tab: EMEA delta flipped short week on week. Click EMEA in Daily Greek to see the VaR side.' });
+  mk('w3', 'var.alerts', { rule: { kind: 'data' } }); mk('w4', 'layout.header', { title: 'Desk drill-down' });
+  mk('w5', 'var.standalone'); mk('w6', 'var.standalone-trend', { link: 'w5' }); mk('w13', 'layout.header', { title: 'Limits' });
+  mk('w7', 'var.limits'); mk('w8', 'var.limit-exposure', { link: 'w7' });
+  mk('w9', 'greek.daily-greek'); mk('w10', 'greek.daily-stress'); mk('w11', 'greek.conc-delta'); mk('w12', 'greek.top-jtd');
+  const pick = function (ids, patch) { return ids.map(function (id) { return Object.assign(clone(W[id]), (patch || {})[id] || {}); }); };
+  const v5 = { tabs: [{ id: 't1', name: 'Overview', layout: 'manual', rows: [['w1'], ['w5', 'w6'], ['w7', 'w8']] }], widgets: pick(['w1', 'w5', 'w6', 'w7', 'w8'], { w1: { span: 12 } }), scopes: {} };
+  const v6 = { tabs: [{ id: 't1', name: 'Overview', layout: 'manual', rows: [['w1'], ['w3'], ['w5', 'w6'], ['w7', 'w8'], ['w9', 'w12']] }], widgets: pick(['w1', 'w3', 'w5', 'w6', 'w7', 'w8', 'w9', 'w12'], { w1: { span: 12 }, w9: { span: 8 }, w12: { span: 4, h: 's' } }), scopes: {} };
+  const v7 = {
+    tabs: [{ id: 't1', name: 'Overview', layout: 'manual', rows: [['w1', 'w2'], ['w3'], ['w4'], ['w5', 'w6'], ['w13'], ['w7', 'w8']] }, { id: 't2', name: 'Greeks', layout: 'auto', rows: [['w9'], ['w10', 'w11', 'w12']] }],
+    widgets: pick(['w1', 'w2', 'w3', 'w4', 'w5', 'w6', 'w13', 'w7', 'w8', 'w9', 'w10', 'w11', 'w12']), scopes: {}
+  };
+  return [
+    { v: 5, when: '02-Sep-2026 18:10', who: 'Rajesh', note: 'First version', doc: v5 },
+    { v: 6, when: '08-Sep-2026 09:42', who: 'Rajesh', note: 'Added limit alerts and Greeks', doc: v6 },
+    { v: 7, when: '11-Sep-2026 08:15', who: 'Rajesh', note: 'Split into tabs, added notes and headers', doc: v7 }
+  ];
+}
+function diffDocs(a, b) {
+  if (!a) return [{ text: 'Created', fg: '#475467' }];
+  const ia = {}, ib = {}; a.widgets.forEach(function (w) { ia[w.id] = w; }); b.widgets.forEach(function (w) { ib[w.id] = w; });
+  const out = [];
+  b.widgets.forEach(function (w) { if (!ia[w.id]) out.push({ text: '+ ' + titleOf(w), fg: '#067647' }); });
+  a.widgets.forEach(function (w) { if (!ib[w.id]) out.push({ text: MINUS + ' ' + titleOf(w), fg: '#b42318' }); });
+  const tn = function (d) { return d.tabs.map(function (t) { return t.name + (t.layout === 'auto' ? ' (auto)' : ''); }).join(', '); };
+  if (tn(a) !== tn(b)) out.push({ text: '~ Tabs: ' + tn(b), fg: '#1d4596' });
+  b.widgets.forEach(function (w) { const o = ia[w.id]; if (o && JSON.stringify(o) !== JSON.stringify(w)) out.push({ text: '~ ' + titleOf(w) + ' settings', fg: '#1d4596' }); });
+  if (!out.length) out.push({ text: '~ Layout changed', fg: '#1d4596' });
+  return out.length > 6 ? out.slice(0, 6).concat([{ text: '… ' + (out.length - 6) + ' more', fg: '#667085' }]) : out;
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const vs = seedVersions();
+    this.dragKey = null;
+    this.state = {
+      dashboards: [{ id: 'cd_8f2a', name: 'EMEA Risk Desk', version: 7, doc: clone(vs[2].doc), versions: vs }],
+      active: 'cd_8f2a', tab: 't1', mode: 'view', draft: null, draftName: '', hist: [], fut: [], preview: null,
+      filters: Object.assign({}, DEF), sel: {}, xf: null, sort: {}, my: [],
+      drawer: null, cfg: null, cfgTab: 'columns', q: '', cat: 'All', colQ: '', scopeOpen: null,
+      dragging: false, over: null, toast: null, flash: null, jsonTab: 'doc'
+    };
+  }
+  componentWillUnmount() { clearTimeout(this.tt); clearTimeout(this.ft); }
+  dash() { const s = this.state; return s.dashboards.find(function (x) { return x.id === s.active; }); }
+  doc() {
+    const s = this.state;
+    if (s.mode === 'edit') return s.draft;
+    if (s.preview) { const v = this.dash().versions.find(function (x) { return x.v === s.preview; }); if (v) return v.doc; }
+    return this.dash().doc;
+  }
+  tabObj(d) { const s = this.state; return d.tabs.find(function (t) { return t.id === s.tab; }) || d.tabs[0]; }
+  curTabId() { return this.tabObj(this.doc()).id; }
+  toastMsg(m) { clearTimeout(this.tt); this.setState({ toast: m }); this.tt = setTimeout(() => this.setState({ toast: null }), 2600); }
+  flashId(id) { clearTimeout(this.ft); this.setState({ flash: id }); this.ft = setTimeout(() => this.setState({ flash: null }), 1600); }
+  mut(fn, noHist) {
+    this.setState(function (s) { const d = clone(s.draft); fn(d); return noHist ? { draft: d } : { draft: d, hist: s.hist.concat([s.draft]).slice(-60), fut: [] }; });
+  }
+
+  startEdit() { const b = this.dash(); this.setState({ mode: 'edit', draft: clone(b.doc), draftName: b.name, hist: [], fut: [], drawer: null, preview: null }); }
+  cancelEdit() {
+    const b = this.dash();
+    if (b.version === 0) { const rest = this.state.dashboards.filter(function (x) { return x.id !== b.id; }); this.setState({ dashboards: rest, active: rest[0].id, tab: rest[0].doc.tabs[0].id, mode: 'view', draft: null, drawer: null, cfg: null, scopeOpen: null }); }
+    else this.setState({ mode: 'view', draft: null, drawer: null, cfg: null, scopeOpen: null });
+  }
+  save() {
+    const s = this.state, b = this.dash(), v = b.version + 1, nm = (s.draftName || '').trim() || 'Untitled dashboard';
+    const ver = { v: v, when: 'Just now', who: 'Rajesh (you)', note: s.hist.length ? s.hist.length + ' change' + (s.hist.length > 1 ? 's' : '') : 'Saved without changes', doc: clone(s.draft) };
+    const list = s.dashboards.map(function (x) { return x.id === b.id ? { id: x.id, name: nm, version: v, doc: clone(s.draft), versions: x.versions.concat([ver]) } : x; });
+    this.setState({ dashboards: list, mode: 'view', draft: null, drawer: null, cfg: null, scopeOpen: null });
+    this.toastMsg('Saved “' + nm + '” · version ' + v);
+  }
+  restore(vn) {
+    const s = this.state, b = this.dash(); const src = b.versions.find(function (x) { return x.v === vn; }); const v = b.version + 1;
+    const ver = { v: v, when: 'Just now', who: 'Rajesh (you)', note: 'Restored v' + vn, doc: clone(src.doc) };
+    const list = s.dashboards.map(function (x) { return x.id === b.id ? Object.assign({}, x, { version: v, doc: clone(src.doc), versions: x.versions.concat([ver]) }) : x; });
+    this.setState({ dashboards: list, preview: null, drawer: null, tab: src.doc.tabs[0].id });
+    this.toastMsg('Restored v' + vn + ' as version ' + v);
+  }
+  newDash() {
+    const id = 'cd_' + Math.random().toString(16).slice(2, 6);
+    const doc = { tabs: [{ id: 't' + (++SEQ), name: 'Overview', layout: 'manual', rows: [] }], widgets: [], scopes: {} };
+    const b = { id: id, name: 'Untitled dashboard', version: 0, doc: doc, versions: [] };
+    this.setState({ dashboards: this.state.dashboards.concat([b]), active: id, tab: doc.tabs[0].id, mode: 'edit', draft: clone(doc), draftName: b.name, hist: [], fut: [], drawer: null, cfg: null, sel: {}, xf: null, preview: null });
+  }
+  openDash(id) {
+    if (this.state.mode === 'edit') { this.toastMsg('Save or cancel your edits first'); return; }
+    const b = this.state.dashboards.find(function (x) { return x.id === id; });
+    this.setState({ active: id, tab: b.doc.tabs[0].id, sel: {}, xf: null, drawer: null, preview: null });
+  }
+  startFrom(kind) {
+    const nd = oneTabDoc(kind);
+    this.mut(function (d) { d.tabs = nd.tabs; d.widgets = nd.widgets; d.scopes = {}; });
+    this.setState({ tab: nd.tabs[0].id });
+    if (this.state.draftName === 'Untitled dashboard') this.setState({ draftName: kind === 'var' ? 'My VaR Summary' : 'My Greek view' });
+  }
+  undo() { this.setState(function (s) { return s.hist.length ? { draft: s.hist[s.hist.length - 1], hist: s.hist.slice(0, -1), fut: [s.draft].concat(s.fut) } : null; }); }
+  redo() { this.setState(function (s) { return s.fut.length ? { draft: s.fut[0], fut: s.fut.slice(1), hist: s.hist.concat([s.draft]) } : null; }); }
+
+  instFromKey(k) {
+    if (k.indexOf('my:') === 0) { const m = this.state.my.find(function (x) { return x.id === k.slice(3); }); const w = mkInst(m.base); const id = w.id; Object.assign(w, clone(m.snap)); w.id = id; return w; }
+    return mkInst(k);
+  }
+  addKey(k) {
+    const w = this.instFromKey(k), tabId = this.curTabId();
+    this.mut(function (d) { autoLink(d, w); d.widgets.push(w); appendTo(d, d.tabs.find(function (t) { return t.id === tabId; }) || d.tabs[0], w); });
+    this.flashId(w.id); this.toastMsg('Added “' + titleOf(w) + '”');
+  }
+  saveMine(w) {
+    const id = 'm' + (++SEQ);
+    const snap = clone({ title: titleOf(w), span: w.span, h: w.h, pins: w.pins, cols: w.cols, rule: w.rule, xf: w.xf, text: w.text });
+    this.setState({ my: this.state.my.concat([{ id: id, base: w.t, snap: snap }]) });
+    this.toastMsg('Saved “' + titleOf(w) + '” to My widgets');
+  }
+  remove(id) {
+    const w = wOf(this.doc(), id);
+    this.mut(function (d) {
+      d.widgets = d.widgets.filter(function (x) { return x.id !== id; });
+      d.widgets.forEach(function (x) { if (x.link === id) x.link = null; });
+      d.tabs.forEach(function (t) { t.rows = t.rows.map(function (r) { return r.filter(function (x) { return x !== id; }); }).filter(function (r) { return r.length; }); });
+      Object.keys(d.scopes || {}).forEach(function (f) { d.scopes[f] = d.scopes[f].filter(function (x) { return x !== id; }); });
+    });
+    if (this.state.xf && this.state.xf.from === id) this.setState({ xf: null });
+    if (this.state.cfg === id) this.setState({ drawer: null, cfg: null });
+    this.toastMsg('Removed “' + titleOf(w) + '” · Undo is in the header');
+  }
+  dup(id) {
+    const nw = Object.assign(clone(wOf(this.doc(), id)), { id: 'w' + (++SEQ) });
+    this.mut(function (d) { d.widgets.push(nw); const p = findPos(d, id); d.tabs[p[0]].rows[p[1]].splice(p[2] + 1, 0, nw.id); });
+    this.flashId(nw.id);
+  }
+  moveLR(id, dir) {
+    this.mut(function (d) {
+      const p = findPos(d, id); const rows = d.tabs[p[0]].rows; const r = rows[p[1]]; const j = p[2] + dir;
+      if (j >= 0 && j < r.length) { r[p[2]] = r[j]; r[j] = id; return; }
+      const ri = p[1] + dir; if (ri < 0 || ri >= rows.length) return;
+      r.splice(p[2], 1); if (dir < 0) rows[ri].push(id); else rows[ri].unshift(id);
+      cleanRows(d);
+    });
+  }
+  moveToTab(id, tabId) {
+    this.mut(function (d) { const p = findPos(d, id); d.tabs[p[0]].rows[p[1]][p[2]] = null; d.tabs.find(function (t) { return t.id === tabId; }).rows.push([id]); cleanRows(d); });
+    const nm = this.state.draft.tabs.find(function (t) { return t.id === tabId; }).name;
+    this.toastMsg('Moved to “' + nm + '”');
+  }
+  setW(id, k, v, noHist) { this.mut(function (d) { wOf(d, id)[k] = v; }, noHist); }
+  setPin(id, f, v) { this.mut(function (d) { const w = wOf(d, id); if (v === undefined) delete w.pins[f]; else w.pins[f] = v; }); }
+  colOp(id, f, op) {
+    this.mut(function (d) {
+      const w = wOf(d, id);
+      if (op === 'reset') { w.cols = TM[w.t].cols.map(function (c) { return { f: c.f, on: c.on, pin: !!c.pin }; }); return; }
+      const i = w.cols.findIndex(function (c) { return c.f === f; }); const c = w.cols[i];
+      if (op === 'toggle') { c.on = !c.on; if (c.on) { w.cols.splice(i, 1); let k = -1; w.cols.forEach(function (x, n) { if (x.on) k = n; }); w.cols.splice(k + 1, 0, c); } }
+      if (op === 'pin') c.pin = !c.pin;
+      if (op === 'up' || op === 'down') { const on = w.cols.filter(function (x) { return x.on; }); const o = on[on.indexOf(c) + (op === 'up' ? -1 : 1)]; if (!o) return; const a = w.cols.indexOf(c), b = w.cols.indexOf(o); w.cols[a] = o; w.cols[b] = c; }
+    });
+  }
+  addTab() { const id = 't' + (++SEQ); this.mut(function (d) { d.tabs.push({ id: id, name: 'New tab', layout: 'manual', rows: [] }); }); this.setState({ tab: id }); }
+  delTab(id) {
+    const d0 = this.state.draft; const first = d0.tabs.find(function (t) { return t.id !== id; });
+    this.mut(function (d) { const t = d.tabs.find(function (x) { return x.id === id; }); const to = d.tabs.find(function (x) { return x.id === first.id; }); t.rows.forEach(function (r) { to.rows.push(r); }); d.tabs = d.tabs.filter(function (x) { return x.id !== id; }); });
+    this.setState({ tab: first.id }); this.toastMsg('Tab deleted · its widgets moved to “' + first.name + '”');
+  }
+  toggleScope(f, id) {
+    this.mut(function (d) { d.scopes = d.scopes || {}; const a = d.scopes[f] || []; d.scopes[f] = a.indexOf(id) >= 0 ? a.filter(function (x) { return x !== id; }) : a.concat([id]); if (!d.scopes[f].length) delete d.scopes[f]; });
+  }
+
+  dragStart(key, e) { this.dragKey = key; try { e.dataTransfer.setData('text/plain', key); e.dataTransfer.effectAllowed = 'copyMove'; } catch (x) {} this.setState({ dragging: true }); }
+  dragEnd() { this.dragKey = null; this.setState({ dragging: false, over: null }); }
+  overCard(id, e) {
+    if (!this.dragKey) return; e.preventDefault();
+    const r = e.currentTarget.getBoundingClientRect(); const side = e.clientX < r.left + r.width / 2 ? 'before' : 'after';
+    const o = this.state.over; if (!o || o.id !== id || o.side !== side) this.setState({ over: { id: id, side: side } });
+  }
+  overZone(i, e) { if (!this.dragKey) return; e.preventDefault(); const o = this.state.over; if (!o || o.zone !== i) this.setState({ over: { zone: i } }); }
+  overTab(id, e) { if (!this.dragKey || this.state.mode !== 'edit') return; e.preventDefault(); const o = this.state.over; if (!o || o.tab !== id) this.setState({ over: { tab: id } }); }
+  dropAt(target, e) {
+    e.preventDefault(); const key = this.dragKey; if (!key) return;
+    const nw = key.indexOf('t:') === 0 ? this.instFromKey(key.slice(2)) : null;
+    const tabId = target.tab || this.curTabId();
+    this.mut(function (d) {
+      let id;
+      if (nw) { autoLink(d, nw); d.widgets.push(nw); id = nw.id; }
+      else { id = key.slice(2); if (target.id === id) return; const p = findPos(d, id); d.tabs[p[0]].rows[p[1]][p[2]] = null; }
+      const tab = d.tabs.find(function (t) { return t.id === tabId; }) || d.tabs[0];
+      if (target.tab) tab.rows.push([id]);
+      else if (target.zone != null) tab.rows.splice(target.zone, 0, [id]);
+      else { const q = findPos(d, target.id); d.tabs[q[0]].rows[q[1]].splice(q[2] + (target.side === 'after' ? 1 : 0), 0, id); }
+      cleanRows(d);
+    });
+    if (target.tab) this.setState({ tab: target.tab });
+    if (nw) { this.flashId(nw.id); this.toastMsg('Added “' + titleOf(nw) + '”'); }
+    this.dragEnd();
+  }
+
+  excluded(d, f, id) { const s = (d.scopes || {})[f]; return !!s && s.indexOf(id) >= 0; }
+  eff(d, w) {
+    const s = this.state, o = Object.assign({}, s.filters), self = this;
+    Object.keys(d.scopes || {}).forEach(function (f) { if (self.excluded(d, f, w.id)) o[f] = DEF[f]; });
+    Object.assign(o, w.pins);
+    if (s.xf && w.xf !== false && s.xf.from !== w.id) o.xregion = s.xf.value;
+    return o;
+  }
+  respondsX(w) { const t = TM[w.t]; return t.cat === 'VaR Summary' || t.data === 'dgr' || t.data === 'dsr'; }
+  usedFilters(d) {
+    const m = {}, self = this;
+    d.widgets.forEach(function (w) { TM[w.t].filters.forEach(function (f) { if (w.pins[f] === undefined && !self.excluded(d, f, w.id)) m[f] = (m[f] || 0) + 1; }); });
+    return m;
+  }
+  rowOk(r, ef, t) {
+    if (t.filters.indexOf('region') >= 0 && ef.region !== 'All' && r.region && r.region !== ef.region) return false;
+    if (ef.xregion && r.region) { const want = t.cat === 'Greek Dashboard' ? ef.xregion : XMAP[ef.xregion]; if (r.region !== want) return false; }
+    return true;
+  }
+  regionShare(ef) {
+    const self = this, t = TM['var.standalone']; let a = 0, tot = 0;
+    D.sa.forEach(function (r) { tot += r.mcVarCob; if (self.rowOk(r, ef, t)) a += r.mcVarCob; }); return tot ? a / tot : 1;
+  }
+  scale(w, ef) { const t = TM[w.t]; if (t.cat !== 'VaR Summary') return 1; return (ATTR[ef.attribute] || 1) * (t.filters.indexOf('variant') >= 0 && ef.variant === '10D' ? 3.16 : 1); }
+  provSel(d, p) {
+    const t = TM[p.t]; const id = this.state.sel[p.id]; if (id) return id;
+    if (t.defaultSel === 'first') { const rows = this.gridRows(d, p); return rows.length ? rows[0].id : null; }
+    return null;
+  }
+  link(d, w) {
+    if (!w.link) return null; const p = wOf(d, w.link); if (!p) return null;
+    const id = this.provSel(d, p); const pt = TM[p.t];
+    return { p: p, pt: pt, row: id ? D[pt.data].find(function (r) { return r.id === id; }) : null };
+  }
+  deskShare(d, w) { const l = this.link(d, w); if (!l || !l.row) return null; let t = 0; D.sa.forEach(function (r) { t += r.mcVarCob; }); return { f: l.row.mcVarCob / t, label: l.row.name }; }
+  gridRows(d, w) {
+    const t = TM[w.t], ef = this.eff(d, w), sc = this.scale(w, ef), self = this;
+    const ds = t.consumes === 'desk' ? this.deskShare(d, w) : null; const f = ds ? Math.min(ds.f * 2.2, 1) : 1;
+    const rows = D[t.data].filter(function (r) { return self.rowOk(r, ef, t); }).map(function (r) {
+      const o = Object.assign({}, r);
+      if (t.data === 'lim') { o.exposure = r.exposure * sc; o.chg1d = r.chg1d * sc; o.chg5d = r.chg5d * sc; o.utilization = o.exposure / r.threshold; o.headroom = r.threshold - o.exposure; }
+      else if (t.cols) t.cols.forEach(function (c) { if ((c.t === 'num' || c.t === 'diff') && typeof r[c.f] === 'number') o[c.f] = r[c.f] * sc * f; });
+      return o;
+    });
+    const so = this.state.sort[w.id] || t.sort;
+    if (so) rows.sort(function (a, b) { const x = a[so.f], y = b[so.f]; return (x > y ? 1 : x < y ? -1 : 0) * so.d; });
+    return rows;
+  }
+  gridModel(d, w) {
+    const t = TM[w.t], ef = this.eff(d, w), self = this, s = this.state;
+    const hideG = function (c) { return t.filters.indexOf('display') >= 0 && c.g && ((ef.display === 'MC' && c.g.indexOf('Historical') === 0) || (ef.display === 'Hist' && c.g.indexOf('Monte') === 0)); };
+    const all = w.cols.map(function (c) { return Object.assign({}, t.cols.find(function (x) { return x.f === c.f; }), { on: c.on, pin: c.pin }); });
+    let vis = all.filter(function (c) { return c.on && !hideG(c); });
+    vis = vis.filter(function (c) { return c.pin; }).concat(vis.filter(function (c) { return !c.pin; }));
+    const groups = []; t.cols.forEach(function (c) { if (c.g && groups.indexOf(c.g) < 0) groups.push(c.g); });
+    const gcol = function (g) { return TONES[groups.indexOf(g) % TONES.length]; };
+    const wd = function (c) { return c.t === 'text' ? 150 : c.t === 'util' ? 140 : c.t === 'mono' ? 90 : 84; };
+    const gtc = vis.map(function (c) { return c.t === 'text' ? 'minmax(150px,1.7fr)' : 'minmax(' + wd(c) + 'px,1fr)'; }).join(' ');
+    const minW = vis.reduce(function (a, c) { return a + wd(c); }, 0);
+    const isNum = function (c) { return ['num', 'diff', 'sign', 'int', 'util'].indexOf(c.t) >= 0; };
+    const stick = function (i, c) { return i === 0 && c.pin; };
+    const blOf = function (i) { if (i === 0) return '0'; return (vis[i].g || '') !== (vis[i - 1].g || '') ? '1px solid #eef1f6' : '0'; };
+    const bands = []; vis.forEach(function (c, i) { const g = c.g || ''; const last = bands[bands.length - 1]; if (last && last.g === g && i > 0) last.span++; else bands.push({ g: g, span: 1, i: i }); });
+    const so = s.sort[w.id] || t.sort;
+    const heads = vis.map(function (c, i) {
+      return { label: c.h, arrow: so && so.f === c.f ? (so.d > 0 ? '▲' : '▼') : '', just: isNum(c) ? 'flex-end' : 'flex-start', pos: stick(i, c) ? 'sticky' : 'relative', z: stick(i, c) ? 2 : 0, pl: i === 0 ? 16 : 10, bl: blOf(i), fg: so && so.f === c.f ? '#1d4596' : '#475467',
+        onSort: function () { const cur = self.state.sort[w.id] || t.sort; const n = cur && cur.f === c.f ? { f: c.f, d: -cur.d } : { f: c.f, d: isNum(c) ? -1 : 1 }; self.setState({ sort: Object.assign({}, self.state.sort, { [w.id]: n }) }); } };
+    });
+    const rows = this.gridRows(d, w); const selId = t.provides ? this.provSel(d, w) : null; const isX = !!XPROV[w.t];
+    const cell = function (r, c, i) {
+      const v = r[c.f]; const o = { text: '', color: '#101828', fw: 400, just: isNum(c) ? 'flex-end' : 'flex-start', ff: isNum(c) || c.t === 'mono' ? "'IBM Plex Mono',monospace" : 'inherit', pos: stick(i, c) ? 'sticky' : 'relative', z: stick(i, c) ? 1 : 0, bg: stick(i, c) ? 'inherit' : 'transparent', pl: i === 0 ? 16 : 10, bl: blOf(i), br: stick(i, c) ? '1px solid #eef1f6' : '0', hasBar: false, isBadge: c.t === 'badge', plain: c.t !== 'badge', barW: 0, barC: '' };
+      if (c.t === 'num' || c.t === 'sign') { o.text = f2(v); o.color = ncol(v); }
+      else if (c.t === 'diff') { o.text = fd(v); o.color = dcol(v); }
+      else if (c.t === 'int') { o.text = fi(v); o.color = ncol(v); }
+      else if (c.t === 'util') { o.text = fp(v); o.hasBar = true; o.barW = Math.min(v / 1.2, 1) * 100; o.barC = utone(v); o.color = v >= 1 ? '#b42318' : v >= 0.8 ? '#b54708' : '#101828'; o.fw = v >= 0.8 ? 600 : 400; }
+      else { o.text = v == null ? '' : String(v); if (i === 0) o.fw = 500; }
+      return o;
+    };
+    const out = rows.map(function (r) {
+      const on = (selId && selId === r.id) || (isX && s.xf && s.xf.from === w.id && s.xf.value === r.region);
+      let click = null;
+      if (t.provides) click = function () { const cur = self.state.sel[w.id]; const n = Object.assign({}, self.state.sel); if (cur === r.id && !t.defaultSel) delete n[w.id]; else n[w.id] = r.id; self.setState({ sel: n }); };
+      else if (isX) click = function () { const x = self.state.xf; self.setState({ xf: x && x.from === w.id && x.value === r.region ? null : { dim: 'region', value: r.region, from: w.id } }); };
+      return { cells: vis.map(function (c, i) { return cell(r, c, i); }), cur: click ? 'pointer' : 'default', bg: on ? '#eef3fd' : '#ffffff', sh: on ? 'inset 3px 0 0 #2f62c9' : 'none', onClick: click };
+    });
+    let tot = [];
+    if (t.total && rows.length) tot = vis.map(function (c, i) {
+      const sum = rows.reduce(function (a, r) { return a + (typeof r[c.f] === 'number' ? r[c.f] : 0); }, 0);
+      const o = { text: '', color: '#101828', just: isNum(c) ? 'flex-end' : 'flex-start', ff: isNum(c) ? "'IBM Plex Mono',monospace" : 'inherit', pos: stick(i, c) ? 'sticky' : 'relative', z: stick(i, c) ? 1 : 0, pl: i === 0 ? 16 : 10, bl: blOf(i), br: stick(i, c) ? '1px solid #eef1f6' : '0' };
+      if (i === 0) o.text = 'Total'; else if (c.t === 'num' || c.t === 'sign') { o.text = f2(sum); o.color = ncol(sum); } else if (c.t === 'diff') { o.text = fd(sum); o.color = dcol(sum); } else if (c.t === 'int') { o.text = fi(sum); o.color = ncol(sum); }
+      return o;
+    });
+    return {
+      gtc: gtc, minW: minW, heads: heads, rows: out, hasTot: tot.length > 0, tot: tot, empty: rows.length === 0, hasBands: vis.some(function (c) { return c.g; }),
+      bands: bands.map(function (b) { const st = b.i === 0 && vis[0].pin; return { label: b.g, span: b.span, color: b.g ? gcol(b.g) : '#667085', hasDot: !!b.g, pos: st ? 'sticky' : 'relative', z: st ? 2 : 0, bl: b.i === 0 ? '0' : '1px solid #eef1f6', sh: b.g ? 'inset 0 2px 0 ' + gcol(b.g) : 'none' }; })
+    };
+  }
+  axes(maxV) {
+    const m = niceMax(maxV * 1.05); const grid = [], yLab = [];
+    for (let k = 0; k <= 4; k++) { const v = m * k / 4; const y = 222 - (v / m) * 205; grid.push({ y: y }); yLab.push({ lp: 44 / 640 * 100, tp: y / 250 * 100, label: v >= 100 ? v.toFixed(0) : v.toFixed(v >= 10 ? 0 : 1) }); }
+    return { m: m, grid: grid, yLab: yLab };
+  }
+  xLabels(dates) { const n = dates.length; return [0, Math.floor((n - 1) / 2), n - 1].map(function (i) { const x = 44 + (n > 1 ? i / (n - 1) : 0) * 586; return { lp: x / 640 * 100, tp: 96, label: dlabel(dates[i]) }; }); }
+  chartModel(d, w) {
+    const t = TM[w.t], ef = this.eff(d, w), sc = this.scale(w, ef), days = ef.days || 30;
+    const where = function (ds) { return ds ? 'Desk · ' + ds.label : ef.xregion ? 'Cross-filter · ' + ef.xregion : ef.region === 'All' ? 'All desks' : 'Region · ' + ef.region; };
+    if (t.kind === 'line') {
+      const ds = this.deskShare(d, w); const f = sc * (ds ? ds.f : this.regionShare(ef));
+      const rows = D.satr.slice(-days); const names = ['MC VaR', 'Hist VaR', 'MC SVaR', 'Hist SVaR'];
+      let idx = [1, 2, 3, 4]; if (ef.display === 'MC') idx = [1, 3]; if (ef.display === 'Hist') idx = [2, 4];
+      let mx = 0; rows.forEach(function (r) { idx.forEach(function (i) { mx = Math.max(mx, r[i] * f); }); });
+      const ax = this.axes(mx); const n = rows.length;
+      const paths = idx.map(function (i) { return { d: rows.map(function (r, k) { return (k ? 'L' : 'M') + (44 + k / (n - 1) * 586).toFixed(1) + ' ' + (222 - (r[i] * f / ax.m) * 205).toFixed(1); }).join(' '), color: TONES[i - 1], sw: 2.25, dash: i > 2 ? '5 4' : 'none' }; });
+      return { grid: ax.grid, yLab: ax.yLab, xLab: this.xLabels(rows.map(function (r) { return r[0]; })), paths: paths, bars: [], hasStats: false, stats: [], legend: idx.map(function (i) { return { label: names[i - 1], color: TONES[i - 1], val: f2(rows[n - 1][i] * f) }; }), sub: where(ds) };
+    }
+    if (t.kind === 'stack') {
+      const ds = this.deskShare(d, w); const f = sc * (ds ? Math.min(ds.f * 2.2, 1) : this.regionShare(ef));
+      const rows = D.comptr.slice(-days); const off = ef.display === 'Hist' ? 7 : 1; const names = ['Equity delta', 'Index delta', 'IR delta', 'FX delta', 'Equity vega', 'Other'];
+      let mx = 0; rows.forEach(function (r) { let a = 0; for (let k = 0; k < 6; k++) a += r[off + k] * f; mx = Math.max(mx, a); });
+      const ax = this.axes(mx); const n = rows.length; const bw = 586 / n; const bars = [];
+      rows.forEach(function (r, i) { let y = 222; for (let k = 0; k < 6; k++) { const h = r[off + k] * f / ax.m * 205; y -= h; bars.push({ x: (44 + i * bw + bw * 0.14).toFixed(1), y: y.toFixed(1), w: (bw * 0.72).toFixed(1), h: Math.max(h, 0).toFixed(1), fill: TONES[k] }); } });
+      const last = rows[n - 1];
+      return { grid: ax.grid, yLab: ax.yLab, xLab: this.xLabels(rows.map(function (r) { return r[0]; })), paths: [], bars: bars, hasStats: false, stats: [], legend: names.map(function (nm, k) { return { label: nm, color: TONES[k], val: f2(last[off + k] * f) }; }), sub: (ef.display === 'Hist' ? 'Historical' : 'Monte Carlo') + ' · ' + where(ds) };
+    }
+    const l = this.link(d, w); const L = l && l.row ? l.row : D.lim[0];
+    const f = L.exposure / 17.82 * (ATTR[ef.attribute] || 1), th = L.threshold;
+    const rows = D.limh.slice(-days); let mx = th; rows.forEach(function (r) { mx = Math.max(mx, r[1] * f); });
+    const ax = this.axes(mx); const n = rows.length; const bw = 586 / n; const bars = [];
+    rows.forEach(function (r, i) { const v = r[1] * f; const h = v / ax.m * 205; bars.push({ x: (44 + i * bw + bw * 0.15).toFixed(1), y: (222 - h).toFixed(1), w: (bw * 0.7).toFixed(1), h: h.toFixed(1), fill: utone(v / th) }); });
+    const ty = 222 - th / ax.m * 205; const cur = rows[n - 1][1] * f; let pk = 0; rows.forEach(function (r) { pk = Math.max(pk, r[1] * f); });
+    const tone = function (u) { return u >= 1 ? ['#fdeceb', '#f1d6d2', '#b42318'] : u >= 0.8 ? ['#fef6ee', '#f9dbaf', '#b54708'] : ['#f5f8fc', '#e6ebf3', '#475467']; };
+    const s1 = tone(cur / th), s2 = tone(pk / th);
+    return { grid: ax.grid, yLab: ax.yLab, xLab: this.xLabels(rows.map(function (r) { return r[0]; })), bars: bars, paths: [{ d: 'M44 ' + ty.toFixed(1) + ' L630 ' + ty.toFixed(1), color: '#b42318', sw: 1.5, dash: '6 4' }],
+      legend: [{ label: 'Exposure', color: '#3a6ae6', val: '' }, { label: 'Threshold', color: '#b42318', val: f2(th) }], hasStats: true,
+      stats: [{ label: 'CURRENT', val: f2(cur), note: fp(cur / th) + ' of threshold', bg: s1[0], bd: s1[1], noteFg: s1[2] }, { label: 'PEAK', val: f2(pk), note: fp(pk / th) + ' of threshold', bg: s2[0], bd: s2[1], noteFg: s2[2] }], sub: L.limitId + ' · ' + L.name };
+  }
+  kpiModel(d, w) {
+    const ef = this.eff(d, w), sc = this.scale(w, ef), self = this;
+    const rows = D.sa.filter(function (r) { return self.rowOk(r, ef, TM['var.kpi']); });
+    const sum = function (k) { return rows.reduce(function (a, r) { return a + r[k]; }, 0) * sc; };
+    const lim = D.lim.filter(function (r) { return self.rowOk(r, ef, TM['var.kpi']); }).map(function (r) { return r.exposure * (ATTR[ef.attribute] || 1) / r.threshold; });
+    const br = lim.filter(function (u) { return u >= 1; }).length, ar = lim.filter(function (u) { return u >= 0.8 && u < 1; }).length;
+    const tile = function (label, k, acc) { const v = sum(k + 'Cob'), dv = sum(k + 'Diff'); return { label: label, val: f2(v), sub: fd(dv) + ' vs PCOB', subFg: dcol(dv), accent: acc }; };
+    return [tile('MC VAR', 'mcVar', '#3a6ae6'), tile('HIST VAR', 'histVar', '#7a5af8'), tile('MC SVAR', 'mcSvar', '#0e9384'), { label: 'LIMITS IN BREACH', val: String(br), sub: ar + ' above 80%', subFg: br ? '#b42318' : '#067647', accent: br ? '#d92d20' : '#12b76a' }];
+  }
+  alertsModel(d, w) {
+    const ef = this.eff(d, w), self = this;
+    const rows = D.lim.filter(function (r) { return self.rowOk(r, ef, TM['var.alerts']); }).map(function (r) { return Object.assign({}, r, { u: r.exposure * (ATTR[ef.attribute] || 1) / r.threshold }); }).filter(function (r) { return r.u >= 0.8; }).sort(function (a, b) { return b.u - a.u; });
+    const lw = d.widgets.find(function (x) { return x.t === 'var.limits'; });
+    return rows.map(function (r) {
+      const b = r.u >= 1;
+      return { status: b ? 'BREACH' : 'WARNING', name: r.name, id: r.limitId, util: fp(r.u), tip: lw ? 'Select in the limits grid' : 'Add the VaR/SVaR Limits widget to drill in', bd: b ? '#f1d6d2' : '#f9dbaf', bg: b ? '#fff6f5' : '#fffaf3', tagBg: b ? '#fdeceb' : '#fef0c7', tagFg: b ? '#b42318' : '#b54708',
+        onClick: function () { if (lw) self.setState({ sel: Object.assign({}, self.state.sel, { [lw.id]: r.id }) }); else self.toastMsg('Add the VaR/SVaR Limits widget to drill in'); } };
+    });
+  }
+  listModel(d, w) {
+    const t = TM[w.t], ef = this.eff(d, w); const n = ef.topN === 'All' ? 99 : ef.topN;
+    const rows = D[t.data].slice().sort(function (a, b) { return Math.abs(b[t.vf]) - Math.abs(a[t.vf]); }).slice(0, n);
+    const mx = rows.reduce(function (a, r) { return Math.max(a, Math.abs(r[t.vf])); }, 1);
+    return rows.map(function (r) { const v = r[t.vf]; return { name: r.name, val: fi(v), color: ncol(v), w: Math.abs(v) / mx * 100, barC: v < 0 ? '#f79009' : '#3a6ae6', hasDiff: r.diff != null, diff: r.diff != null ? (r.diff > 0 ? '+' : r.diff < 0 ? MINUS : '') + Math.abs(r.diff) : '', dFg: dcol(r.diff || 0) }; });
+  }
+  hasData(d, w) {
+    const k = TM[w.t].kind;
+    if (k === 'grid') return this.gridRows(d, w).length > 0;
+    if (k === 'alerts') return this.alertsModel(d, w).length > 0;
+    if (k === 'list') return this.listModel(d, w).length > 0;
+    return true;
+  }
+  ruleOk(d, w) {
+    const r = w.rule || { kind: 'always' };
+    if (r.kind === 'data') return this.hasData(d, w);
+    if (r.kind === 'filter') { if (!r.vals || !r.vals.length) return true; const v = this.eff(d, w)[r.f]; return r.vals.indexOf(v) >= 0; }
+    return true;
+  }
+  ruleText(w) {
+    const r = w.rule || { kind: 'always' };
+    if (r.kind === 'data') return 'Shows only with data';
+    if (r.kind === 'filter') return 'Shows when ' + FDEF[r.f].label + ' is ' + (r.vals.length ? r.vals.map(function (v) { return optLabel(r.f, v); }).join(' / ') : 'any');
+    return '';
+  }
+
+  renderVals() {
+    const s = this.state, self = this;
+    const isEdit = s.mode === 'edit'; const d = this.doc(); const b = this.dash(); const tab = this.tabObj(d);
+    const used = this.usedFilters(d);
+    const opt = function (on) { return on ? { bg: '#fff', fg: '#0f1a3a', sh: '0 1px 2px rgba(16,24,40,.12),0 4px 10px -4px rgba(15,26,58,.35)' } : { bg: 'transparent', fg: '#b9c6e6', sh: 'none' }; };
+    const pill = function (on) { return on ? { bd: '#2f62c9', bg: '#eef3fd', fg: '#1d4596' } : { bd: '#e2e8f2', bg: '#fff', fg: '#475467' }; };
+    const setF = function (f, v) { self.setState({ filters: Object.assign({}, self.state.filters, { [f]: v }) }); };
+
+    const nav = [{ isHead: true, isItem: false, label: 'DAILY RISK · EQUITIES' }];
+    [['VaR Summary', ICON.dash], ['Greek Dashboard', ICON.greek]].forEach(function (x) { nav.push({ isHead: false, isItem: true, label: x[0], icon: x[1], bg: 'transparent', fg: '#b3bfdd', fw: 500, sh: 'none', hov: 'rgba(255,255,255,.06)', icoBg: 'rgba(255,255,255,.05)', icoFg: '#8fa6e0', hasBadge: false, onClick: function () { self.toastMsg('Fixed dashboards open from here in the app'); } }); });
+    nav.push({ isHead: true, isItem: false, label: 'MY DASHBOARDS' });
+    s.dashboards.forEach(function (x) {
+      const on = x.id === s.active;
+      nav.push({ isHead: false, isItem: true, label: on && isEdit ? (s.draftName || 'Untitled dashboard') : x.name, icon: ICON.star, bg: on ? 'linear-gradient(180deg,rgba(91,134,245,.32),rgba(91,134,245,.18))' : 'transparent', fg: on ? '#fff' : '#b3bfdd', fw: on ? 600 : 500, sh: on ? 'inset 0 1px 0 rgba(255,255,255,.12)' : 'none', hov: on ? 'rgba(91,134,245,.36)' : 'rgba(255,255,255,.06)', icoBg: on ? '#5b86f5' : 'rgba(255,255,255,.05)', icoFg: on ? '#fff' : '#8fa6e0', hasBadge: x.version === 0, badge: 'DRAFT', badgeBg: '#f0d48f', badgeFg: '#3d2c00', onClick: function () { self.openDash(x.id); } });
+    });
+    nav.push({ isHead: false, isItem: true, label: 'New dashboard', icon: ICON.plus, bg: 'transparent', fg: '#a9c0ff', fw: 600, sh: 'none', hov: 'rgba(255,255,255,.06)', icoBg: 'rgba(91,134,245,.16)', icoFg: '#a9c0ff', hasBadge: false, onClick: function () { if (isEdit) self.toastMsg('Save or cancel your edits first'); else self.newDash(); } });
+
+    const usersOf = function (f) { return d.widgets.filter(function (w) { return TM[w.t].filters.indexOf(f) >= 0 && w.pins[f] === undefined; }); };
+    const barSecs = BAR_ORDER.filter(function (f) { return used[f]; }).map(function (f) {
+      const all = usersOf(f); const partial = used[f] < all.length;
+      return {
+        label: FDEF[f].label, count: partial ? used[f] + '/' + all.length : used[f], showCount: isEdit || partial, cntBg: partial ? '#f79009' : '#5b86f5', isEditable: isEdit, cur: isEdit ? 'pointer' : 'default',
+        tip: 'Applies to: ' + all.filter(function (w) { return !self.excluded(d, f, w.id); }).map(titleOf).join(', '),
+        secBg: s.scopeOpen === f ? 'rgba(91,134,245,.22)' : 'rgba(255,255,255,.05)', secBd: s.scopeOpen === f ? 'rgba(143,176,251,.6)' : 'rgba(255,255,255,.09)',
+        onScope: function () { if (isEdit) self.setState({ scopeOpen: self.state.scopeOpen === f ? null : f }); },
+        items: FDEF[f].opts.map(function (o) { const st = opt(s.filters[f] === o[0]); return { label: o[1], bg: st.bg, fg: st.fg, sh: st.sh, onPick: function () { setF(f, o[0]); } }; })
+      };
+    });
+    let scope = { items: [] };
+    if (isEdit && s.scopeOpen && used[s.scopeOpen] !== undefined || (isEdit && s.scopeOpen)) {
+      const f = s.scopeOpen;
+      const ws = d.widgets.filter(function (w) { return TM[w.t].filters.indexOf(f) >= 0; });
+      const inc = ws.filter(function (w) { return w.pins[f] === undefined && !self.excluded(d, f, w.id); }).length;
+      scope = {
+        label: FDEF[f].label, summary: inc + ' of ' + ws.length + ' widgets', def: optLabel(f, DEF[f]),
+        all: function () { self.mut(function (dd) { if (dd.scopes) delete dd.scopes[f]; }); }, close: function () { self.setState({ scopeOpen: null }); },
+        items: ws.map(function (w) {
+          const pinned = w.pins[f] !== undefined; const on = !pinned && !self.excluded(d, f, w.id); const p = findPos(d, w.id);
+          return { label: titleOf(w), tab: p ? '· ' + d.tabs[p[0]].name : '', locked: pinned, tip: pinned ? 'Pinned to ' + optLabel(f, w.pins[f]) + ' in its Data tab' : on ? 'Click to exclude' : 'Click to include',
+            bd: on ? '#2f62c9' : '#e2e8f2', bg: on ? '#eef3fd' : pinned ? '#f9fafb' : '#fff', fg: pinned ? '#98a2b3' : '#101828', boxBg: on ? '#2f62c9' : '#fff', boxBd: on ? '#2f62c9' : '#c4cdd9',
+            onClick: function () { self.toggleScope(f, w.id); } };
+        })
+      };
+    }
+    const compareOpts = FDEF.compare.opts.map(function (o) { const on = s.filters.compare === o[0]; return { label: o[1], bg: on ? '#14224a' : 'transparent', fg: on ? '#fff' : '#475467', sh: on ? '0 4px 10px -4px rgba(15,26,58,.5)' : 'none', onClick: function () { setF('compare', o[0]); } }; });
+
+    const chips = [];
+    d.widgets.filter(function (w) { return TM[w.t].provides; }).forEach(function (p) {
+      const id = s.sel[p.id]; if (!id) return; const pt = TM[p.t]; const r = D[pt.data].find(function (x) { return x.id === id; }); if (!r) return;
+      const ap = d.widgets.filter(function (w) { return w.link === p.id; }).map(titleOf);
+      chips.push({ kind: pt.chip, value: pt.chip === 'LIMIT' ? r.limitId + ' · ' + r.name : r.name, dot: pt.chip === 'LIMIT' ? '#d92d20' : '#3a6ae6', applies: ap.length + ' linked', tip: 'Drives: ' + ap.join(', '), clear: function () { const n = Object.assign({}, self.state.sel); delete n[p.id]; self.setState({ sel: n }); } });
+    });
+    if (s.xf) {
+      const ap = d.widgets.filter(function (w) { return w.id !== s.xf.from && w.xf !== false && self.respondsX(w); }).map(titleOf);
+      chips.push({ kind: 'REGION', value: s.xf.value, dot: '#7a5af8', applies: ap.length + ' widgets', tip: 'Filters: ' + ap.join(', '), clear: function () { self.setState({ xf: null }); } });
+    }
+    const hasProv = d.widgets.some(function (w) { return TM[w.t].provides || XPROV[w.t]; });
+
+    const tabs = d.tabs.map(function (t) {
+      const on = t.id === tab.id; const ov = s.over && s.over.tab === t.id;
+      const n = t.rows.reduce(function (a, r) { return a + r.filter(function (id) { const w = wOf(d, id); return w && TM[w.t].kind !== 'header'; }).length; }, 0);
+      return {
+        name: t.name, count: n, editing: isEdit && on, plain: !(isEdit && on), canDel: isEdit && on && d.tabs.length > 1,
+        bg: ov ? '#eef3fd' : on ? '#fff' : 'transparent', bd: ov ? '#2f62c9' : on ? '#dfe5ef' : 'transparent', bdb: on ? '#fff' : 'transparent', sh: on ? '0 -4px 12px -8px rgba(20,34,74,.25)' : 'none',
+        fw: on ? 700 : 600, fg: on ? '#0f1a3a' : '#475467', cntBg: on ? '#eef3fd' : '#eef1f6', cntFg: on ? '#1d4596' : '#667085',
+        onClick: function () { self.setState({ tab: t.id }); }, onName: function (e) { const v = e.target.value; self.mut(function (dd) { dd.tabs.find(function (x) { return x.id === t.id; }).name = v; }, true); },
+        onDel: function () { self.delTab(t.id); }, onOver: function (e) { self.overTab(t.id, e); }, onDrop: function (e) { self.dropAt({ tab: t.id }, e); }
+      };
+    });
+    const layoutOpts = [['manual', 'Manual', 'Set each widget\'s width and height'], ['auto', 'Auto grid', 'Equal tiles that fit the screen']].map(function (o) { const on = tab.layout === o[0]; return { label: o[1], tip: o[2], bg: on ? '#2f62c9' : 'transparent', fg: on ? '#fff' : '#475467', onClick: function () { self.mut(function (dd) { dd.tabs.find(function (x) { return x.id === tab.id; }).layout = o[0]; }); } }; });
+
+    const zoneSt = function (on) { return on ? { bd: '#2f62c9', bg: 'rgba(91,134,245,.12)' } : { bd: '#bcd0f5', bg: 'rgba(255,255,255,.5)' }; };
+    let hiddenN = 0;
+    const rowsM = [];
+    tab.rows.forEach(function (r, ri) {
+      const cards = [];
+      r.forEach(function (id) { const w = wOf(d, id); if (!w) return; const vis = self.ruleOk(d, w); if (!vis) hiddenN++; if (!vis && !isEdit) return; cards.push(self.cardModel(d, w, isEdit, tab, vis)); });
+      if (!cards.length) return;
+      const zo = zoneSt(s.over && s.over.zone === ri);
+      rowsM.push({ zone: { bd: zo.bd, bg: zo.bg, onOver: function (e) { self.overZone(ri, e); }, onDrop: function (e) { self.dropAt({ zone: ri }, e); } }, cards: cards });
+    });
+    const ez = zoneSt(s.over && s.over.zone === tab.rows.length);
+
+    const q = s.q.trim().toLowerCase(); const tpls = []; const catList = (s.my.length ? ['My widgets'] : []).concat(['VaR Summary', 'Greek Dashboard', 'Layout']);
+    catList.forEach(function (cat) {
+      if (s.cat !== 'All' && s.cat !== cat) return;
+      let items;
+      if (cat === 'My widgets') items = s.my.map(function (m) { const bt = TM[m.base]; return { key: 'my:' + m.id, mine: m, title: m.snap.title, desc: 'Saved from ' + bt.title + ' with your columns, pins and size.', kind: KIND[bt.kind], glyph: GLYPH[bt.kind], filters: bt.filters, base: m.base }; });
+      else items = T.filter(function (t) { return t.cat === cat; }).map(function (t) { return { key: t.id, title: t.title, desc: t.desc, kind: KIND[t.kind], glyph: GLYPH[t.kind], filters: t.filters, base: t.id }; });
+      items = items.filter(function (it) { return !q || (it.title + ' ' + it.desc + ' ' + it.kind).toLowerCase().indexOf(q) >= 0; });
+      if (!items.length) return;
+      tpls.push({ head: true, item: false, headLabel: cat.toUpperCase() + ' · ' + items.length });
+      items.forEach(function (it) {
+        const n = d.widgets.filter(function (w) { return w.t === it.base; }).length;
+        const uses = TM[it.base].cat === 'Layout' ? 'No data · layout only' : it.filters.length ? 'Uses: COB · ' + it.filters.map(function (f) { return FDEF[f].label; }).join(' · ') : 'Uses: COB only · own PCOB (−7d)';
+        tpls.push({ head: false, item: true, title: it.title, desc: it.desc, kind: it.kind, glyph: it.glyph, uses: uses, isMine: !!it.mine, bd: it.mine ? '#c9d7f5' : '#e6ebf3', bg: it.mine ? '#fbfcff' : '#fff',
+          onDash: n > 0 && TM[it.base].cat !== 'Layout', onDashLabel: 'On dashboard' + (n > 1 ? ' ×' + n : ''),
+          onAdd: function () { self.addKey(it.key); }, onDragStart: function (e) { self.dragStart('t:' + it.key, e); },
+          onForget: function () { self.setState({ my: self.state.my.filter(function (x) { return x !== it.mine; }) }); } });
+      });
+    });
+    const cats = ['All'].concat(catList).map(function (c) { const on = s.cat === c; return { label: c, bd: on ? '#2f62c9' : '#e2e8f2', bg: on ? '#eef3fd' : '#fff', fg: on ? '#1d4596' : '#475467', onClick: function () { self.setState({ cat: c }); } }; });
+
+    const cfgW = s.cfg && isEdit ? wOf(d, s.cfg) : null;
+    const cfg = cfgW ? this.cfgModel(d, cfgW) : { tabs: [], shown: [], avail: [], filters: [], links: [], spans: [], hs: [], tabOpts: [], ruleKinds: [], ruleFilters: [], ruleVals: [] };
+
+    const versions = b.versions.slice().reverse().map(function (v) {
+      const prev = b.versions[b.versions.indexOf(v) - 1]; const cur = v.v === b.version; const pv = s.preview === v.v;
+      return { v: v.v, when: v.when, who: v.who, note: v.note, changes: diffDocs(prev ? prev.doc : null, v.doc), isCurrent: cur, canAct: !cur && !isEdit,
+        dot: cur ? '#12b76a' : pv ? '#f79009' : '#98a2b3', ring: cur ? '#dcfae6' : pv ? '#fef0c7' : '#f2f4f7', bd: pv ? '#fedf89' : '#e6ebf3', bg: pv ? '#fffcf5' : '#fff',
+        onPreview: function () { self.setState({ preview: v.v, tab: v.doc.tabs[0].id, drawer: null, sel: {}, xf: null }); }, onRestore: function () { self.restore(v.v); } };
+    });
+    const jsonTabs = [['doc', 'Saved document'], ['filters', 'Merged filters']].map(function (o) { const on = s.jsonTab === o[0]; return { label: o[1], bg: on ? '#fff' : 'transparent', fg: on ? '#0f1a3a' : '#b9c6e6', onClick: function () { self.setState({ jsonTab: o[0] }); } }; });
+    const emptyTab = !(isEdit && d.widgets.length === 0) && rowsM.length === 0;
+
+    return {
+      nav: nav, isEdit: isEdit, isView: !isEdit, crumb: isEdit ? 'Editing' : s.preview ? 'Preview' : 'Custom', dashName: isEdit ? s.draftName : b.name, verLabel: b.version ? 'v' + b.version : 'draft', dashId: b.id,
+      onName: function (e) { self.setState({ draftName: e.target.value }); },
+      isPreview: !!s.preview, previewLabel: 'v' + s.preview, editOp: s.preview ? 0.5 : 1, exitPreview: function () { self.setState({ preview: null, tab: self.dash().doc.tabs[0].id }); }, restorePreview: function () { self.restore(self.state.preview); },
+      openHistory: function () { self.setState({ drawer: 'hist' }); },
+      hasCompare: !!used.compare, pcob: PCOB[s.filters.compare], compareOpts: compareOpts,
+      openJson: function () { self.setState({ drawer: 'json' }); }, startEdit: function () { self.startEdit(); }, cancelEdit: function () { self.cancelEdit(); }, save: function () { self.save(); },
+      undo: function () { self.undo(); }, redo: function () { self.redo(); }, noUndo: !s.hist.length, noRedo: !s.fut.length, undoOp: s.hist.length ? 1 : 0.4, redoOp: s.fut.length ? 1 : 0.4,
+      draftNote: s.hist.length ? s.hist.length + ' change' + (s.hist.length > 1 ? 's' : '') + ' · not saved' : 'No changes yet',
+      openAdd: function () { self.setState({ drawer: 'add', cfg: null }); }, closeDrawer: function () { self.setState({ drawer: null, cfg: null }); },
+      hasBar: barSecs.length > 0, barSecs: barSecs, scopeOpen: isEdit && !!s.scopeOpen, scope: scope,
+      hasXf: hasProv, chips: chips, hasChips: chips.length > 0, noChips: chips.length === 0, clearXf: function () { self.setState({ sel: {}, xf: null }); },
+      tabs: tabs, addTab: function () { self.addTab(); }, layoutOpts: layoutOpts, tabName: tab.name,
+      hiddenNote: hiddenN ? hiddenN + ' widget' + (hiddenN > 1 ? 's' : '') + ' hidden by show rules' : '',
+      mainPad: isEdit ? '12px' : '0', mainBg: isEdit ? 'radial-gradient(#cfd9ee 1px,transparent 1px) 0 0/18px 18px,rgba(255,255,255,.35)' : 'transparent', mainBd: isEdit ? '1px dashed #c9d7f5' : '0',
+      isEmptyEdit: isEdit && d.widgets.length === 0, isEmptyTab: emptyTab,
+      emptyTabNote: isEdit ? 'This tab is empty. Add widgets, or drag one from another tab onto this tab’s name.' : hiddenN ? 'Every widget on this tab is hidden by its show rule for the current filters.' : 'Nothing on this tab yet.',
+      starts: [
+        { title: 'Blank', sub: 'Pick widgets one by one from the widget list.', icon: ICON.blank, onClick: function () { self.setState({ drawer: 'add' }); } },
+        { title: 'Copy of VaR Summary', sub: 'All 7 VaR widgets, already linked, ready to trim.', icon: ICON.dash, onClick: function () { self.startFrom('var'); } },
+        { title: 'Copy of Greek Dashboard', sub: 'Greek, stress and concentration widgets.', icon: ICON.greek, onClick: function () { self.startFrom('greek'); } }
+      ],
+      rows: rowsM, dragging: s.dragging, endZone: { bd: ez.bd, bg: ez.bg, onOver: function (e) { self.overZone(tab.rows.length, e); }, onDrop: function (e) { self.dropAt({ zone: tab.rows.length }, e); } },
+      onDragEnd: function () { self.dragEnd(); }, rowPad: '7px', showAddTile: isEdit && d.widgets.length > 0 && !s.dragging,
+      drawerAdd: s.drawer === 'add' && isEdit, q: s.q, onQ: function (e) { self.setState({ q: e.target.value }); }, cats: cats, tpls: tpls, noTpl: tpls.length === 0,
+      drawerCfg: s.drawer === 'cfg' && !!cfgW, cfg: cfg,
+      drawerHist: s.drawer === 'hist', versions: versions, noVersions: versions.length === 0,
+      drawerJson: s.drawer === 'json', jsonTabs: jsonTabs, jsonText: s.drawer === 'json' ? this.jsonFor(b, d, used) : '',
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+
+  cardModel(d, w, isEdit, tab, visible) {
+    const s = this.state, self = this, t = TM[w.t], k = t.kind;
+    const ov = s.over && s.over.id === w.id ? s.over.side : null;
+    const isHeader = k === 'header';
+    let sh = isHeader ? 'none' : 'inset 0 2px 0 #3a6ae6,0 1px 2px rgba(16,24,40,.04),0 10px 28px -12px rgba(20,34,74,.16)';
+    if (k === 'text') sh = '0 1px 2px rgba(16,24,40,.04)';
+    if (ov === 'before') sh = 'inset 4px 0 0 #2f62c9,' + sh; if (ov === 'after') sh = 'inset -4px 0 0 #2f62c9,' + sh;
+    if (s.flash === w.id) sh = '0 0 0 3px rgba(91,134,245,.55),' + sh;
+    if (s.cfg === w.id && s.drawer === 'cfg') sh = '0 0 0 2px #2f62c9,' + sh;
+    sh = sh.replace(/,none$/, '');
+    const ef = this.eff(d, w); const chips = [];
+    const chip = function (label, icon, tone, tip) { const T2 = { pin: ['#fff7e6', '#93370d', '#fedf89'], link: ['#eef3fd', '#1d4596', '#c9d7f5'], grey: ['#f2f4f7', '#475467', '#e4e7ec'], purple: ['#f4f3ff', '#5925dc', '#d9d6fe'], green: ['#ecfdf3', '#067647', '#abefc6'] }[tone]; chips.push({ label: label, icon: icon, bg: T2[0], fg: T2[1], bd: T2[2], tip: tip || '' }); };
+    Object.keys(w.pins).forEach(function (f) { chip(FDEF[f].label + ': ' + optLabel(f, w.pins[f]), ICON.pin, 'pin', 'Pinned for this widget'); });
+    Object.keys(d.scopes || {}).forEach(function (f) { if (self.excluded(d, f, w.id)) chip('Ignores ' + FDEF[f].label, ICON.off, 'grey', 'Left out of this filter’s scope'); });
+    let sub = t.sub || '';
+    if (t.consumes) { const l = this.link(d, w); chip(!w.link ? 'Not linked · all' : l && l.row ? (t.consumes === 'limit' ? 'Limit ' + l.row.limitId : l.row.name) : 'All desks', ICON.link, w.link ? 'link' : 'grey', w.link ? 'Follows row clicks in ' + titleOf(wOf(d, w.link)) : 'Shows the all view'); }
+    if (s.xf && s.xf.from !== w.id && this.respondsX(w)) { if (w.xf === false) chip('Ignores cross-filters', ICON.off, 'grey'); else chip('Region · ' + s.xf.value, ICON.filter, 'purple', 'Cross-filter from ' + titleOf(wOf(d, s.xf.from))); }
+    else if (isEdit && w.xf === false) chip('Ignores cross-filters', ICON.off, 'grey');
+    if (t.local) chip('PCOB 04-Sep-2026 · −7d', ICON.clock, 'purple', 'Keeps its own PCOB rule, so it does not follow Compare');
+    if (isEdit && w.rule && w.rule.kind !== 'always') chip(this.ruleText(w) + (visible ? '' : ' · hidden now'), visible ? ICON.eye : ICON.off, visible ? 'green' : 'grey');
+    if (XPROV[w.t] && !sub) sub = 'Click a region to cross-filter the dashboard';
+    const isChart = ['line', 'stack', 'exposure'].indexOf(k) >= 0;
+    const ch = isChart ? this.chartModel(d, w) : null;
+    if (ch && ch.sub && !t.sub) sub = ch.sub;
+    const cats = t.cat === 'VaR Summary' ? ['VaR', '#eef3fd', '#1d4596'] : t.cat === 'Greek Dashboard' ? ['GREEK', '#f4f3ff', '#5925dc'] : ['', '', ''];
+    const auto = tab.layout === 'auto' && !isHeader;
+    const canH = ['grid', 'line', 'stack', 'exposure', 'list'].indexOf(k) >= 0;
+    const alerts = k === 'alerts' ? this.alertsModel(d, w) : [];
+    return {
+      id: w.id, title: titleOf(w), sub: sub, hasSub: !!sub, tag: cats[0], hasTag: !!cats[0], tagBg: cats[1], tagFg: cats[2], chips: chips, hasChips: chips.length > 0,
+      flex: isHeader ? '1 1 100%' : auto ? '1 1 440px' : w.span + ' 1 0px', minW: isHeader ? 300 : auto ? 340 : w.span <= 3 ? 260 : w.span <= 5 ? 320 : w.span <= 8 ? 420 : 520,
+      bg: isHeader ? (isEdit ? 'rgba(255,255,255,.7)' : 'transparent') : k === 'text' ? '#fbfcfe' : '#fff', bd: isHeader && !isEdit ? 'transparent' : isEdit ? '#c9d7f5' : '#e6ebf3', bdStyle: isHeader && isEdit ? 'dashed' : 'solid', sh: sh,
+      op: s.dragging && self.dragKey === 'w:' + w.id ? 0.45 : visible ? 1 : 0.55,
+      bodyH: canH ? HPX[w.h] + 'px' : 'auto',
+      isHeader: isHeader, hdrPad: isEdit ? '10px 14px' : '8px 4px 0', isCard: !isHeader, isText: k === 'text', text: w.text || '', showExport: !isEdit && ['grid', 'line', 'stack', 'exposure', 'list'].indexOf(k) >= 0,
+      isGrid: k === 'grid', g: k === 'grid' ? this.gridModel(d, w) : { rows: [], heads: [], bands: [], tot: [] },
+      isChart: isChart, ch: ch || { legend: [], grid: [], bars: [], paths: [], yLab: [], xLab: [], stats: [] },
+      isKpi: k === 'kpi', kpis: k === 'kpi' ? this.kpiModel(d, w) : [],
+      isAlerts: k === 'alerts', alerts: alerts, noAlerts: k === 'alerts' && alerts.length === 0,
+      isList: k === 'list', list: k === 'list' ? this.listModel(d, w) : [],
+      onExport: function () { self.toastMsg('Exported “' + titleOf(w) + '” as CSV'); },
+      dragAttr: isEdit ? 'true' : 'false', onDragStart: function (e) { if (isEdit) self.dragStart('w:' + w.id, e); },
+      onOver: function (e) { self.overCard(w.id, e); }, onDrop: function (e) { self.dropAt({ id: w.id, side: (self.state.over && self.state.over.side) || 'after' }, e); },
+      onLeft: function () { self.moveLR(w.id, -1); }, onRight: function () { self.moveLR(w.id, 1); },
+      showSpans: !auto && !isHeader, autoNote: auto,
+      spans: SPANS.map(function (o) { const on = w.span === o[0]; return { label: o[1], tip: o[2], bg: on ? '#2f62c9' : 'transparent', fg: on ? '#fff' : '#475467', onClick: function () { self.setW(w.id, 'span', o[0]); } }; }),
+      canH: canH, hs: HS.map(function (o) { const on = w.h === o[0]; return { label: o[1], tip: o[2], bg: on ? '#2f62c9' : 'transparent', fg: on ? '#fff' : '#475467', onClick: function () { self.setW(w.id, 'h', o[0]); } }; }),
+      cfgLabel: k === 'grid' ? 'Columns & data' : isHeader || k === 'text' ? 'Edit' : 'Configure', canSaveMine: t.cat !== 'Layout',
+      onCfg: function () { self.setState({ drawer: 'cfg', cfg: w.id, cfgTab: k === 'grid' ? 'columns' : t.cat === 'Layout' ? 'display' : 'data', colQ: '' }); },
+      onMine: function () { self.saveMine(w); }, onDup: function () { self.dup(w.id); }, onDel: function () { self.remove(w.id); }
+    };
+  }
+
+  cfgModel(d, w) {
+    const s = this.state, self = this, t = TM[w.t], ef = this.eff(d, w);
+    const tabs = t.cat === 'Layout' ? [['display', 'Display']] : (t.kind === 'grid' ? [['columns', 'Columns']] : []).concat([['data', 'Data'], ['display', 'Display']]);
+    const tab = tabs.some(function (x) { return x[0] === s.cfgTab; }) ? s.cfgTab : tabs[0][0];
+    const pill = function (on) { return on ? { bd: '#2f62c9', bg: '#eef3fd', fg: '#1d4596' } : { bd: '#e2e8f2', bg: '#fff', fg: '#475467' }; };
+    const radio = function (on) { return on ? { bd: '#2f62c9', bg: '#eef3fd', dot: '#2f62c9', fill: '#2f62c9' } : { bd: '#e6ebf3', bg: '#fff', dot: '#c4cdd9', fill: '#fff' }; };
+    const m = { title: titleOf(w), isCols: tab === 'columns', isData: tab === 'data', isDisp: tab === 'display', shown: [], avail: [], filters: [], links: [],
+      tabs: tabs.map(function (o) { const on = tab === o[0]; return { label: o[1], bg: on ? '#fff' : 'transparent', fg: on ? '#0f1a3a' : '#475467', sh: on ? '0 1px 3px rgba(16,24,40,.12)' : 'none', onClick: function () { self.setState({ cfgTab: o[0] }); } }; }) };
+    if (t.kind === 'grid') {
+      const q = s.colQ.trim().toLowerCase(); const meta = function (c) { return t.cols.find(function (x) { return x.f === c.f; }); };
+      const match = function (c) { const mm = meta(c); return !q || (mm.h + ' ' + (mm.g || '')).toLowerCase().indexOf(q) >= 0; };
+      const on = w.cols.filter(function (c) { return c.on; });
+      const hideG = function (mm) { return t.filters.indexOf('display') >= 0 && mm.g && ((ef.display === 'MC' && mm.g.indexOf('Historical') === 0) || (ef.display === 'Hist' && mm.g.indexOf('Monte') === 0)); };
+      m.shown = on.filter(match).map(function (c) { const mm = meta(c); const k = on.indexOf(c);
+        return { label: mm.h, group: mm.g || '', hasGroup: !!mm.g, hidden: hideG(mm), pinTip: c.pin ? 'Unpin' : 'Pin to the left', pinBd: c.pin ? '#2f62c9' : '#e6ebf3', pinBg: c.pin ? '#eef3fd' : '#fff', pinFg: c.pin ? '#2f62c9' : '#98a2b3',
+          noUp: k === 0, noDown: k === on.length - 1, upOp: k === 0 ? 0.35 : 1, downOp: k === on.length - 1 ? 0.35 : 1,
+          onToggle: function () { self.colOp(w.id, c.f, 'toggle'); }, onPin: function () { self.colOp(w.id, c.f, 'pin'); }, onUp: function () { self.colOp(w.id, c.f, 'up'); }, onDown: function () { self.colOp(w.id, c.f, 'down'); } }; });
+      m.avail = w.cols.filter(function (c) { return !c.on && match(c); }).map(function (c) { const mm = meta(c); return { label: mm.h, group: mm.g || '', hasGroup: !!mm.g, onToggle: function () { self.colOp(w.id, c.f, 'toggle'); } }; });
+      m.shownCount = on.length + ' of ' + w.cols.length; m.availCount = w.cols.length - on.length; m.noAvail = m.avail.length === 0;
+      m.colQ = s.colQ; m.onColQ = function (e) { self.setState({ colQ: e.target.value }); }; m.onReset = function () { self.colOp(w.id, null, 'reset'); };
+    }
+    m.filters = t.filters.map(function (f) {
+      const pinned = w.pins[f] !== undefined; const ex = self.excluded(d, f, w.id);
+      const opts = [['__dash', 'Dashboard']].concat(FDEF[f].opts).map(function (o) { const on = o[0] === '__dash' ? !pinned : pinned && w.pins[f] === o[0]; const st = pill(on); return { label: o[1], bd: st.bd, bg: st.bg, fg: st.fg, onClick: function () { self.setPin(w.id, f, o[0] === '__dash' ? undefined : o[0]); } }; });
+      return { label: FDEF[f].label, status: pinned ? 'Pinned for this widget' : ex ? 'Out of scope · uses ' + optLabel(f, DEF[f]) : 'Follows dashboard · ' + optLabel(f, s.filters[f]), stFg: pinned ? '#b54708' : ex ? '#667085' : '#067647', bd: pinned ? '#fedf89' : '#e6ebf3', bg: pinned ? '#fffcf5' : '#fff', opts: opts };
+    });
+    m.noFilters = m.filters.length === 0;
+    m.noFiltersNote = 'This widget only uses COB. The Greek service sets its PCOB to COB −7 days, which differs from the VaR Compare rule, so it keeps its own PCOB and the card shows it.';
+    const xon = w.xf !== false;
+    m.xfTrack = xon ? '#2f62c9' : '#d0d5dd'; m.xfKnob = xon ? 18 : 2; m.xfAria = xon ? 'true' : 'false';
+    m.xfNote = this.respondsX(w) ? (xon ? 'Follows region clicks in the Greek grids' : 'Stays fixed when someone clicks a region') : 'This widget has no region data, so cross-filters don’t change it';
+    m.onXf = function () { self.setW(w.id, 'xf', !xon); };
+    m.hasLink = !!t.consumes;
+    if (t.consumes) {
+      const provs = d.widgets.filter(function (x) { return TM[x.t].provides === t.consumes; });
+      m.links = [{ id: null, label: 'None · show all' }].concat(provs.map(function (p) { return { id: p.id, label: titleOf(p) }; })).map(function (o) { const st = radio((w.link || null) === o.id); return { label: o.label, bd: st.bd, bg: st.bg, dot: st.dot, fill: st.fill, onClick: function () { self.setW(w.id, 'link', o.id); } }; });
+    }
+    m.titleVal = titleOf(w); m.onTitle = function (e) { self.setW(w.id, 'title', e.target.value, true); };
+    m.isText = t.kind === 'text'; m.textVal = w.text || ''; m.onText = function (e) { self.setW(w.id, 'text', e.target.value, true); };
+    const p = findPos(d, w.id);
+    m.tabOpts = d.tabs.map(function (tb, i) { const st = pill(p && p[0] === i); return { label: tb.name, bd: st.bd, bg: st.bg, fg: st.fg, onClick: function () { if (!(p && p[0] === i)) self.moveToTab(w.id, tb.id); } }; });
+    m.spans = SPANS.map(function (o) { const st = pill(w.span === o[0]); return { label: o[2], bd: st.bd, bg: st.bg, fg: st.fg, onClick: function () { self.setW(w.id, 'span', o[0]); } }; });
+    m.canH = ['grid', 'line', 'stack', 'exposure', 'list'].indexOf(t.kind) >= 0;
+    m.hs = HS.map(function (o) { const st = pill(w.h === o[0]); return { label: o[2], bd: st.bd, bg: st.bg, fg: st.fg, onClick: function () { self.setW(w.id, 'h', o[0]); } }; });
+    const r = w.rule || { kind: 'always' };
+    m.ruleKinds = [['always', 'Always'], ['data', 'Only when it has data'], ['filter', 'Only when a filter matches']].map(function (o) { const st = radio(r.kind === o[0]); return { label: o[1], bd: st.bd, bg: st.bg, dot: st.dot, fill: st.fill,
+      onClick: function () { self.setW(w.id, 'rule', o[0] === 'filter' ? { kind: 'filter', f: 'region', vals: [s.filters.region] } : { kind: o[0] }); } }; });
+    m.ruleIsFilter = r.kind === 'filter';
+    if (m.ruleIsFilter) {
+      m.ruleFilters = RULE_FILTERS.map(function (f) { const st = pill(r.f === f); return { label: FDEF[f].label, bd: st.bd, bg: st.bg, fg: st.fg, onClick: function () { self.setW(w.id, 'rule', { kind: 'filter', f: f, vals: [s.filters[f]] }); } }; });
+      m.ruleVals = FDEF[r.f].opts.map(function (o) { const on = r.vals.indexOf(o[0]) >= 0; const st = pill(on); return { label: o[1], bd: st.bd, bg: st.bg, fg: st.fg, onClick: function () { const vals = on ? r.vals.filter(function (v) { return v !== o[0]; }) : r.vals.concat([o[0]]); self.setW(w.id, 'rule', { kind: 'filter', f: r.f, vals: vals }); } }; });
+    } else { m.ruleFilters = []; m.ruleVals = []; }
+    m.hasSrc = !!t.src;
+    m.src = t.src ? 'GET ' + t.src + '/data?' + ['cob'].concat(t.filters).map(function (f) { return f + '=' + (f === 'cob' ? '2026-09-11' : ef[f]); }).join('&') + (ef.xregion ? '&xregion=' + ef.xregion : '') + (t.kind === 'grid' ? '&columns=' + w.cols.filter(function (c) { return c.on; }).map(function (c) { return c.f; }).join(',') : '') : '';
+    return m;
+  }
+
+  jsonFor(b, d, used) {
+    const s = this.state, self = this;
+    if (s.jsonTab === 'filters') {
+      const fields = [{ id: 'cob', label: 'COB', placement: 'header' }];
+      if (used.compare) fields.push({ id: 'compare', label: 'Compare', placement: 'header' }, { id: 'pcob', derive: { from: 'cob', via: 'compareOffset' } });
+      BAR_ORDER.forEach(function (f) { if (used[f]) fields.push({ id: f, label: FDEF[f].label, placement: 'bar', value: s.filters[f], appliesTo: d.widgets.filter(function (w) { return TM[w.t].filters.indexOf(f) >= 0 && w.pins[f] === undefined && !self.excluded(d, f, w.id); }).map(function (w) { return w.id; }) }); });
+      const pinned = [], local = [];
+      d.widgets.forEach(function (w) { Object.keys(w.pins).forEach(function (f) { pinned.push({ widgetId: w.id, filter: f, value: w.pins[f] }); }); if (TM[w.t].local) local.push({ widgetId: w.id, field: 'pcob', derive: { from: 'cob', via: 'addDays', days: -7 } }); });
+      return JSON.stringify({ schemaVersion: '1.0', dashboardId: b.id, fields: fields, pinnedParams: pinned, widgetLocal: local, crossFilters: { region: { providers: d.widgets.filter(function (w) { return XPROV[w.t]; }).map(function (w) { return w.id; }), active: s.xf ? s.xf.value : null } } }, null, 2);
+    }
+    const doc = {
+      id: b.id, name: s.mode === 'edit' ? s.draftName : b.name, schemaVersion: '2.0', version: b.version,
+      layout: { kind: 'TabsLayout', tabs: d.tabs.map(function (t) { return { id: t.id, title: t.name, layout: t.layout === 'auto' ? { kind: 'AutoGridLayout', minWidth: 440 } : { kind: 'RowsLayout', rows: t.rows.map(function (r) { return r.map(function (id) { const w = wOf(d, id); return { id: id, span: w.span, height: w.h }; }); }) }, items: t.layout === 'auto' ? [].concat.apply([], t.rows) : undefined }; }) },
+      widgets: d.widgets.map(function (w) {
+        const o = { id: w.id, templateId: w.t };
+        if (w.title) o.title = w.title;
+        if (w.text) o.text = w.text;
+        if (Object.keys(w.pins).length) o.pinnedParams = w.pins;
+        if (w.link) o.links = { [TM[w.t].consumes]: w.link };
+        if (w.xf === false) o.crossFilters = 'ignore';
+        if (w.rule && w.rule.kind !== 'always') o.showWhen = w.rule.kind === 'data' ? { hasData: true } : { filter: w.rule.f, in: w.rule.vals };
+        if (w.cols) { const def = TM[w.t].cols; if (w.cols.some(function (c, i) { return c.f !== def[i].f || c.on !== def[i].on || c.pin !== !!def[i].pin; })) o.grid = { columns: w.cols.map(function (c) { return { colId: c.f, hide: !c.on, pinned: c.pin ? 'left' : null }; }) }; }
+        return o;
+      }),
+      filterScopes: d.scopes && Object.keys(d.scopes).length ? Object.keys(d.scopes).reduce(function (a, f) { a[f] = { exclude: d.scopes[f] }; return a; }, {}) : undefined
+    };
+    return JSON.stringify(doc, null, 2);
+  }
+}
+
+</script>
+<script>
+window.__comp = new Component({});
+render();
+</script>
+</body>
+</html>

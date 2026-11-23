@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KPI Card · dynamic component spec</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0f1a3a;--navy2:#14224a;--ink:#101828;--ink2:#344054;--mute:#667085;--mute2:#98a2b3;--line:#e6ebf3;--line2:#eef1f6;--acc:#2f62c9;--acc2:#5b86f5;--accBg:#eef3fd;
+  --bad:#b42318;--badBg:#fef3f2;--badBd:#fecdca;--good:#067647;--goodBg:#ecfdf3;--goodBd:#abefc6;--warn:#b54708;--warnBg:#fffaeb;--warnBd:#fedf89;
+  --mono:'IBM Plex Mono',ui-monospace,monospace}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:radial-gradient(1100px 520px at 88% -8%,#e2ebff 0,rgba(226,235,255,0) 62%),linear-gradient(180deg,#eef2f9 0,#f4f6fa 520px);background-attachment:fixed;color:var(--ink);font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-size:14px}
+button,input,select{font-family:inherit}
+button:focus-visible,select:focus-visible,input:focus-visible,.kpi:focus-visible{outline:2px solid var(--acc2);outline-offset:2px}
+::selection{background:#d6e2fb}
+code,pre{font-family:var(--mono)}
+
+/* ---------- page chrome ---------- */
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:18px;padding:12px 28px;background:rgba(244,246,250,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--navy)}
+.brand i{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#5b86f5,#2f62c9);display:grid;place-items:center;color:#fff;font-style:normal;font-size:12px}
+.brand small{display:block;font-size:11px;font-weight:500;color:var(--mute)}
+.top nav{display:flex;gap:2px;margin-left:auto;padding:3px;background:#e9eef7;border-radius:11px}
+.top nav a{padding:6px 12px;border-radius:8px;font-size:12.5px;font-weight:600;color:#475467;text-decoration:none}
+.top nav a:hover{background:#fff;color:var(--navy)}
+main{max-width:1360px;margin:0 auto;padding:26px 28px 80px}
+section.blk{margin-bottom:46px;scroll-margin-top:70px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--acc);text-transform:uppercase}
+h1{font-size:28px;margin:6px 0 8px;color:var(--navy);letter-spacing:-.01em}
+h2{font-size:20px;margin:4px 0 6px;color:var(--navy)}
+.lead{color:#475467;max-width:860px;line-height:1.6;margin:0}
+.secHead{display:flex;align-items:flex-end;gap:16px;margin-bottom:16px}
+.secHead p{margin:0;color:#475467;font-size:13.5px;line-height:1.55;max-width:820px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 12px 30px -18px rgba(20,34,74,.18)}
+
+/* ---------- playground ---------- */
+.play{display:grid;grid-template-columns:290px minmax(0,1fr);gap:18px;align-items:start}
+.ctl{position:sticky;top:76px;padding:16px;display:flex;flex-direction:column;gap:14px;max-height:calc(100vh - 96px);overflow:auto}
+.ctl h3{margin:0;font-size:13px;color:var(--navy)}
+.fld{display:flex;flex-direction:column;gap:6px}
+.fld>span{font-size:10.5px;font-weight:700;letter-spacing:.09em;color:var(--mute);text-transform:uppercase}
+.seg{display:flex;flex-wrap:wrap;gap:4px}
+.seg button{height:28px;padding:0 10px;border:1px solid #e2e8f2;border-radius:8px;background:#fff;color:#475467;font-size:12px;font-weight:600;cursor:pointer}
+.seg button[aria-pressed=true]{border-color:var(--acc);background:var(--accBg);color:#1d4596}
+.tg{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:600;color:var(--ink2);cursor:pointer;user-select:none}
+.tg input{display:none}
+.tg b{width:30px;height:18px;border-radius:99px;background:#d0d5dd;position:relative;transition:.15s;flex:none}
+.tg b:after{content:'';position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.tg input:checked+b{background:var(--acc)}.tg input:checked+b:after{left:14px}
+.rng{display:flex;align-items:center;gap:8px}.rng input{flex:1;accent-color:var(--acc)}.rng output{font-family:var(--mono);font-size:12px;min-width:44px;text-align:right;color:var(--ink2)}
+.stage{display:flex;flex-direction:column;gap:14px;min-width:0}
+.frame{border-radius:18px;overflow:hidden}
+.frameTop{display:flex;align-items:center;gap:12px;padding:14px 18px;background:linear-gradient(180deg,#1a2b5c,#14224a);color:#fff}
+.frameTop b{font-size:15px}
+.pill{display:flex;flex-direction:column;padding:4px 10px;border-radius:9px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12)}
+.pill small{font-size:9px;font-weight:700;letter-spacing:.1em;color:#a9c0ff}
+.pill span{font-family:var(--mono);font-size:12px}
+.cmp{display:flex;gap:2px;padding:3px;border-radius:9px;background:rgba(255,255,255,.08)}
+.cmp button{height:26px;padding:0 10px;border:0;border-radius:7px;background:transparent;color:#b9c6e6;font-size:12px;font-weight:600;cursor:pointer}
+.cmp button[aria-pressed=true]{background:#fff;color:var(--navy)}
+.frameBody{padding:16px;background:#f4f6fa;min-height:180px}
+.frameBody.resizable{resize:horizontal;overflow:auto;max-width:100%}
+.hint{font-size:12px;color:var(--mute);display:flex;align-items:center;gap:6px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 16px 40px -10px rgba(15,26,58,.55);opacity:0;pointer-events:none;transition:.2s;z-index:50}
+.toast.on{opacity:1}
+
+/* ---------- KPI group layouts ---------- */
+.kg{--min:230px;display:grid;gap:12px}
+.kg.grid{grid-template-columns:repeat(auto-fit,minmax(var(--min),1fr))}
+.kg.wrap{grid-template-columns:repeat(var(--cols),minmax(0,1fr))}
+.kg.featured>.kpi:first-child{grid-column:span 2}
+.kgs{position:relative}
+.kg.scroll{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:2px;margin:-2px}
+.kg.scroll::-webkit-scrollbar{display:none}
+.kg.scroll>.kpi{flex:0 0 var(--min);scroll-snap-align:start}
+.kgs .nav{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;box-shadow:0 6px 16px -6px rgba(15,26,58,.35);cursor:pointer;color:var(--navy);font-size:15px;z-index:2;display:none}
+.kgs.ovf .nav{display:block}.kgs .nav.l{left:-12px}.kgs .nav.r{right:-12px}
+.kgs .nav[disabled]{opacity:0;pointer-events:none}
+.kgs .fade{position:absolute;top:0;bottom:0;width:40px;pointer-events:none;z-index:1;display:none}
+.kgs.ovf .fade{display:block}.kgs .fade.l{left:0;background:linear-gradient(90deg,#f4f6fa,rgba(244,246,250,0))}.kgs .fade.r{right:0;background:linear-gradient(270deg,#f4f6fa,rgba(244,246,250,0))}
+.kgHead{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;font-weight:700;letter-spacing:.09em;color:var(--mute);text-transform:uppercase}
+.kgHead .cnt{font-family:var(--mono);letter-spacing:0;font-weight:600;padding:1px 6px;border-radius:6px;background:#e9eef7;color:#475467}
+.kgHead .sum{margin-left:auto;display:flex;gap:6px;text-transform:none;letter-spacing:0;font-weight:600}
+.sumc{display:flex;align-items:center;gap:5px;padding:2px 8px;border-radius:99px;font-size:11.5px}
+.sumc i{width:7px;height:7px;border-radius:50%}
+
+/* ---------- KPI card ---------- */
+.kpi{container:kpi/inline-size;position:relative;display:flex;flex-direction:column;min-width:0;background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:inset 0 2px 0 var(--accent,#3a6ae6),0 1px 2px rgba(16,24,40,.04),0 10px 26px -16px rgba(20,34,74,.2);cursor:pointer;transition:box-shadow .15s,border-color .15s,transform .15s;text-align:left}
+.kpi:hover{border-color:#cdd8ee;transform:translateY(-1px)}
+.kpi.sel{border-color:var(--acc);box-shadow:inset 0 2px 0 var(--accent,#3a6ae6),0 0 0 3px rgba(47,98,201,.18),0 10px 26px -16px rgba(20,34,74,.25)}
+.kpi.st-breach{--accent:#d92d20;background:linear-gradient(180deg,#fff7f6 0,#fff 70px)}
+.kpi.st-warn{--accent:#f79009}
+.kpi.st-ok{--accent:#12b76a}
+.kpi.st-none{--accent:#3a6ae6}
+.kpi.dense{border-radius:11px}
+.kin{padding:13px 14px 12px;display:flex;flex-direction:column;gap:8px;flex:1}
+.dense .kin{padding:9px 11px 9px;gap:5px}
+.khead{display:flex;align-items:center;gap:6px;min-width:0}
+.klabel{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#475467;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.kunit{font-size:10.5px;font-weight:600;color:var(--mute2);white-space:nowrap}
+.kstat{margin-left:auto;display:inline-flex;align-items:center;gap:4px;height:19px;padding:0 7px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:.04em;white-space:nowrap;flex:none}
+.kstat i{width:6px;height:6px;border-radius:50%;background:currentColor}
+.kstat.breach{background:var(--badBg);color:var(--bad);border:1px solid var(--badBd)}
+.kstat.warn{background:var(--warnBg);color:var(--warn);border:1px solid var(--warnBd)}
+.kstat.ok{background:var(--goodBg);color:var(--good);border:1px solid var(--goodBd)}
+.kstat.stale{background:#f2f4f7;color:#475467;border:1px solid #e4e7ec}
+.kstat.filt{background:var(--accBg);color:#1d4596;border:1px solid #c9d7f5}
+.kbody{display:flex;flex-direction:column;gap:8px;min-width:0}
+.kval{font-family:var(--mono);font-weight:600;font-size:27px;line-height:1.05;letter-spacing:-.02em;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kval.neg{color:var(--bad)}
+.dense .kval{font-size:21px}
+.kdl{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;min-width:0}
+.kdelta{display:inline-flex;align-items:center;gap:4px;height:21px;padding:0 7px;border-radius:6px;font-family:var(--mono);font-size:11.5px;font-weight:600;white-space:nowrap}
+.kdelta.bad{background:var(--badBg);color:var(--bad)}.kdelta.good{background:var(--goodBg);color:var(--good)}.kdelta.flat{background:#f2f4f7;color:#475467}
+.ksub{font-size:11.5px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ksub b{font-family:var(--mono);font-weight:500;color:#475467}
+.krows{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0;padding:8px 0 0;border-top:1px dashed var(--line)}
+.krows dt{font-size:11px;color:var(--mute);white-space:nowrap}
+.krows dd{margin:0;text-align:right;font-family:var(--mono);font-size:12px;color:var(--ink2);white-space:nowrap}
+.krows dd.bad{color:var(--bad)}.krows dd.good{color:var(--good)}
+.kmeter{display:flex;flex-direction:column;gap:4px}
+.kmt{position:relative;height:6px;border-radius:99px;background:#eef1f6;overflow:visible}
+.kmt>i{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
+.kmt>u{position:absolute;top:-3px;bottom:-3px;width:2px;border-radius:2px;background:var(--navy)}
+.kml{display:flex;justify-content:space-between;font-size:10.5px;color:var(--mute);gap:6px}
+.kml b{font-family:var(--mono);font-weight:600}.kml span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kspark{display:block;width:100%;height:38px}
+.kfoot{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--mute2);white-space:nowrap;overflow:hidden}
+.kpair{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.kpair>div{display:flex;flex-direction:column;gap:5px;min-width:0;padding-right:10px}
+.kpair>div+div{padding:0 0 0 10px;border-left:1px solid var(--line2)}
+.ktag{align-self:flex-start;font-size:10px;font-weight:700;padding:1px 6px;border-radius:5px;background:#f2f4f7;color:#475467;font-family:var(--mono)}
+.kpair .kval{font-size:20px}.kpair .kdelta{font-size:10.5px;padding:0 5px;gap:3px}
+.kmore{position:absolute;top:8px;right:8px;z-index:1;background:#fff !important;box-shadow:0 0 0 1px var(--line);width:24px;height:22px;border:0;border-radius:6px;background:transparent;color:var(--mute2);cursor:pointer;font-size:14px;line-height:1;flex:none;opacity:0;transition:.15s}
+.kpi:hover .kmore,.kpi:focus-within .kmore{opacity:1}.kpi.st-error .kmore{display:none}
+.kmore:hover{color:var(--ink)}
+.kstat+.kmore{margin-left:0}
+.khead .kmore:first-of-type:not(.kstat+.kmore){margin-left:auto}
+
+/* container queries: one component, layout by its own width */
+@container kpi (min-width: 400px){
+  .kbody.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(170px,.9fr);gap:16px;align-items:start}
+  .kbody.split .krows{border-top:0;border-left:1px dashed var(--line);padding:0 0 0 14px}
+  .kval{font-size:30px}
+}
+@container kpi (max-width: 265px){ .kstat span{display:none} .kstat{padding:0 5px;height:16px} }
+@container kpi (max-width: 205px){
+  .kval{font-size:20px}
+  .ksub,.kunit,.kfoot{display:none}
+  .krows{grid-template-columns:1fr auto}
+  .kstat span{display:none}.kstat{padding:0 5px}
+  .kpair{grid-template-columns:1fr}.kpair>div+div{border-left:0;padding:6px 0 0;border-top:1px solid var(--line2)}
+}
+@container kpi (max-width: 150px){ .krows,.kspark{display:none} }
+
+/* compact variant (strips) */
+.kpi.v-compact .kin{gap:3px;padding:8px 11px}
+.kpi.v-compact .kval{font-size:16px}.kpi.v-compact .kunit{display:none}
+.kpi.v-compact .kbody{flex-direction:row;align-items:center;justify-content:space-between;gap:8px}.kpi.v-compact .kdelta{height:19px;font-size:11px}
+
+/* states */
+.sk{border-radius:6px;background:linear-gradient(90deg,#eef1f6 0,#f6f8fb 40%,#eef1f6 80%);background-size:800px 100%;animation:sh 1.3s linear infinite}
+@keyframes sh{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.kpi.st-error{--accent:#d0d5dd;cursor:default}
+.kerr{display:flex;flex-direction:column;gap:6px;font-size:12px;color:#475467}
+.kerr button{align-self:flex-start;height:26px;padding:0 10px;border:1px solid #d0d5dd;border-radius:7px;background:#fff;font-size:11.5px;font-weight:600;cursor:pointer}
+.kpi.stale .kval{color:#475467}
+.kpi.na .kval{color:var(--mute2)}
+
+/* ---------- gallery ---------- */
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.gcell{display:flex;flex-direction:column;gap:10px;padding:14px;background:#fff;border:1px solid var(--line);border-radius:16px}
+.gcell h4{margin:0;font-size:13.5px;color:var(--navy);display:flex;align-items:center;gap:8px}
+.gcell h4 code{font-size:11px;font-weight:600;color:#1d4596;background:var(--accBg);padding:1px 6px;border-radius:5px}
+.gcell p{margin:0;font-size:12px;color:#475467;line-height:1.5}
+.gcell .stagebg{padding:12px;background:#f4f6fa;border-radius:12px}
+.widths{display:flex;flex-direction:column;gap:14px}
+.wrow{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.wbox{display:flex;flex-direction:column;gap:6px}
+.wbox>span{font-family:var(--mono);font-size:11px;color:var(--mute)}
+.cmpGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cmpCol h4{margin:0 0 8px;font-size:13px;color:var(--navy)}
+.legacy{border-radius:14px;padding:12px;font-size:12px}
+.legacy.salmon{background:#f2a38f;color:#3b0f05;font-family:var(--mono)}
+.legacy.salmon div{display:flex;justify-content:space-between}
+.why{margin:8px 0 0;padding-left:18px;font-size:12.5px;color:#475467;line-height:1.6}
+
+/* ---------- contract ---------- */
+.ctr{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+pre.code{margin:0;padding:14px 16px;background:#0f1a3a;color:#dbe4ff;border-radius:14px;font-size:11.8px;line-height:1.6;overflow:auto;max-height:560px}
+pre.code .k{color:#8fb0fb}pre.code .s{color:#a6e3c8}pre.code .c{color:#7d8bb3}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);text-align:left;padding:8px 10px;background:#f8fafd;border-bottom:1px solid var(--line)}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--line2);vertical-align:top;color:var(--ink2)}
+.tbl td code{font-size:11.5px;color:#1d4596}
+.jsonTabs{display:flex;gap:2px;padding:3px;background:#e9eef7;border-radius:10px;align-self:flex-start}
+.jsonTabs button{height:28px;padding:0 12px;border:0;border-radius:7px;background:transparent;font-size:12px;font-weight:600;color:#475467;cursor:pointer}
+.jsonTabs button[aria-pressed=true]{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(16,24,40,.12)}
+@media (max-width:1000px){.play,.ctr,.cmpGrid{grid-template-columns:1fr}.ctl{position:static;max-height:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><i>KPI</i><div>KPI Card<small>Dynamic, config-driven component · design spec</small></div></div>
+  <nav><a href="#play">Playground</a><a href="#variants">Variants</a><a href="#states">States</a><a href="#scale">Scaling</a><a href="#legacy">Before / after</a><a href="#contract">Contract</a></nav>
+</header>
+<main>
+  <section class="blk">
+    <div class="eyebrow">Component spec · mock data</div>
+    <h1>One KPI card for every dashboard</h1>
+    <p class="lead">Today the Stress Testing headline cards and the CRiSP VaR threshold cards are two separate designs. This replaces both with one <code>&lt;KpiCard&gt;</code> driven by a definition from the service. The definition says what the value is, how to format it, which direction is “worse”, what to compare against, and which threshold applies. The card works out the change, the status and the colours, and switches layout from its own width. All numbers on this page are invented.</p>
+  </section>
+
+  <!-- PLAYGROUND -->
+  <section class="blk" id="play">
+    <div class="secHead"><div><div class="eyebrow">01</div><h2>Playground</h2><p>Change the settings and see the same definitions render differently. Click a card to select it as a cross-filter, as on the existing Stress page. Drag the bottom-right corner of the preview to resize it; the cards adapt to their own width.</p></div></div>
+    <div class="play">
+      <aside class="panel ctl" id="ctl" aria-label="Settings"></aside>
+      <div class="stage">
+        <div class="panel frame">
+          <div class="frameTop"><b id="ftTitle">Stress Testing</b>
+            <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+              <div class="cmp" id="cmpSeg"></div>
+              <div class="pill"><small>COB</small><span>20-Nov-2026</span></div>
+              <div class="pill"><small>PCOB</small><span id="pcobLbl">19-Nov-2026</span></div>
+            </div>
+          </div>
+          <div class="frameBody resizable" id="preview"></div>
+        </div>
+        <div class="hint">↘ Drag the preview's corner to see the container-query layouts: wide (value + detail side by side), standard, narrow (sub-text hidden), tiny (value only).</div>
+        <div class="panel" style="padding:14px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px"><b style="font-size:13px;color:var(--navy)">What the service sends</b><div class="jsonTabs" id="jsonTabs"></div></div>
+          <pre class="code" id="jsonOut" style="max-height:340px"></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARIANTS -->
+  <section class="blk" id="variants">
+    <div class="secHead"><div><div class="eyebrow">02</div><h2>Variants</h2><p>Six layouts from the same definition. <code>variant: "auto"</code> picks one from the data: a threshold → <em>detail</em>; a pair of horizons → <em>pair</em>; otherwise <em>headline</em>. Dashboards can override it.</p></div></div>
+    <div class="gal" id="gal"></div>
+  </section>
+
+  <!-- STATES -->
+  <section class="blk" id="states">
+    <div class="secHead"><div><div class="eyebrow">03</div><h2>States</h2><p>Every card handles loading, errors, missing data, stale data and selection the same way, so dashboards never need custom code for them. Colour comes from <em>meaning</em> (worse or better, breach or warning), never from the sign of the number.</p></div></div>
+    <div class="gal" id="states-g"></div>
+  </section>
+
+  <!-- SCALING -->
+  <section class="blk" id="scale">
+    <div class="secHead"><div><div class="eyebrow">04</div><h2>Scaling</h2><p>The card adapts to its container, not the screen. That matters in the custom dashboard, where a user can make a card a quarter-width or full-width. A group of cards can grow from 4 to 40 without a new design.</p></div></div>
+    <div class="panel" style="padding:16px;display:flex;flex-direction:column;gap:22px">
+      <div><div class="kgHead">Same card, four container widths</div><div class="widths" id="widths"></div></div>
+      <div><div class="kgHead">Many KPIs · one row with scroll, arrows and a status summary</div><div id="manyScroll"></div></div>
+      <div><div class="kgHead">Many KPIs · compact strip (for dense pages, like the legacy Excel view)</div><div id="manyCompact"></div></div>
+    </div>
+  </section>
+
+  <!-- LEGACY -->
+  <section class="blk" id="legacy">
+    <div class="secHead"><div><div class="eyebrow">05</div><h2>Before / after</h2><p>How the two existing cards map onto the new one (invented values).</p></div></div>
+    <div class="cmpGrid">
+      <div class="panel" style="padding:16px">
+        <div class="cmpCol"><h4>CRiSP VaR threshold card</h4>
+          <div style="display:grid;grid-template-columns:160px 1fr;gap:14px;align-items:start">
+            <div class="legacy salmon"><b style="display:block;text-align:center;font-family:'Plus Jakarta Sans';margin-bottom:6px">Trading 10D</b><div><span>COB:</span><span>266.80</span></div><div><span>PCOB:</span><span>228.41</span></div><div><span>Diff:</span><span>38.39</span></div><div><span>Diff %:</span><span>16.81</span></div><div><span>Threshold:</span><span>15</span></div><div><span>% Threshold:</span><span>112</span></div></div>
+            <div id="legacyVar"></div>
+          </div>
+          <ul class="why"><li>The whole card was salmon, so every card looked “in breach”. Now colour appears only when the threshold is crossed: a red rail, a Breach badge and a red meter.</li><li>The value is the hero; COB/PCOB/Diff move to a small detail list.</li><li>“% Threshold” becomes a meter with a marker at 100%, so “how close” is visible at a glance.</li><li>Trading 1D and 10D can share one card (the <em>pair</em> variant), which halves the 8-card row.</li></ul>
+        </div>
+      </div>
+      <div class="panel" style="padding:16px">
+        <div class="cmpCol"><h4>Stress Testing headline card</h4>
+          <div style="display:grid;grid-template-columns:160px 1fr;gap:14px;align-items:start">
+            <div class="legacy" style="background:#fff;border:1px solid var(--line)"><div style="font-size:11px;color:#475467">Deep Deflation ($MM)</div><div style="font-family:var(--mono);font-size:20px;color:#b42318;margin:4px 0">-2,841.6</div><div style="font-size:11px;color:#b42318">▼ 939.3 (49.4%)</div><div style="font-size:11px;color:#667085">vs PCOB -1,902.3</div></div>
+            <div id="legacyStress"></div>
+          </div>
+          <ul class="why"><li>Same information, same reading order, so users won't need retraining.</li><li>Red now means <em>worse</em> (loss grew), driven by <code>polarity</code>. A smaller loss shows green, even though the number is negative.</li><li>An optional sparkline shows whether the jump is new or part of a trend.</li><li>The selected (cross-filter) state gets a ring and a “Filtering” badge, not just a border.</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTRACT -->
+  <section class="blk" id="contract">
+    <div class="secHead"><div><div class="eyebrow">06</div><h2>Contract</h2><p>The service sends definitions (stable, saved with the dashboard) and values (per COB). The card derives Diff, Diff %, the threshold usage and the status, so every dashboard calculates them the same way. The service can override the status or colours when it knows better, e.g. a limit breach decided upstream.</p></div></div>
+    <div class="ctr">
+      <pre class="code" id="tsOut"></pre>
+      <div class="panel" style="padding:4px 0;overflow:auto">
+        <table class="tbl"><thead><tr><th>Field</th><th>Purpose</th><th>Default</th></tr></thead><tbody id="propTbl"></tbody></table>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= data (invented) ================= */
+function rng(seed){let a=seed>>>0;return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function series(seed,end,prev,n,vol){const r=rng(seed);const out=[];let v=prev;for(let i=n-2;i>=0;i--){out.unshift(v);v=v*(1+(r()-.5)*vol);}out.push(end);return out;}
+const CMPOFF={DoD:1,WoW:5,MoM:21};
+const PCOB={DoD:'19-Nov-2026',WoW:'13-Nov-2026',MoM:'21-Oct-2026'};
+
+const DEFS={
+  stress:{title:'Stress Testing',group:'Scenario stress loss',items:[
+    {id:'dsd',label:'Deep Deflation',unit:'$MM',v:-2841.6,p:-1902.3},
+    {id:'dsi',label:'Deep Inflation',unit:'$MM',v:-2214.8,p:-1790.2},
+    {id:'msd',label:'Moderate Deflation',unit:'$MM',v:-962.4,p:-701.5},
+    {id:'msi',label:'Moderate Inflation',unit:'$MM',v:-388.1,p:-251.9},
+    {id:'h08',label:'Historical 2008',unit:'$MM',v:-1966.0,p:-1704.7},
+    {id:'h74',label:'Historical 1974',unit:'$MM',v:-1312.5,p:-1330.8}
+  ].map(function(o,i){return Object.assign(o,{polarity:'lowerIsWorse',format:{dec:1},spark:series(11+i,o.v,o.p,20,.06)});})},
+  var:{title:'Monte Carlo VaR',group:'VaR by perimeter',items:[
+    {id:'t1',label:'Trading',h:'1D',unit:'$MM',v:84.37,p:81.10,thr:15},
+    {id:'t10',label:'Trading',h:'10D',unit:'$MM',v:266.80,p:228.41,thr:15},
+    {id:'e1',label:'Economic',h:'1D',unit:'$MM',v:97.42,p:99.85,thr:15},
+    {id:'e10',label:'Economic',h:'10D',unit:'$MM',v:308.05,p:301.60,thr:15},
+    {id:'v1',label:'Volcker',h:'1D',unit:'$MM',v:61.90,p:52.70,thr:10},
+    {id:'v10',label:'Volcker',h:'10D',unit:'$MM',v:195.70,p:180.20,thr:10},
+    {id:'c1',label:'Trading & Credit',h:'1D',unit:'$MM',v:118.64,p:112.03,thr:12},
+    {id:'c10',label:'Trading & Credit',h:'10D',unit:'$MM',v:375.12,p:351.80,thr:12}
+  ].map(function(o,i){return Object.assign(o,{polarity:'higherIsWorse',format:{dec:2},threshold:{type:'diffPct',value:o.thr,warnAt:.8},spark:series(31+i,o.v,o.p,20,.05)});})},
+  mixed:{title:'Risk overview',group:'Headline KPIs',items:[
+    {id:'lim',label:'VaR limit usage',unit:'$MM',v:84.37,p:81.10,polarity:'higherIsWorse',format:{dec:2},threshold:{type:'limit',value:120,warnAt:.8}},
+    {id:'svar',label:'SVaR',unit:'$MM',v:212.40,p:205.18,polarity:'higherIsWorse',format:{dec:2},threshold:{type:'limit',value:230,warnAt:.85}},
+    {id:'dsd',label:'Deep Deflation',unit:'$MM',v:-2841.6,p:-1902.3,polarity:'lowerIsWorse',format:{dec:1}},
+    {id:'pnl',label:'Daily P&L',unit:'$MM',v:12.84,p:-4.10,polarity:'higherIsBetter',format:{dec:2}},
+    {id:'brk',label:'Backtest exceptions',unit:'250d',v:3,p:3,polarity:'higherIsWorse',format:{dec:0},threshold:{type:'limit',value:5,warnAt:.8}},
+    {id:'cnt',label:'Desks in breach',unit:'',v:2,p:4,polarity:'higherIsWorse',format:{dec:0}}
+  ].map(function(o,i){return Object.assign(o,{spark:series(51+i,o.v,o.p,20,.07)});})}
+};
+
+/* ================= core: derive + format ================= */
+const MINUS='−';
+function fmt(v,dec,neg){if(v==null||isNaN(v))return '–';const s=Math.abs(v).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});if(v<0&&+Math.abs(v).toFixed(dec)!==0)return neg==='parens'?'('+s+')':MINUS+s;return s;}
+function derive(d,cmpMode){
+  // pcob shifts with compare mode (mock: pick from the series)
+  const off=CMPOFF[cmpMode||'DoD'];const sp=d.spark;const p=cmpMode&&cmpMode!=='DoD'&&sp?sp[Math.max(0,sp.length-1-off)]:d.p;
+  const diff=d.v-p;const pct=p?diff/Math.abs(p)*100:null;
+  const pol=d.polarity||'neutral';
+  const worse=pol==='higherIsWorse'?diff>0:pol==='lowerIsWorse'?diff<0:pol==='higherIsBetter'?diff<0:false;
+  const better=pol!=='neutral'&&!worse&&Math.abs(diff)>1e-9;
+  let used=null,status='none',thrText='';
+  const t=d.threshold;
+  if(t){ if(t.type==='diffPct'){used=Math.abs(pct)/t.value;thrText=t.value+'% move';} else {used=Math.abs(d.v)/t.value;thrText='limit '+fmt(t.value,(d.format||{}).dec||0);}
+    status=used>=1?'breach':used>=(t.warnAt||.8)?'warn':'ok'; }
+  if(d.statusOverride)status=d.statusOverride;
+  return {p:p,diff:diff,pct:pct,tone:worse?'bad':better?'good':'flat',used:used,status:status,thrText:thrText};
+}
+const STLABEL={breach:'Breach',warn:'Near',ok:'Within',none:''};
+
+/* ================= render one card ================= */
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function spark(vals,tone){
+  const w=200,h=38,mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals),r=mx-mn||1;
+  const pts=vals.map(function(v,i){return[(i/(vals.length-1))*w,h-3-((v-mn)/r)*(h-8)];});
+  const d=pts.map(function(p,i){return(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(' ');
+  const c=tone==='bad'?'#d92d20':tone==='good'?'#12b76a':'#3a6ae6';const l=pts[pts.length-1],pp=pts[pts.length-2];
+  return '<svg class="kspark" viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" aria-hidden="true"><path d="'+d+' L'+w+' '+h+' L0 '+h+' Z" fill="'+c+'" opacity=".08"/><path d="'+d+'" fill="none" stroke="'+c+'" stroke-width="1.6" vector-effect="non-scaling-stroke"/><circle cx="'+pp[0]+'" cy="'+pp[1]+'" r="2.4" fill="#fff" stroke="#98a2b3" stroke-width="1.2"/><circle cx="'+l[0]+'" cy="'+l[1]+'" r="3" fill="'+c+'"/></svg>';
+}
+function meter(x,d,short){
+  if(x.used==null)return '';const max=1.5;const w=Math.min(x.used,max)/max*100;const col=x.status==='breach'?'#d92d20':x.status==='warn'?'#f79009':'#12b76a';
+  return '<div class="kmeter" title="'+Math.round(x.used*100)+'% of '+esc(x.thrText)+'"><div class="kmt"><i style="width:'+w.toFixed(1)+'%;background:'+col+'"></i><u style="left:calc('+(100/max).toFixed(2)+'% - 1px)"></u></div><div class="kml"><span>'+(short?'of threshold':d.threshold.type==='diffPct'?'Move vs threshold':'Usage of limit')+'</span><b style="color:'+col+'">'+Math.round(x.used*100)+'%</b></div></div>';
+}
+function deltaChip(x,d,o){
+  const dec=(d.format||{}).dec;const arrow=x.diff>0?'▲':x.diff<0?'▼':'■';
+  if(o.pctOnly)return '<span class="kdelta '+x.tone+'" title="Change vs PCOB: '+fmt(x.diff,dec,'minus')+'">'+arrow+' '+fmt(Math.abs(x.diff),dec,'minus')+' · '+fmt(Math.abs(x.pct),1)+'%</span>';
+  return '<span class="kdelta '+x.tone+'" title="Change vs PCOB">'+arrow+' '+fmt(Math.abs(x.diff),dec,'minus')+(o.pct!==false&&x.pct!=null?' ('+fmt(Math.abs(x.pct),1)+'%)':'')+'</span>';
+}
+function rowsHtml(x,d,o){
+  const dec=(d.format||{}).dec,neg=o.neg;const R=[['COB',fmt(d.v,dec,neg),''],['PCOB',fmt(x.p,dec,neg),''],['Diff',fmt(x.diff,dec,neg),x.tone],['Diff %',x.pct==null?'–':fmt(x.pct,1,neg)+'%',x.tone]];
+  if(d.threshold){R.push([d.threshold.type==='diffPct'?'Threshold':'Limit',d.threshold.type==='diffPct'?d.threshold.value+'%':fmt(d.threshold.value,dec,neg),'']);R.push(['% of threshold',Math.round(x.used*100)+'%',x.status==='breach'?'bad':'']);}
+  return '<dl class="krows">'+R.map(function(r){return '<dt>'+r[0]+'</dt><dd class="'+r[2]+'">'+r[1]+'</dd>';}).join('')+'</dl>';
+}
+function headHtml(d,x,o,label){
+  let st='';
+  if(o.state==='stale')st='<span class="kstat stale" title="Last data: 18-Nov-2026"><i></i><span>As of 18-Nov</span></span>';
+  else if(o.selected)st='<span class="kstat filt"><i></i><span>Filtering</span></span>';
+  else if(x&&x.status!=='none'&&o.showStatus!==false)st='<span class="kstat '+x.status+'" title="'+Math.round(x.used*100)+'% of '+esc(x.thrText)+'"><i></i><span>'+STLABEL[x.status]+'</span></span>';
+  return '<div class="khead"><span class="klabel" title="'+esc(label)+'">'+esc(label)+'</span>'+(d.unit?'<span class="kunit">'+esc(d.unit)+'</span>':'')+st+(st?'':'<span style="margin-left:auto"></span>')+'<button class="kmore" aria-label="More actions" data-more="'+d.id+'">⋯</button></div>';
+}
+function autoVariant(d,o){ if(d.pair)return 'pair'; if(d.threshold)return 'detail'; return o.spark?'trend':'headline'; }
+function renderKpi(d,o){
+  o=o||{};const cls=['kpi'];if(o.dense)cls.push('dense');if(o.selected)cls.push('sel');
+  const variant=o.variant&&o.variant!=='auto'?(o.variant==='pair'&&!d.pair?'detail':o.variant):autoVariant(d,o);
+  if(variant==='pair'&&d.pair)return renderPair(d,o,cls);
+  const label=d.h&&!o.noH?d.label+' '+d.h:d.label;
+  if(o.state==='loading'){cls.push('st-none');return '<article class="'+cls.join(' ')+'" aria-busy="true"><div class="kin"><div class="sk" style="height:11px;width:55%"></div><div class="sk" style="height:26px;width:72%"></div><div class="sk" style="height:12px;width:45%"></div></div></article>';}
+  if(o.state==='error'){cls.push('st-error');return '<article class="'+cls.join(' ')+'"><div class="kin">'+headHtml(d,null,o,label)+'<div class="kerr"><span>Couldn\'t load this value. The service returned 503.</span><button data-retry>Retry</button></div></div></article>';}
+  const x=derive(d,o.cmp);cls.push('st-'+(o.state==='stale'?'none':x.status));cls.push('v-'+variant);if(o.state==='stale')cls.push('stale');
+  const dec=(d.format||{}).dec,neg=o.neg;const na=o.state==='nodata';if(na)cls.push('na');
+  const valCls='kval'+(o.negRed&&d.v<0&&!na?' neg':'');
+  const val='<div class="'+valCls+'" title="'+(na?'No data':d.v)+'">'+(na?'–':fmt(d.v,dec,neg))+'</div>';
+  const delta=na||o.delta===false?'':deltaChip(x,d,o);
+  const sub=na?'<span class="ksub">No data for this COB</span>':o.pcob===false?'':'<span class="ksub">vs PCOB <b>'+fmt(x.p,dec,neg)+'</b></span>';
+  const aria=label+': '+fmt(d.v,dec,'minus')+' '+(d.unit||'')+', change '+fmt(x.diff,dec,'minus')+(x.status!=='none'?', '+STLABEL[x.status]:'');
+  let body;
+  if(variant==='compact'){
+    body='<div class="kin">'+headHtml(d,x,Object.assign({},o,{showStatus:false}),label)+'<div class="kbody">'+val+(na?'':'<span class="kdelta '+x.tone+'">'+(x.diff>0?'▲':x.diff<0?'▼':'■')+' '+(x.pct==null?'':fmt(Math.abs(x.pct),1)+'%')+'</span>')+'</div></div>';
+    if(x.status!=='none'){cls.push('cstat');}
+  } else {
+    const main='<div style="display:flex;flex-direction:column;gap:6px;min-width:0">'+val+'<div class="kdl">'+delta+sub+'</div></div>';
+    let extra='';
+    if(variant==='detail')extra=(o.rows!==false?rowsHtml(x,d,o):'');
+    const below=[];
+    if((variant==='trend'||(o.spark&&variant!=='threshold'))&&d.spark&&!na)below.push(spark(d.spark,x.tone));
+    if((variant==='detail'||variant==='threshold')&&d.threshold&&o.meter!==false&&!na)below.push(meter(x,d));
+    if(variant==='threshold'&&d.threshold&&!na)below.push('<div class="kfoot">'+(x.status==='breach'?'⚠ ':'')+Math.round(x.used*100)+'% of '+esc(x.thrText)+' · PCOB '+PCOB[o.cmp||'DoD']+'</div>');
+    body='<div class="kin">'+headHtml(d,x,o,label)+'<div class="kbody'+(extra?' split':'')+'">'+main+extra+'</div>'+below.join('')+'</div>';
+  }
+  return '<article class="'+cls.join(' ')+'" tabindex="0" role="button" aria-pressed="'+(!!o.selected)+'" aria-label="'+esc(aria)+'" data-kpi="'+d.id+'">'+body+'</article>';
+}
+function renderPair(d,o,cls){
+  const xs=d.pair.map(function(m){return derive(m,o.cmp);});const rank={breach:3,warn:2,ok:1,none:0};
+  const worst=xs.reduce(function(a,x){return rank[x.status]>rank[a]?x.status:a;},'none');
+  cls.push('st-'+worst);cls.push('v-pair');
+  const cols=d.pair.map(function(m,i){const x=xs[i],dec=(m.format||{}).dec;return '<div><span class="ktag">'+m.h+'</span><div class="kval" title="'+m.v+'">'+fmt(m.v,dec,o.neg)+'</div><div class="kdl">'+'<span class="kdelta '+x.tone+'" title="Change vs PCOB: '+fmt(x.diff,dec,'minus')+'">'+(x.diff>0?'▲':x.diff<0?'▼':'■')+' '+fmt(Math.abs(x.pct),1)+'%</span></div>'+(m.threshold&&o.meter!==false?meter(x,m,true):'')+'</div>';}).join('');
+  const st=o.selected?'<span class="kstat filt"><i></i><span>Filtering</span></span>':worst!=='none'?'<span class="kstat '+worst+'"><i></i><span>'+(worst==='breach'?xs.filter(function(x){return x.status==='breach';}).length+' breach':STLABEL[worst])+'</span></span>':'';
+  return '<article class="'+cls.join(' ')+'" tabindex="0" role="button" aria-pressed="'+(!!o.selected)+'" data-kpi="'+d.id+'"><div class="kin"><div class="khead"><span class="klabel">'+esc(d.label)+'</span><span class="kunit">'+esc(d.unit)+'</span>'+st+(st?'':'<span style="margin-left:auto"></span>')+'<button class="kmore" aria-label="More actions">⋯</button></div><div class="kpair">'+cols+'</div><div class="kfoot">vs PCOB '+PCOB[o.cmp||'DoD']+(d.pair[0].threshold?' · threshold '+d.pair[0].threshold.value+'% move':'')+'</div></div></article>';
+}
+function pairUp(items){const out=[],seen={};items.forEach(function(it){if(!it.h){out.push(it);return;}if(seen[it.label]){seen[it.label].pair.push(it);return;}const g={id:'p_'+it.id,label:it.label,unit:it.unit,pair:[it]};seen[it.label]=g;out.push(g);});return out;}
+
+/* ================= group renderer ================= */
+function renderGroup(host,defs,o){
+  const cnt={breach:0,warn:0};defs.forEach(function(d){(d.pair||[d]).forEach(function(m){if(o.state)return;const x=derive(m,o.cmp);if(cnt[x.status]!=null)cnt[x.status]++;});});
+  const sum=(cnt.breach?'<span class="sumc" style="background:var(--badBg);color:var(--bad)"><i style="background:#d92d20"></i>'+cnt.breach+' breach</span>':'')+(cnt.warn?'<span class="sumc" style="background:var(--warnBg);color:var(--warn)"><i style="background:#f79009"></i>'+cnt.warn+' near</span>':'');
+  const head=o.groupTitle?'<div class="kgHead">'+esc(o.groupTitle)+'<span class="cnt">'+defs.length+'</span><span class="sum">'+sum+'</span></div>':'';
+  const cards=defs.map(function(d,i){return renderKpi(d,Object.assign({},o,{selected:o.sel&&o.sel===d.id,state:o.states?o.states[i]:o.state}));}).join('');
+  const kcls='kg '+o.layout+(o.featured&&o.layout!=='scroll'?' featured':'');
+  const style='--min:'+(o.minW||230)+'px;--cols:'+(o.cols||4);
+  if(o.layout==='scroll'){host.innerHTML=head+'<div class="kgs"><span class="fade l"></span><span class="fade r"></span><button class="nav l" aria-label="Scroll left">‹</button><button class="nav r" aria-label="Scroll right">›</button><div class="'+kcls+'" style="'+style+'">'+cards+'</div></div>';wireScroll(host.querySelector('.kgs'));}
+  else host.innerHTML=head+'<div class="'+kcls+'" style="'+style+'">'+cards+'</div>';
+}
+function wireScroll(w){
+  const sc=w.querySelector('.kg'),l=w.querySelector('.nav.l'),r=w.querySelector('.nav.r'),fl=w.querySelector('.fade.l'),fr=w.querySelector('.fade.r');
+  const upd=function(){const ov=sc.scrollWidth>sc.clientWidth+2;w.classList.toggle('ovf',ov);l.disabled=sc.scrollLeft<4;r.disabled=sc.scrollLeft+sc.clientWidth>=sc.scrollWidth-4;fl.style.opacity=l.disabled?0:1;fr.style.opacity=r.disabled?0:1;};
+  l.onclick=function(){sc.scrollBy({left:-sc.clientWidth*.8,behavior:'smooth'});};r.onclick=function(){sc.scrollBy({left:sc.clientWidth*.8,behavior:'smooth'});};
+  sc.addEventListener('scroll',upd,{passive:true});new ResizeObserver(upd).observe(sc);upd();
+}
+
+/* ================= playground ================= */
+const S={preset:'stress',variant:'auto',layout:'grid',cols:4,minW:220,count:6,pair:false,neg:'minus',dense:false,spark:false,delta:true,pct:true,pcob:true,meter:true,rows:true,featured:false,negRed:true,cmp:'WoW',sel:null,json:'def'};
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove('on');},1800);}
+function segHtml(key,opts){return '<div class="seg">'+opts.map(function(o){return '<button data-k="'+key+'" data-v="'+o[0]+'" aria-pressed="'+(String(S[key])===String(o[0]))+'">'+o[1]+'</button>';}).join('')+'</div>';}
+function tgHtml(key,label){return '<label class="tg"><input type="checkbox" data-t="'+key+'"'+(S[key]?' checked':'')+'><b></b>'+label+'</label>';}
+function renderCtl(){
+  const maxN=DEFS[S.preset].items.length;
+  document.getElementById('ctl').innerHTML=
+   '<h3>Settings</h3>'+
+   '<div class="fld"><span>Data</span>'+segHtml('preset',[['stress','Stress scenarios'],['var','VaR + thresholds'],['mixed','Mixed']])+'</div>'+
+   '<div class="fld"><span>Variant</span>'+segHtml('variant',[['auto','Auto'],['headline','Headline'],['detail','Detail'],['threshold','Threshold'],['trend','Trend'],['compact','Compact']])+'</div>'+
+   (S.preset==='var'?'<div class="fld"><span>Horizons</span>'+tgHtml('pair','Pair 1D + 10D in one card')+'</div>':'')+
+   '<div class="fld"><span>Layout</span>'+segHtml('layout',[['grid','Auto-fit'],['wrap','Fixed columns'],['scroll','One row']])+'</div>'+
+   (S.layout==='wrap'?'<div class="fld"><span>Columns</span><div class="rng"><input type="range" min="1" max="8" value="'+S.cols+'" data-r="cols"><output>'+S.cols+'</output></div></div>':'<div class="fld"><span>Min card width</span><div class="rng"><input type="range" min="150" max="420" step="10" value="'+S.minW+'" data-r="minW"><output>'+S.minW+'px</output></div></div>')+
+   '<div class="fld"><span>Number of KPIs</span><div class="rng"><input type="range" min="1" max="'+maxN+'" value="'+Math.min(S.count,maxN)+'" data-r="count"><output>'+Math.min(S.count,maxN)+'</output></div></div>'+
+   '<div class="fld"><span>Show</span>'+tgHtml('delta','Change chip')+tgHtml('pct','Change %')+tgHtml('pcob','PCOB value')+tgHtml('spark','Sparkline (20 COBs)')+tgHtml('meter','Threshold meter')+tgHtml('rows','Detail rows')+'</div>'+
+   '<div class="fld"><span>Format</span>'+segHtml('neg',[['minus','−1,234.5'],['parens','(1,234.5)']])+tgHtml('negRed','Negative values in red')+'</div>'+
+   '<div class="fld"><span>Density</span>'+tgHtml('dense','Compact cards')+tgHtml('featured','First card double width')+'</div>';
+}
+function curDefs(){let it=DEFS[S.preset].items.slice(0,S.count);if(S.preset==='var'&&S.pair)it=pairUp(it);return it;}
+function renderPlay(){
+  document.getElementById('ftTitle').textContent=DEFS[S.preset].title;
+  document.getElementById('pcobLbl').textContent=PCOB[S.cmp];
+  document.getElementById('cmpSeg').innerHTML=['DoD','WoW','MoM'].map(function(c){return '<button data-cmp="'+c+'" aria-pressed="'+(S.cmp===c)+'">'+c+'</button>';}).join('');
+  renderGroup(document.getElementById('preview'),curDefs(),{groupTitle:DEFS[S.preset].group,layout:S.layout,cols:S.cols,minW:S.minW,variant:S.variant,neg:S.neg,dense:S.dense,spark:S.spark,delta:S.delta,pct:S.pct,pcob:S.pcob,meter:S.meter,rows:S.rows,featured:S.featured,negRed:S.negRed,cmp:S.cmp,sel:S.sel});
+  document.getElementById('jsonTabs').innerHTML=[['def','KPI definitions'],['val','Values (per COB)'],['grp','Group config']].map(function(t){return '<button data-json="'+t[0]+'" aria-pressed="'+(S.json===t[0])+'">'+t[1]+'</button>';}).join('');
+  document.getElementById('jsonOut').innerHTML=hl(JSON.stringify(jsonFor(),null,2));
+}
+function defOf(d){const o={id:d.id,label:d.label+(d.h?' '+d.h:''),unit:d.unit,valueField:d.id,format:{decimals:d.format.dec,negative:S.neg,scale:1},polarity:d.polarity,compare:{to:'pcob'}};if(d.threshold)o.threshold={type:d.threshold.type,value:d.threshold.value,warnAt:d.threshold.warnAt};if(d.h)o.pairKey=d.label;o.trend={field:d.id,window:20};o.onClick={type:'crossFilter',dimension:'scenario',value:d.id};return o;}
+function jsonFor(){
+  const it=DEFS[S.preset].items.slice(0,S.count);
+  if(S.json==='def')return {kpis:it.slice(0,3).map(defOf),_note:it.length>3?'… '+(it.length-3)+' more':undefined};
+  if(S.json==='val')return {cob:'2026-11-20',pcob:PCOB[S.cmp],compare:S.cmp,asOf:'2026-11-20T13:41:43-05:00',items:it.slice(0,3).map(function(d){const x=derive(d,S.cmp);const o={id:d.id,value:d.v,pcobValue:+x.p.toFixed(4)};if(d.spark&&S.spark)o.trend=d.spark.slice(-5).map(function(v){return +v.toFixed(2);}).concat(['…']);return o;}),_note:'Diff, Diff %, % of threshold and status are derived by the card; send status only to override'};
+  return {type:'kpiGroup',title:DEFS[S.preset].group,kpis:it.map(function(d){return d.id;}),layout:{mode:S.layout,minCardWidth:S.minW,columns:S.layout==='wrap'?S.cols:undefined,featuredFirst:S.featured,density:S.dense?'compact':'comfortable'},card:{variant:S.variant,pairHorizons:S.preset==='var'?S.pair:undefined,show:{delta:S.delta,deltaPct:S.pct,pcob:S.pcob,sparkline:S.spark,meter:S.meter,detailRows:S.rows},negativeInRed:S.negRed},summary:{showStatusCounts:true}};
+}
+function hl(s){return esc(s).replace(/(&quot;[^&]*?&quot;)(\s*:)?/g,function(m,a,b){return b?'<span class="k">'+a+'</span>'+b:'<span class="s">'+a+'</span>';});}
+document.getElementById('ctl').addEventListener('click',function(e){const b=e.target.closest('button[data-k]');if(!b)return;const k=b.dataset.k;let v=b.dataset.v;if(k==='cols')v=+v;S[k]=v;if(k==='preset'){S.count=DEFS[v].items.length;S.sel=null;S.minW=v==='var'?200:220;}renderCtl();renderPlay();});
+document.getElementById('ctl').addEventListener('change',function(e){const t=e.target;if(t.dataset.t){S[t.dataset.t]=t.checked;renderCtl();renderPlay();}});
+document.getElementById('ctl').addEventListener('input',function(e){const t=e.target;if(t.dataset.r){S[t.dataset.r]=+t.value;t.nextElementSibling.textContent=t.value+(t.dataset.r==='minW'?'px':'');renderPlay();}});
+document.querySelector('.frameTop').addEventListener('click',function(e){const b=e.target.closest('[data-cmp]');if(b){S.cmp=b.dataset.cmp;renderPlay();}});
+document.getElementById('jsonTabs').addEventListener('click',function(e){const b=e.target.closest('[data-json]');if(b){S.json=b.dataset.json;renderPlay();}});
+function onCardAct(e,isPlay){
+  const more=e.target.closest('.kmore');if(more){toast('Menu: View definition · Copy value · Open trend · Drill down');return;}
+  if(e.target.closest('[data-retry]')){toast('Retrying…');return;}
+  const c=e.target.closest('.kpi[data-kpi]');if(!c)return;
+  if(isPlay){const id=c.dataset.kpi;S.sel=S.sel===id?null:id;renderPlay();toast(S.sel?'Cross-filter on: '+c.querySelector('.klabel').textContent:'Cross-filter cleared');}
+  else{c.classList.toggle('sel');}
+}
+document.getElementById('preview').addEventListener('click',function(e){onCardAct(e,true);});
+document.getElementById('preview').addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target.classList.contains('kpi')){e.preventDefault();onCardAct(e,true);}});
+document.querySelectorAll('#gal,#states-g,#widths,#manyScroll,#manyCompact,#legacyVar,#legacyStress').forEach(function(h){h.addEventListener('click',function(e){onCardAct(e,false);});});
+
+/* ================= gallery ================= */
+const V=DEFS.var.items,ST=DEFS.stress.items,MX=DEFS.mixed.items;
+const GAL=[
+  ['Headline','headline','The default for numbers without a threshold (stress scenarios). Value, change vs PCOB, PCOB value.',ST[0],{}],
+  ['Detail','detail','For numbers with a threshold. Shows the CRiSP COB/PCOB/Diff rows; when the card is ≥400px wide they move beside the value.',V[1],{}],
+  ['Threshold','threshold','When “how close to the limit” matters most: the meter and the percentage lead, and the rows are hidden.',MX[0],{}],
+  ['Trend','trend','Adds a 20-COB sparkline. The hollow dot is PCOB and the solid dot is COB, so the jump is visible.',ST[1],{spark:true}],
+  ['Pair','pair','Two horizons of one perimeter (1D/10D) in one card. The status shows the worse of the two, which halves the number of cards.',pairUp([V[0],V[1]])[0],{}],
+  ['Compact','compact','Two short lines for dense strips and side panels, like the legacy Excel view. The status shows as the top accent colour.',V[4],{}]
+];
+document.getElementById('gal').innerHTML=GAL.map(function(g){return '<div class="gcell"><h4>'+g[0]+' <code>variant: "'+g[1]+'"</code></h4><p>'+g[2]+'</p><div class="stagebg">'+renderKpi(g[3],Object.assign({variant:g[1],cmp:'DoD',negRed:true},g[4]))+'</div></div>';}).join('');
+const STATES=[
+  ['Loading','First load shows a skeleton the size of the card, so nothing jumps. On refresh the old value stays with a soft fade.',V[0],{state:'loading'}],
+  ['Error','Shown on this card only. The rest of the dashboard still works.',V[0],{state:'error'}],
+  ['No data','The value is “–”, never 0, so a missing feed can\'t pass for zero risk.',ST[2],{state:'nodata'}],
+  ['Stale','The service sends asOf older than the COB. The value is greyed and badged with the date it is from.',ST[3],{state:'stale'}],
+  ['Selected','Used as a cross-filter. Ring + “Filtering” badge; click again to clear. Works with the keyboard (Enter/Space).',ST[0],{selected:true}],
+  ['Better vs worse','Loss shrank, so the change is green even though the value is negative. Colour follows polarity.',ST[5],{}],
+  ['Warning','Between warnAt (80%) and 100% of threshold: amber accent and “Near” badge.',V[5],{variant:'detail',rows:false}],
+  ['Breach','≥100% of threshold: red rail, light red tint, badge and meter. Nothing else on the card is red.',V[4],{variant:'detail',rows:false}],
+  ['Within threshold','Green accent and “Within” badge. Calm colours for the usual case.',V[2],{variant:'detail',rows:false}]
+];
+document.getElementById('states-g').innerHTML=STATES.map(function(g){return '<div class="gcell"><h4>'+g[0]+'</h4><p>'+g[1]+'</p><div class="stagebg">'+renderKpi(g[2],Object.assign({cmp:'DoD',negRed:true},g[3]))+'</div></div>';}).join('');
+
+/* ================= scaling ================= */
+document.getElementById('widths').innerHTML='<div class="wrow">'+[[460,'≥400px · value and detail side by side'],[300,'standard'],[190,'≤205px · sub-text hidden'],[140,'≤150px · value only']].map(function(w){return '<div class="wbox" style="width:'+w[0]+'px"><span>'+w[0]+'px · '+w[1]+'</span>'+renderKpi(V[1],{variant:'detail',cmp:'DoD'})+'</div>';}).join('')+'</div>';
+const MANY=[];for(let i=0;i<14;i++){const b=V[i%8];MANY.push(Object.assign({},b,{id:'m'+i,label:['Trading','Economic','Volcker','Trading & Credit','Equities','Rates','FX','Credit','Commodities','Spread Products','Securitized','Muni','EM Rates','Prime'][i],h:i<4?b.h:'1D',v:+(b.v*(0.6+((i*37)%10)/10)).toFixed(2),p:+(b.p*(0.6+((i*37)%10)/10)*(i%3===0?0.86:1)).toFixed(2)}));}
+renderGroup(document.getElementById('manyScroll'),MANY,{groupTitle:'VaR by business · 14 KPIs',layout:'scroll',minW:210,variant:'detail',rows:false,cmp:'DoD'});
+renderGroup(document.getElementById('manyCompact'),MANY,{groupTitle:'Same 14 KPIs as a compact strip',layout:'grid',minW:190,variant:'compact',cmp:'DoD',dense:true});
+
+/* ================= legacy mapping ================= */
+document.getElementById('legacyVar').innerHTML=renderKpi(V[1],{variant:'detail',cmp:'DoD'});
+document.getElementById('legacyStress').innerHTML=renderKpi(ST[0],{variant:'trend',spark:true,cmp:'DoD',negRed:true});
+
+/* ================= contract ================= */
+const TS=`<span class="c">// Saved with the dashboard (definition.json → widget kind "kpiGroup")</span>
+<span class="k">interface</span> KpiDefinition {
+  id: string;                       <span class="c">// "dsd", "trading_10d"</span>
+  label: string;                    <span class="c">// "Deep Deflation"</span>
+  unit?: string;                    <span class="c">// "$MM"</span>
+  valueField: string;               <span class="c">// field in the dataset / query</span>
+  format?: { decimals?: number; negative?: 'minus' | 'parens'; scale?: 1 | 1e3 | 1e6; suffix?: string };
+  polarity?: 'higherIsWorse' | 'lowerIsWorse' | 'higherIsBetter' | 'neutral';
+  compare?: { to: 'pcob' | 'fixed'; value?: number };
+  threshold?: { type: 'diffPct' | 'diffAbs' | 'limit'; value: number; warnAt?: number };  <span class="c">// warnAt 0–1</span>
+  trend?: { field: string; window: number };
+  pairKey?: string;                 <span class="c">// same pairKey → one "pair" card (1D + 10D)</span>
+  variant?: 'auto' | 'headline' | 'detail' | 'threshold' | 'trend' | 'compact' | 'pair';
+  onClick?: { type: 'crossFilter'; dimension: string; value: string }
+          | { type: 'drill'; dashboardId: string; params?: Record&lt;string,string&gt; };
+  info?: string;                    <span class="c">// tooltip: methodology / source</span>
+}
+
+<span class="c">// Per COB from the service (protobuf → JSON)</span>
+<span class="k">interface</span> KpiValue {
+  id: string;
+  value: number | null;             <span class="c">// null → "–" (never 0)</span>
+  pcobValue: number | null;
+  asOf?: string;                    <span class="c">// older than COB → stale badge</span>
+  trend?: number[];
+  status?: 'breach' | 'warn' | 'ok';  <span class="c">// optional override</span>
+  color?: string;                   <span class="c">// optional hex override (service already sends colours)</span>
+  error?: string;
+}
+
+<span class="c">// Group = one widget in the custom dashboard</span>
+<span class="k">interface</span> KpiGroupConfig {
+  kpis: string[];
+  layout: { mode: 'grid' | 'wrap' | 'scroll'; minCardWidth?: number; columns?: number; featuredFirst?: boolean; density?: 'comfortable' | 'compact' };
+  card?: { variant?: KpiDefinition['variant']; pairHorizons?: boolean; show?: Partial&lt;Record&lt;'delta'|'deltaPct'|'pcob'|'sparkline'|'meter'|'detailRows', boolean&gt;&gt; };
+  summary?: { showStatusCounts?: boolean };
+}
+
+<span class="c">// React usage</span>
+&lt;KpiGroup config={group} definitions={defs} values={data}
+          compare="WoW" selectedId={sel} onSelect={setSel} /&gt;
+&lt;KpiCard definition={def} value={val} variant="auto" /&gt;`;
+document.getElementById('tsOut').innerHTML=TS;
+const PROPS=[['polarity','Says which direction is bad, which sets the change colour. Stress loss = lowerIsWorse, VaR = higherIsWorse, P&L = higherIsBetter.','neutral'],['threshold.type','diffPct = CRiSP move-vs-PCOB rule; limit = usage of a limit; diffAbs = absolute move.','—'],['threshold.warnAt','Fraction of the threshold that turns the card amber.','0.8'],['format.negative','−1,234.5 or (1,234.5) to match each team\'s convention.','minus'],['format.scale','Show $K data as $MM without changing the service.','1'],['variant','auto picks: pairKey → pair, threshold → detail, else headline.','auto'],['pairKey','Pairs 1D/10D (or COB/SVaR) into one card.','—'],['layout.mode','grid = auto-fit by min width; wrap = fixed columns; scroll = one row with arrows.','grid'],['layout.minCardWidth','Below this width cards wrap (grid) or scroll.','220'],['status / color','Service overrides; otherwise derived on the client.','derived'],['asOf','Older than COB → stale badge and grey value.','COB'],['onClick','Cross-filter (same as today) or drill to another dashboard.','none']];
+document.getElementById('propTbl').innerHTML=PROPS.map(function(p){return '<tr><td><code>'+p[0]+'</code></td><td>'+esc(p[1])+'</td><td><code>'+p[2]+'</code></td></tr>';}).join('');
+
+renderCtl();renderPlay();
+</script>
+</body>
+</html>

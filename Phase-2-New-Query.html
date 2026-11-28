@@ -1,0 +1,1315 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Phase 2 · New query · Custom Dashboards</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><style>
+:root{--navy:#0f1a3a;--navy2:#14224a;--navy3:#1a2b5c;--ink:#101828;--ink2:#344054;--mute:#667085;--mute2:#98a2b3;--line:#e6ebf3;--line2:#eef1f6;--acc:#2f62c9;--acc2:#5b86f5;--accBg:#eef3fd;--accBd:#c9d7f5;
+--bad:#b42318;--badBg:#fef3f2;--badBd:#fecdca;--good:#067647;--goodBg:#ecfdf3;--goodBd:#abefc6;--warn:#b54708;--warnBg:#fffaeb;--warnBd:#fedf89;--vio:#5925dc;--vioBg:#f4f3ff;--vioBd:#d9d6fe;
+--mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;--sans:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:var(--sans);font-size:13px;color:var(--ink);background:radial-gradient(1100px 520px at 88% -8%,#e2ebff 0,rgba(226,235,255,0) 62%),linear-gradient(180deg,#eef2f9 0,#f4f6fa 520px);background-attachment:fixed;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--acc2);outline-offset:2px}
+.mono{font-family:var(--mono)}
+.muted{color:var(--mute)}
+.hide{display:none!important}
+
+/* ---------- app shell ---------- */
+.app{display:flex;min-height:100vh}
+.side{width:224px;flex:none;background:linear-gradient(180deg,#14224a,#0f1a3a);color:#c9d4f2;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;padding:14px 10px;gap:4px;z-index:5}
+.side .brand{display:flex;align-items:center;gap:9px;padding:6px 8px 14px;color:#fff;font-weight:700;font-size:14px}
+.side .brand i{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#5b86f5,#2f62c9);display:grid;place-items:center;font-style:normal;font-size:11px}
+.side .who{font-family:var(--mono);font-size:10.5px;color:#8fa6e0;padding:0 8px 10px}
+.side .sec{font-size:10px;font-weight:700;letter-spacing:.1em;color:#7d8bb3;padding:12px 10px 4px}
+.side a,.side button.nav{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;color:#b9c6e6;text-decoration:none;font-weight:500;border:0;background:transparent;text-align:left;width:100%}
+.side a:hover,.side button.nav:hover{background:rgba(255,255,255,.07);color:#fff}
+.side a.on{background:linear-gradient(180deg,rgba(91,134,245,.32),rgba(91,134,245,.18));color:#fff;font-weight:600}
+.side a small{margin-left:auto;font-size:10px;color:#8fa6e0}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.crumb{font-size:11.5px;color:var(--mute)}
+.crumb b{color:var(--ink2);font-weight:600}
+
+/* phase banner */
+.phase{display:flex;align-items:center;gap:10px;padding:7px 18px;background:#0b1430;color:#c9d4f2;font-size:12px;flex-wrap:wrap}
+.phase b{color:#fff}
+.phase .tag{padding:2px 8px;border-radius:99px;background:rgba(91,134,245,.25);color:#cfdcff;font-weight:700;font-size:10.5px;letter-spacing:.04em}
+.phase nav{margin-left:auto;display:flex;gap:2px;flex-wrap:wrap}
+.phase nav a{color:#9fb2e3;text-decoration:none;padding:3px 7px;border-radius:6px;font-size:11px;font-weight:600}
+.phase nav a:hover{background:rgba(255,255,255,.08);color:#fff}
+.phase nav a.on{background:#2f62c9;color:#fff}
+
+/* ---------- header ---------- */
+.hdr{display:flex;align-items:center;gap:12px;padding:14px 18px 10px;flex-wrap:wrap}
+.hdr h1{margin:2px 0 0;font-size:21px;color:var(--navy);letter-spacing:-.01em}
+.hdr .title-in{font-size:20px;font-weight:700;color:var(--navy);border:1px solid transparent;border-radius:9px;padding:3px 8px;margin-left:-9px;background:transparent;min-width:240px}
+.hdr .title-in:hover{border-color:var(--line)}.hdr .title-in:focus{border-color:var(--acc2);background:#fff;outline:0}
+.sp{flex:1}
+.btn{height:32px;padding:0 12px;border-radius:9px;border:1px solid #d5ddeb;background:#fff;color:var(--ink2);font-weight:600;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:#bcd0f5;color:#1d4596}
+.btn.pri{background:linear-gradient(180deg,#2c4ea3,#1a2b5c);border-color:#1a2b5c;color:#fff;box-shadow:0 8px 18px -10px rgba(26,43,92,.8)}
+.btn.pri:hover{filter:brightness(1.1);color:#fff}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.ghost:hover{background:#fff;border-color:var(--line)}
+.btn.sm{height:26px;padding:0 9px;font-size:12px;border-radius:7px}
+.btn.danger{color:var(--bad)}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.icon{width:15px;height:15px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:99px;font-size:11.5px;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--ink2);white-space:nowrap}
+.pill.good{background:var(--goodBg);border-color:var(--goodBd);color:var(--good)}
+.pill.warn{background:var(--warnBg);border-color:var(--warnBd);color:var(--warn)}
+.pill.bad{background:var(--badBg);border-color:var(--badBd);color:var(--bad)}
+.pill.acc{background:var(--accBg);border-color:var(--accBd);color:#1d4596}
+.pill.vio{background:var(--vioBg);border-color:var(--vioBd);color:var(--vio)}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+
+/* navy inputs bar (VaR redesign) */
+.bar{margin:0 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:9px 12px;border-radius:14px;background:linear-gradient(180deg,#1a2b5c,#14224a);color:#fff;box-shadow:0 14px 30px -20px rgba(15,26,58,.8)}
+.bar .lbl{font-size:9.5px;font-weight:700;letter-spacing:.1em;color:#a9c0ff}
+.bar .grp{display:flex;align-items:center;gap:6px;padding:3px 4px 3px 9px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.bar .seg{display:flex;gap:2px;padding:2px;border-radius:8px;background:rgba(6,14,38,.4)}
+.bar .seg button{border:0;height:24px;padding:0 9px;border-radius:7px;background:transparent;color:#b9c6e6;font-weight:600;font-size:12px}
+.bar .seg button.on{background:#fff;color:var(--navy)}
+.bar .cob{font-family:var(--mono);font-size:12.5px;font-weight:600;padding:0 4px}
+.bar .arrow{width:22px;height:22px;border:0;border-radius:6px;background:transparent;color:#c9d4f2}
+.bar .arrow:hover{background:rgba(255,255,255,.1)}
+.bar select,.bar .tree{height:26px;border-radius:7px;border:0;background:rgba(6,14,38,.4);color:#fff;padding:0 8px;font-weight:600;font-size:12px}
+.bar select option{color:#101828}
+.xf{margin:8px 18px 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-height:30px;padding:6px 12px;border-radius:12px;background:rgba(15,26,58,.92);color:#c9d4f2;font-size:12px}
+.xf .chip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 4px 0 10px;border-radius:99px;background:#fff;color:var(--navy);font-weight:600}
+.xf .chip small{color:#5925dc;font-weight:700;font-size:10px;letter-spacing:.05em}
+.xf .chip button{width:18px;height:18px;border-radius:50%;border:0;background:#eef1f6;color:#475467;font-size:11px;line-height:1}
+
+/* ---------- cards / widgets ---------- */
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:inset 0 2px 0 #3a6ae6,0 1px 2px rgba(16,24,40,.04),0 12px 28px -16px rgba(20,34,74,.2);display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+.card.flat{box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.whead{display:flex;align-items:flex-start;gap:8px;padding:12px 14px 6px}
+.whead h3{margin:0;font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.whead .sub{font-size:11px;color:var(--mute2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.whead .acts{margin-left:auto;display:flex;gap:2px;flex:none}
+.whead .acts button{width:26px;height:26px;border:0;border-radius:7px;background:transparent;color:var(--mute2)}
+.whead .acts button:hover{background:#f2f4f7;color:var(--ink)}
+.wchips{display:flex;flex-wrap:wrap;gap:5px;padding:0 14px 6px}
+.wchip{display:inline-flex;align-items:center;gap:5px;height:21px;padding:0 4px 0 8px;border-radius:99px;font-size:10.5px;font-weight:600;background:var(--vioBg);color:var(--vio);border:1px solid var(--vioBd)}
+.wchip.grey{background:#f2f4f7;color:#475467;border-color:#e4e7ec;padding-right:8px}
+.wchip.warn{background:var(--warnBg);color:var(--warn);border-color:var(--warnBd);padding-right:8px}
+.wchip.good{background:var(--goodBg);color:var(--good);border-color:var(--goodBd);padding-right:8px}
+.wchip button{width:16px;height:16px;border:0;border-radius:50%;background:rgba(89,37,220,.12);color:inherit;font-size:10px;line-height:1}
+.wbody{flex:1;min-height:0;position:relative;overflow:auto}
+
+/* grid table */
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px}
+.tbl th{position:sticky;top:0;z-index:1;background:#f8fafd;color:#475467;font-size:11px;font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none}
+.tbl th.num,.tbl td.num{text-align:right}
+.tbl th.grp{text-align:center;font-size:10.5px;color:#1d4596;cursor:default;border-bottom:0;padding-bottom:2px}
+.tbl td{padding:7px 10px;border-bottom:1px solid var(--line2);white-space:nowrap}
+.tbl td.num{font-family:var(--mono)}
+.tbl tr.row{cursor:pointer}
+.tbl tr.row:hover td{background:#f5f8ff}
+.tbl tr.sel td{background:#eef3fd}
+.tbl tr.sel td:first-child{box-shadow:inset 3px 0 0 var(--acc)}
+.tbl tr.tot td{font-weight:700;background:#f8fafd;position:sticky;bottom:0;border-top:1px solid var(--line)}
+.neg{color:var(--bad)}
+.heat{display:inline-block;min-width:84px;padding:2px 8px;border-radius:6px;text-align:right}
+.pager{display:flex;align-items:center;gap:6px;padding:6px 12px;border-top:1px solid var(--line2);font-size:11.5px;color:var(--mute)}
+
+/* kpi */
+.kpis{display:grid;gap:12px;padding:4px 14px 14px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.kpi{border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:7px;background:#fff;box-shadow:inset 0 2px 0 var(--accent,#3a6ae6),0 6px 18px -14px rgba(20,34,74,.3);min-width:0;cursor:pointer}
+.kpi.breach{--accent:#d92d20;background:linear-gradient(180deg,#fff7f6,#fff 70px)}
+.kpi.warnst{--accent:#f79009}.kpi.okst{--accent:#12b76a}
+.kpi.sel{border-color:var(--acc);box-shadow:inset 0 2px 0 var(--accent,#3a6ae6),0 0 0 3px rgba(47,98,201,.18)}
+.kpi .kl{font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#475467;display:flex;gap:6px;align-items:center;min-width:0}
+.kpi .kl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kpi .kv{font-family:var(--mono);font-size:24px;font-weight:600;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .kd{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.delta{display:inline-flex;align-items:center;height:21px;padding:0 7px;border-radius:6px;font-family:var(--mono);font-size:11.5px;font-weight:600;white-space:nowrap}
+.delta.bad{background:var(--badBg);color:var(--bad)}.delta.good{background:var(--goodBg);color:var(--good)}.delta.flat{background:#f2f4f7;color:#475467}
+.krows{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;padding-top:7px;border-top:1px dashed var(--line);font-size:11px}
+.krows span{color:var(--mute)}.krows b{font-family:var(--mono);font-weight:500;text-align:right;color:var(--ink2)}
+.meter{height:6px;border-radius:99px;background:#eef1f6;position:relative}
+.meter i{position:absolute;left:0;top:0;bottom:0;border-radius:99px}
+.meter u{position:absolute;top:-3px;bottom:-3px;left:66.6%;width:2px;background:var(--navy);border-radius:2px}
+
+/* states */
+.sk{border-radius:7px;background:linear-gradient(90deg,#eef1f6 0,#f6f8fb 40%,#eef1f6 80%);background-size:800px 100%;animation:sh 1.3s linear infinite}
+@keyframes sh{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.state{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:16px;text-align:center;color:#475467;font-size:12.5px}
+.state b{color:var(--ink)}
+.state.err b{color:var(--bad)}
+.state code{font-size:11px;color:var(--mute2)}
+.state .req{display:flex;gap:6px;align-items:center}
+.state select,.state input{height:30px;border:1px solid #d5ddeb;border-radius:8px;padding:0 8px;background:#fff}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:10px 12px 10px 16px;border-radius:12px;font-weight:600;display:flex;gap:12px;align-items:center;box-shadow:0 18px 40px -12px rgba(15,26,58,.6);opacity:0;pointer-events:none;transition:.2s;z-index:100;max-width:80vw}
+.toast.on{opacity:1;transform:translateX(-50%);pointer-events:auto}
+.toast button{border:0;background:rgba(255,255,255,.14);color:#fff;border-radius:7px;height:26px;padding:0 10px;font-weight:700}
+
+/* panels used by studio */
+.panel{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 1px 2px rgba(16,24,40,.04),0 12px 30px -20px rgba(20,34,74,.25)}
+.sect{border-top:1px solid var(--line2);padding:12px 14px}
+.sect:first-child{border-top:0}
+.sect>h4{margin:0 0 8px;font-size:10.5px;font-weight:700;letter-spacing:.09em;color:var(--mute);text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.sect>h4 .sp{flex:1}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.field>span{font-size:11px;font-weight:600;color:#475467}
+.inp{height:32px;border:1px solid #d5ddeb;border-radius:9px;padding:0 10px;background:#fff;width:100%}
+.inp:focus{border-color:var(--acc2);outline:0;box-shadow:0 0 0 3px rgba(91,134,245,.18)}
+textarea.inp{height:auto;padding:8px 10px;min-height:70px;resize:vertical}
+.opts{display:flex;flex-wrap:wrap;gap:4px}
+.opt{height:28px;padding:0 10px;border:1px solid #e2e8f2;border-radius:8px;background:#fff;color:#475467;font-weight:600;font-size:12px;display:inline-flex;align-items:center;gap:6px}
+.opt:hover{border-color:#bcd0f5}
+.opt.on{border-color:var(--acc);background:var(--accBg);color:#1d4596}
+.opt[disabled]{opacity:.4;cursor:not-allowed}
+.note{font-size:11.5px;color:var(--mute);line-height:1.5}
+.alert{padding:9px 11px;border-radius:10px;font-size:12px;line-height:1.45;border:1px solid}
+.alert b{display:block;margin-bottom:2px}
+.alert.info{background:var(--accBg);border-color:var(--accBd);color:#1d4596}
+.alert.bad{background:var(--badBg);border-color:var(--badBd);color:var(--bad)}
+.alert.good{background:var(--goodBg);border-color:var(--goodBd);color:var(--good)}
+.alert.warn{background:var(--warnBg);border-color:var(--warnBd);color:var(--warn)}
+.alert.vio{background:var(--vioBg);border-color:var(--vioBd);color:var(--vio)}
+.alert span{color:#475467}
+.code{font-family:var(--mono);font-size:11px;line-height:1.55;background:#0f1a3a;color:#c9d6f5;border-radius:10px;padding:10px 12px;white-space:pre;overflow:auto;max-height:340px;margin:0}
+.toggle{display:flex;align-items:center;gap:9px;padding:6px 0;cursor:pointer;font-weight:600;color:var(--ink2);font-size:12.5px}
+.toggle i{width:30px;height:18px;border-radius:99px;background:#d0d5dd;position:relative;flex:none;transition:.15s}
+.toggle i:after{content:'';position:absolute;left:2px;top:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.toggle.on i{background:var(--acc)}.toggle.on i:after{left:14px}
+.toggle small{display:block;font-weight:500;color:var(--mute);font-size:11px}
+.list{display:flex;flex-direction:column;gap:6px}
+.li{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:11px;background:#fff;text-align:left;width:100%}
+.li:hover{border-color:#bcd0f5}
+.li.on{border-color:var(--acc);background:#f5f8ff;box-shadow:0 0 0 2px rgba(47,98,201,.12)}
+.li .t{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.li .t b{font-size:12.5px;color:var(--ink)}
+.li .t span{font-size:11px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li .t code{font-size:10.5px;color:#1d4596}
+.kbd{font-family:var(--mono);font-size:10.5px;padding:1px 6px;border-radius:5px;border:1px solid var(--line);background:#f8fafd;color:#475467}
+.phase .steps a.on{background:#5b86f5!important;color:#fff!important;border-color:#5b86f5!important}
+
+.work{display:flex;gap:14px;padding:12px 18px 18px;align-items:flex-start;flex:1;min-height:0}
+.lib{width:232px;flex:none;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+.lib .grpT{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--mute);padding:10px 14px 4px}
+.lib .item{display:flex;align-items:center;gap:10px;width:calc(100% - 16px);margin:2px 8px;padding:8px;border:1px solid transparent;border-radius:11px;background:transparent;text-align:left;touch-action:none}
+.lib .item:hover{border-color:#c9d7f5;background:#f5f8ff}
+.lib .item .ic{width:32px;height:32px;border-radius:9px;background:var(--accBg);color:var(--acc);display:grid;place-items:center;flex:none}
+.lib .item b{display:block;font-size:12.5px}
+.lib .item small{display:block;font-size:10.5px;color:var(--mute);line-height:1.3}
+.lib .hint{margin:8px 12px 12px;padding:9px 10px;border-radius:10px;background:#f8fafd;font-size:11px;color:var(--mute);line-height:1.45}
+.cvwrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.cv{position:relative;min-height:200px}
+.cv.edit{background:radial-gradient(#d3dcef 1px,transparent 1px) 0 0/18px 18px;border-radius:16px;outline:1px dashed #cfd9ee;outline-offset:6px}
+.cv .guide{position:absolute;inset:0;display:grid;grid-template-columns:repeat(12,1fr);gap:14px;pointer-events:none;z-index:0}
+.cv .guide span{background:rgba(91,134,245,.07);border:1px dashed rgba(91,134,245,.3);border-radius:8px}
+.gi{position:absolute;display:flex;transition:left .18s,top .18s,width .18s,height .18s;z-index:1}
+.gi.dragging{transition:none;z-index:20;opacity:.92}
+.gi>.card{flex:1}
+.edit .gi>.card{cursor:default}
+.edit .gi:hover>.card{box-shadow:inset 0 2px 0 #3a6ae6,0 0 0 2px #bcd0f5}
+.gi.sel>.card{box-shadow:inset 0 2px 0 #3a6ae6,0 0 0 2px var(--acc),0 12px 28px -16px rgba(20,34,74,.35)!important}
+.gi.flash>.card{animation:flash 1.4s ease}
+@keyframes flash{0%{box-shadow:0 0 0 5px rgba(91,134,245,.55)}100%{box-shadow:inset 0 2px 0 #3a6ae6,0 1px 2px rgba(16,24,40,.04)}}
+.gi .tb{position:absolute;left:0;top:-40px;display:flex;align-items:center;gap:2px;padding:4px;border-radius:11px;background:var(--navy);color:#c9d4f2;box-shadow:0 12px 24px -10px rgba(15,26,58,.6);z-index:30;white-space:nowrap}
+.gi .tb button{height:26px;min-width:26px;padding:0 7px;border:0;border-radius:7px;background:transparent;color:#c9d4f2;font-weight:600;font-size:11.5px;display:inline-flex;align-items:center;gap:5px}
+.gi .tb button:hover{background:rgba(255,255,255,.1);color:#fff}
+.gi .tb button.on{background:#5b86f5;color:#fff}
+.gi .tb .sep{width:1px;height:16px;background:rgba(255,255,255,.15);margin:0 3px}
+.gi .tb .grip{cursor:grab}
+.rh{position:absolute;z-index:25;background:#fff;border:2px solid var(--acc);border-radius:6px;touch-action:none}
+.rh.e{right:-7px;top:50%;width:12px;height:42px;margin-top:-21px;cursor:ew-resize}
+.rh.s{bottom:-7px;left:50%;width:42px;height:12px;margin-left:-21px;cursor:ns-resize}
+.rh.se{right:-7px;bottom:-7px;width:14px;height:14px;cursor:nwse-resize;border-radius:4px}
+.sizeTag{position:absolute;right:10px;top:10px;z-index:26;background:var(--navy);color:#fff;font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:7px}
+.whead[data-drag]{cursor:grab}
+.slot{flex:1;border:2px dashed #9db6ef;border-radius:16px;background:rgba(255,255,255,.75);display:flex;flex-direction:column;gap:8px;padding:12px 14px;overflow:auto;min-height:0}
+.slot:hover{border-color:var(--acc);background:#fff}
+.slot .sh{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.slot .sh b{font-size:13px;color:var(--navy)}
+.slot .sh small{color:var(--mute)}
+.slot .skel{flex:1;display:flex;gap:10px;align-items:stretch;min-height:30px;opacity:.7}
+.slot .skel>div{flex:1;border-radius:10px}
+.slot .fill{display:flex;flex-wrap:wrap;gap:6px}
+.pick{display:flex;flex-direction:column;gap:8px}
+.pick .row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.pick .tile{display:flex;align-items:center;gap:9px;padding:9px;border:1px solid #e2e8f2;border-radius:11px;background:#fff;text-align:left}
+.pick .tile:hover{border-color:var(--acc2);background:#f5f8ff}
+.pick .tile .ic{width:30px;height:30px;border-radius:9px;background:var(--accBg);color:var(--acc);display:grid;place-items:center;flex:none}
+.pick .tile b{display:block;font-size:12.5px}.pick .tile small{display:block;font-size:10.5px;color:var(--mute);line-height:1.3}
+.pick .sug{display:flex;align-items:center;gap:10px;padding:10px;border-radius:11px;border:1px solid var(--accBd);background:var(--accBg);text-align:left;width:100%}
+.pick .sug b{font-size:12.5px;color:#1d4596}.pick .sug code{font-size:10.5px;color:#475467}
+.endAdd{border:2px dashed #c9d7f5;border-radius:16px;padding:10px;text-align:center;color:#1d4596;font-weight:600;background:rgba(255,255,255,.6)}
+.endAdd:hover{border-color:var(--acc);background:#fff}
+.inlinePick{border:2px dashed #8fb0fb;border-radius:16px;background:#fff;padding:12px;animation:up .15s ease}
+@keyframes up{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.insp{width:356px;flex:none;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+.insp .ih{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line2);position:sticky;top:0;background:#fff;z-index:2;border-radius:16px 16px 0 0}
+.insp .ih .ic{width:34px;height:34px;border-radius:10px;background:var(--accBg);color:var(--acc);display:grid;place-items:center;flex:none}
+.insp .ih small{display:block;font-size:10px;font-weight:700;letter-spacing:.09em;color:var(--mute)}
+.insp .ih b{display:block;font-size:13.5px;max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.insp .ih .x{margin-left:auto;width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:var(--mute)}
+.insp .ih .x:hover{background:#f2f4f7}
+.ptabs{display:flex;gap:2px;padding:3px;margin:10px 14px 0;border-radius:10px;background:#f2f4f7}
+.ptabs button{flex:1;height:28px;border:0;border-radius:8px;background:transparent;font-weight:600;color:#475467;font-size:12px}
+.ptabs button.on{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(16,24,40,.12)}
+.src{display:flex;gap:10px;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fbfcfe}
+.src .ic{width:30px;height:30px;border-radius:9px;background:var(--accBg);color:var(--acc);display:grid;place-items:center;flex:none}
+.src b{display:block;font-size:12.5px}.src code{display:block;font-size:10.5px;color:#475467;margin-top:2px}.src span{display:block;font-size:11px;color:var(--mute);margin-top:2px}
+.cat .grpT{font-size:10px;font-weight:700;letter-spacing:.09em;color:var(--mute);margin:10px 0 4px}
+.param{display:grid;grid-template-columns:1fr;gap:5px;padding:8px 10px;border:1px solid var(--line);border-radius:11px;margin-bottom:6px;background:#fff}
+.param .pt{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600}
+.param .pt code{font-size:10px;color:var(--mute2);font-weight:500}
+.param .pr{display:flex;gap:6px;align-items:center}
+.param .pr select{flex:1}
+.seg2{display:flex;gap:2px;padding:2px;border-radius:8px;background:#f2f4f7;flex:none}
+.seg2 button{border:0;height:24px;padding:0 8px;border-radius:6px;background:transparent;font-size:11px;font-weight:600;color:#475467}
+.seg2 button.on{background:#fff;color:#1d4596;box-shadow:0 1px 2px rgba(16,24,40,.12)}
+.charts{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.charts button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border:1px solid #e2e8f2;border-radius:10px;background:#fff;font-size:11.5px;font-weight:600;position:relative}
+.charts button small{font-size:9.5px;color:var(--mute);font-weight:500;text-align:center;line-height:1.2}
+.charts button.on{border-color:var(--acc);background:var(--accBg);color:#1d4596}
+.charts button[disabled]{opacity:.42;cursor:not-allowed}
+.charts .best{position:absolute;top:-7px;right:4px;font-size:8.5px;font-weight:800;letter-spacing:.06em;background:var(--good);color:#fff;border-radius:99px;padding:1px 6px}
+.outline .orow{display:flex;gap:5px;flex-wrap:wrap;padding:6px;border:1px solid var(--line);border-radius:10px;margin-bottom:5px;background:#fbfcfe}
+.outline .orow button{height:24px;padding:0 8px;border:1px solid #e2e8f2;border-radius:7px;background:#fff;font-size:11px;font-weight:600;display:inline-flex;gap:5px;align-items:center}
+.outline .orow button:hover{border-color:var(--acc2)}
+.outline .orow button.on{border-color:var(--acc);background:var(--accBg)}
+.notice{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid;font-size:12.5px}
+.notice .sp{flex:1}
+.notice.info{background:var(--accBg);border-color:var(--accBd);color:#1d4596}
+.notice.warn{background:var(--warnBg);border-color:var(--warnBd);color:#93370d}
+.notice.vio{background:var(--vioBg);border-color:var(--vioBd);color:var(--vio)}
+.notice.good{background:var(--goodBg);border-color:var(--goodBd);color:var(--good)}
+.notice.bad{background:var(--badBg);border-color:var(--badBd);color:var(--bad)}
+.linkTarget>.card{outline:2px dashed var(--acc2);outline-offset:3px}
+.linkBadge{position:absolute;top:10px;right:12px;z-index:28;border:0;border-radius:99px;height:26px;padding:0 11px;font-weight:700;font-size:11.5px;background:var(--acc);color:#fff;box-shadow:0 8px 18px -8px rgba(47,98,201,.8)}
+.linkBadge.on{background:var(--good)}
+.linkSrc>.card{box-shadow:0 0 0 3px #7a5af8!important}
+.logp{position:fixed;left:242px;right:18px;bottom:0;max-height:34vh;overflow:auto;background:#0f1a3a;color:#c9d6f5;border-radius:14px 14px 0 0;z-index:40;box-shadow:0 -20px 40px -20px rgba(15,26,58,.6);font-family:var(--mono);font-size:11.5px}
+.logp .lh{position:sticky;top:0;display:flex;align-items:center;gap:10px;padding:8px 14px;background:#14224a;font-family:var(--sans);font-weight:700;color:#fff}
+.logp .le{padding:6px 14px;border-bottom:1px solid rgba(255,255,255,.06)}
+.logp .le b{color:#a9c0ff}
+.zone{border:1px dashed #c9d7f5;border-radius:11px;padding:8px;background:#fbfcff;margin-bottom:8px}
+.zone .zt{display:flex;align-items:center;font-size:10.5px;font-weight:700;letter-spacing:.08em;color:#475467;margin-bottom:6px}
+.zone .zt .sp{flex:1}
+.zchip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 4px 0 9px;border-radius:8px;font-weight:600;font-size:12px;margin:0 4px 4px 0;border:1px solid}
+.zchip.dim{background:#eef3fd;color:#1d4596;border-color:#c9d7f5}.zchip.met{background:#ecfdf3;color:#067647;border-color:#abefc6}.zchip.flt{background:#fffaeb;color:#93370d;border-color:#fedf89}.zchip.calc{background:var(--vioBg);color:var(--vio);border-color:var(--vioBd)}
+.zchip button{width:18px;height:18px;border:0;border-radius:5px;background:rgba(0,0,0,.06);color:inherit;font-size:11px}
+.zchip em{font-style:normal;font-size:10px;font-family:var(--mono);opacity:.8}
+.fields{display:flex;flex-wrap:wrap;gap:4px}
+.fields button{height:26px;padding:0 9px;border:1px solid #e2e8f2;border-radius:7px;background:#fff;font-size:11.5px;font-weight:600}
+.fields button:hover{border-color:var(--acc2);color:#1d4596}
+.fields button.used{opacity:.45}
+.vrow{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:11px;margin-bottom:6px;background:#fff}
+.vrow .t{flex:1;min-width:0}.vrow b{font-size:12.5px}.vrow span{display:block;font-size:11px;color:var(--mute)}
+.pipe{display:flex;align-items:center;gap:6px;margin:4px 0 10px}
+.pipe .st{flex:1;padding:8px;border-radius:10px;border:1px solid var(--line);background:#fff;text-align:center}
+.pipe .st b{display:block;font-size:12px}.pipe .st span{display:block;font-size:10.5px;color:var(--mute)}
+.pipe .st.on{border-color:var(--goodBd);background:var(--goodBg)}.pipe .st.on b{color:var(--good)}
+.pipe i{color:var(--mute2);font-style:normal}
+.jobbar{height:8px;border-radius:99px;background:#eef1f6;overflow:hidden;width:70%}
+.jobbar i{display:block;height:100%;background:linear-gradient(90deg,#5b86f5,#2f62c9);border-radius:99px;transition:width .3s}
+.upd{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:99px;background:var(--goodBg);color:var(--good);font-size:10.5px;font-weight:700;border:1px solid var(--goodBd)}
+.viewas{margin:8px 18px 0}
+
+.gi .tb.in{top:8px;left:auto;right:8px}
+
+</style></head><body><script>
+/* ===== Custom Dashboard Studio prototype kit · all numbers are invented mock data ===== */
+(function (G) {
+'use strict';
+const K = G.K = {};
+/* ---------- utils ---------- */
+const esc = K.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+K.clone = o => JSON.parse(JSON.stringify(o));
+K.uid = p => (p || 'w') + Math.random().toString(36).slice(2, 7);
+const MINUS = '−';
+K.fmt = function (v, dec, neg) { if (v == null || isNaN(v)) return '–'; dec = dec == null ? 1 : dec; const s = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }); if (v < 0 && +Math.abs(v).toFixed(dec) !== 0) return neg === 'minus' ? MINUS + s : '(' + s + ')'; return s; };
+K.fmtD = function (v, dec) { if (v == null || isNaN(v)) return '–'; const s = Math.abs(v).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }); return (v > 0 ? '+' : v < 0 ? MINUS : '') + s; };
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+K.dLabel = s => s.slice(8) + '-' + MON[+s.slice(5, 7) - 1] + '-' + s.slice(0, 4);
+K.dShort = s => s.slice(8) + '-' + MON[+s.slice(5, 7) - 1];
+K.now = () => new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+const ICONS = {
+  grid: 'M3 4h18v16H3zM3 9h18M3 14h18M9 4v16', chart: 'M4 19V5M4 19h16M8 15l4-5 3 3 5-7', kpi: 'M3 5h8v6H3zM13 5h8v6h-8zM3 13h8v6H3zM13 13h8v6h-8z', text: 'M4 6h16M4 10h16M4 14h12M4 18h8',
+  header: 'M4 6h12M4 12h16M4 18h10', filter: 'M4 5h16l-6 8v6l-4-2v-4L4 5z', tree: 'M5 4v16M5 8h6M5 14h6M11 6h8v4h-8zM11 12h8v4h-8z', button: 'M4 8h16v8H4zM9 12h6', plus: 'M12 5v14M5 12h14',
+  undo: 'M9 14L4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3', redo: 'M15 14l5-5-5-5M20 9H10a6 6 0 0 0 0 12h3', eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z',
+  dl: 'M12 3v12M7 10l5 5 5-5M4 21h16', expand: 'M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5', link: 'M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1',
+  trash: 'M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13', copy: 'M8 8h12v12H8zM4 16V4h12', move: 'M12 3v18M3 12h18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3',
+  db: 'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v12c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3', api: 'M4 6h16v12H4zM8 10l-2 2 2 2M16 10l2 2-2 2M13 9l-2 6',
+  search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM21 21l-5-5', check: 'M5 12l5 5L20 7', x: 'M6 6l12 12M18 6L6 18', more: 'M5 12h.01M12 12h.01M19 12h.01', star: 'M12 3l2.7 5.6 6.3.9-4.5 4.4 1 6.1L12 17l-5.6 3 1-6.1L3 9.5l6.3-.9z',
+  clock: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 3', bolt: 'M13 2L4 14h7l-1 8 9-12h-7z', shield: 'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z', users: 'M16 20v-2a4 4 0 0 0-8 0v2M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM20 20v-2a3 3 0 0 0-2-2.8M17 4.2a3 3 0 0 1 0 5.6',
+  layers: 'M12 3l9 5-9 5-9-5zM3 13l9 5 9-5', code: 'M8 8l-4 4 4 4M16 8l4 4-4 4', refresh: 'M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5', home: 'M3 11l9-7 9 7v9H3z', template: 'M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z', puzzle: 'M10 3h4v3a2 2 0 1 0 4 0V3h3v7h-3a2 2 0 1 0 0 4h3v7h-7v-3a2 2 0 1 0-4 0v3H3v-7h3a2 2 0 1 0 0-4H3V3z'
+};
+K.icon = (n, cls) => '<svg class="icon ' + (cls || '') + '" viewBox="0 0 24 24" aria-hidden="true"><path d="' + (ICONS[n] || ICONS.grid) + '"/></svg>';
+K.ICONS = ICONS;
+let tt; K.toast = function (msg, undo) { let t = document.getElementById('toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); } t.innerHTML = '<span>' + esc(msg) + '</span>' + (undo ? '<button id="toastUndo">Undo</button>' : ''); t.classList.add('on'); if (undo) document.getElementById('toastUndo').onclick = () => { undo(); t.classList.remove('on'); }; clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), undo ? 5200 : 2600); };
+K.store = { get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
+function rng(seed) { let a = seed >>> 0; return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+/* ---------- calendar ---------- */
+K.COBS = (function () { const o = []; const d = new Date(Date.UTC(2026, 10, 27)); while (o.length < 40) { const w = d.getUTCDay(); if (w && w !== 6) o.unshift(d.toISOString().slice(0, 10)); d.setUTCDate(d.getUTCDate() - 1); } return o; })();
+K.OFF = { DoD: 1, WoW: 5, MoM: 21 };
+
+/* ---------- reference data ---------- */
+const REGIONS = ['AMER', 'EMEA', 'APAC', 'LATAM'];
+const BIZ = { Equities: ['Equity Derivatives', 'Equity Cash'], Rates: ['Rates Flow', 'Rates Options'], Credit: ['Credit Trading', 'Securitized Products'], FX: ['FX Spot', 'FX Options'] };
+K.DIMS = { region: { label: 'Region', values: REGIONS }, business: { label: 'Business', values: Object.keys(BIZ) }, desk: { label: 'Volcker desk', values: [].concat.apply([], Object.values(BIZ)) }, cob: { label: 'COB', date: true } };
+K.deskOf = b => b ? BIZ[b] || [] : K.DIMS.desk.values;
+K.HIER = { id: 'GM', label: 'Global Markets', children: Object.keys(BIZ).map(b => ({ id: 'GM.' + b.slice(0, 3).toUpperCase(), label: b, children: BIZ[b].map(d => ({ id: 'GM.' + b.slice(0, 3).toUpperCase() + '.' + d.replace(/[^A-Z]/g, ''), label: d })) })) };
+K.hierFlat = (function () { const o = []; (function walk(n, depth, path) { o.push({ id: n.id, label: n.label, depth: depth, path: path.concat([n.label]) }); (n.children || []).forEach(c => walk(c, depth + 1, path.concat([n.label]))); })(K.HIER, 0, []); return o; })();
+K.MEAS = {
+  s1974: { label: '1974 Historical', unit: '$K', pol: 'lowerIsWorse' }, s2008: { label: '2008 Historical', unit: '$K', pol: 'lowerIsWorse' }, covid: { label: 'COVID Hypothetical', unit: '$K', pol: 'lowerIsWorse' },
+  cvar: { label: 'Component VaR', unit: '$MM', pol: 'higherIsWorse' }, csvar: { label: 'Component SVaR', unit: '$MM', pol: 'higherIsWorse' }, var1d: { label: 'VaR 1D', unit: '$MM', pol: 'higherIsWorse' }, svar: { label: 'SVaR', unit: '$MM', pol: 'higherIsWorse' },
+  limit: { label: 'VaR limit', unit: '$MM', pol: 'neutral' }, usage: { label: '% of limit', unit: '%', pol: 'higherIsWorse', calc: true },
+  delta: { label: 'Delta', unit: '$K', pol: 'neutral' }, vega: { label: 'Vega', unit: '$K', pol: 'neutral' }, gamma: { label: 'Gamma', unit: '$K', pol: 'neutral' }
+};
+/* ---------- mock rows ---------- */
+K.DATA = (function () {
+  const out = { gsst: [], var: [], greeks: [] };
+  const r = rng(27);
+  const combos = []; REGIONS.forEach((rg, ri) => Object.keys(BIZ).forEach((b, bi) => BIZ[b].forEach((d, di) => combos.push({ rg, b, d, w: (ri === 0 ? 1.5 : ri === 3 ? .45 : 1) * (bi === 1 ? 1.25 : bi === 3 ? .7 : 1) * (di ? .6 : 1), ph: r() * 6, sg: [r() < .25 ? 1 : -1, r() < .4 ? 1 : -1, r() < .3 ? 1 : -1] }))));
+  K.COBS.forEach((cob, i) => combos.forEach(c => {
+    const dr = 1 + .12 * Math.sin(i / 4 + c.ph) + (r() - .5) * .06;
+    out.gsst.push({ cob, region: c.rg, business: c.b, desk: c.d, s1974: +(c.sg[0] * 9200 * c.w * dr * (.8 + r() * .4)).toFixed(1), s2008: +(c.sg[1] * 7400 * c.w * dr * (.8 + r() * .4)).toFixed(1), covid: +(c.sg[2] * 8800 * c.w * dr * (.8 + r() * .4)).toFixed(1) });
+    const v = 3.1 * c.w * dr * (1 + .07 * Math.sin(i / 2.3) + ((i * 37) % 11 - 5) * .007) * (.9 + r() * .2);
+    out.var.push({ cob, region: c.rg, business: c.b, desk: c.d, cvar: +v.toFixed(3), csvar: +(v * 1.42).toFixed(3), var1d: +(v * 1.08).toFixed(3), svar: +(v * 1.5).toFixed(3), limit: +(4.6 * c.w).toFixed(2) });
+    out.greeks.push({ cob, region: c.rg, business: c.b, desk: c.d, delta: +((r() - .45) * 900 * c.w).toFixed(1), vega: +((r() - .5) * 420 * c.w).toFixed(1), gamma: +((r() - .5) * 120 * c.w).toFixed(1) });
+  }));
+  return out;
+})();
+
+/* ---------- API catalogue (business name first, code second) ---------- */
+const P = {
+  region: { name: 'REGION_NAME', label: 'Region', type: 'select', dim: 'region', options: ['ALL'].concat(REGIONS), def: 'ALL' },
+  business: { name: 'BUSINESS', label: 'Business', type: 'select', dim: 'business', options: ['ALL'].concat(Object.keys(BIZ)), def: 'ALL' },
+  desk: { name: 'VOLCKER_DESK_NAME', label: 'Volcker desk', type: 'select', dim: 'desk', options: ['ALL'].concat(K.DIMS.desk.values), def: 'ALL' },
+  variant: { name: 'VARIANT', label: 'Horizon', type: 'select', options: ['1DAY', '10DAY'], def: '1DAY', admin: true },
+  level: { name: 'LEVEL_ID', label: 'Hierarchy node', type: 'tree', required: true, def: null, dim: 'level' }
+};
+K.P = P;
+K.APIS = [
+  { code: 'GSST_STRESS_TOTALS', name: 'Stress loss headline totals', desc: 'Total stress P&L per GSST scenario for the chosen perimeter, with PCOB.', area: 'Stress Testing', module: 'DLY_GSST', ds: 'gsst', dims: [], meas: ['s1974', 's2008', 'covid'], views: ['kpi', 'grid'], params: [P.region, P.business], tags: ['GSST', 'stress', 'scenario', 'headline'], syn: ['stress totals', 'scenario P&L'], owner: 'Stress Testing Tech', used: 14 },
+  { code: 'GSST_STRESS_BY_REGION', name: 'Stress loss by region', desc: 'GSST scenario P&L for each region.', area: 'Stress Testing', module: 'DLY_GSST', ds: 'gsst', dims: ['region'], meas: ['s1974', 's2008', 'covid'], views: ['grid', 'column', 'bar', 'donut'], params: [P.business], tags: ['GSST', 'stress', 'region'], syn: ['stress by geography'], owner: 'Stress Testing Tech', used: 11 },
+  { code: 'GSST_STRESS_BY_BUSINESS', name: 'Stress loss by business', desc: 'GSST scenario P&L for each business (Equities, Rates, Credit, FX).', area: 'Stress Testing', module: 'DLY_GSST', ds: 'gsst', dims: ['business'], meas: ['s1974', 's2008', 'covid'], views: ['column', 'bar', 'grid', 'donut'], params: [P.region], tags: ['GSST', 'stress', 'business'], syn: ['stress by LOB'], owner: 'Stress Testing Tech', used: 8 },
+  { code: 'GSST_STRESS_BY_DESK', name: 'Stress loss by Volcker desk', desc: 'GSST scenario P&L for each Volcker desk.', area: 'Stress Testing', module: 'DLY_GSST', ds: 'gsst', dims: ['desk'], meas: ['s1974', 's2008', 'covid'], views: ['grid', 'bar'], params: [P.region, P.business], tags: ['GSST', 'stress', 'desk', 'Volcker'], syn: ['stress by desk'], owner: 'Stress Testing Tech', used: 6 },
+  { code: 'GSST_STRESS_TREND', name: 'Stress loss daily trend', desc: 'Scenario P&L over the last 20 COBs.', area: 'Stress Testing', module: 'DLY_GSST', ds: 'gsst', dims: ['cob'], meas: ['s1974', 's2008', 'covid'], views: ['line', 'area', 'grid'], params: [P.region, P.business], tags: ['GSST', 'trend', 'history'], syn: ['stress history'], owner: 'Stress Testing Tech', used: 5 },
+  { code: 'DLY_EQ_VAR_TOTALS', name: 'VaR / SVaR headline totals', desc: 'Firm-level VaR 1D and SVaR for the chosen perimeter (precomputed, not summed).', area: 'VaR', module: 'DLY_EQ_VAR', ds: 'var', dims: [], meas: ['var1d', 'svar', 'cvar'], views: ['kpi', 'grid'], params: [P.region, P.variant], tags: ['VaR', 'SVaR', 'headline'], syn: ['value at risk', 'stressed VaR'], owner: 'Equities Market Risk Tech', used: 18 },
+  { code: 'DLY_EQ_VAR_VD_MC_CVAR_CSVAR', name: 'Component VaR / SVaR · Monte Carlo by Volcker desk', desc: 'Daily component VaR and stressed VaR (Monte Carlo) for each Volcker desk, in $MM.', area: 'VaR', module: 'DLY_EQ_VAR', ds: 'var', dims: ['desk'], meas: ['cvar', 'csvar'], views: ['grid', 'column', 'bar'], params: [P.desk, P.variant], tags: ['VaR', 'SVaR', 'Monte Carlo', 'Volcker', 'desk'], syn: ['CVaR', 'component VaR', 'MC VaR', 'stressed VaR by desk'], owner: 'Equities Market Risk Tech', used: 12 },
+  { code: 'DLY_EQ_VAR_LIMIT_SUMMARY', name: 'VaR limit usage by hierarchy node', desc: 'VaR against limit for the desks under a hierarchy node. Needs a node.', area: 'Limits', module: 'DLY_EQ_VAR', ds: 'var', dims: ['desk'], meas: ['var1d', 'limit', 'usage'], views: ['grid', 'column', 'bar'], params: [P.level], tags: ['limit', 'usage', 'breach', 'VaR'], syn: ['limit utilisation', 'limit breach'], owner: 'Limits Tech', used: 9 },
+  { code: 'DLY_EQ_VAR_TREND', name: 'VaR daily trend', desc: 'VaR 1D and SVaR over the last 20 COBs.', area: 'VaR', module: 'DLY_EQ_VAR', ds: 'var', dims: ['cob'], meas: ['var1d', 'svar'], views: ['line', 'area', 'grid'], params: [P.region], tags: ['VaR', 'trend'], syn: ['VaR history'], owner: 'Equities Market Risk Tech', used: 7 },
+  { code: 'DLY_EQ_SENS_GREEKS_DESK', name: 'Equity Greeks by Volcker desk', desc: 'Delta, vega and gamma sensitivities for each desk.', area: 'Sensitivities', module: 'DLY_EQ_SENS', ds: 'greeks', dims: ['desk'], meas: ['delta', 'vega', 'gamma'], views: ['grid', 'bar'], params: [P.region], tags: ['Greeks', 'delta', 'vega', 'sensitivity'], syn: ['sensis', 'risk sensitivities'], owner: 'Equities Market Risk Tech', used: 4 },
+  { code: 'GET_HIERARCHY', name: 'Risk hierarchy (Level 1 to 4)', desc: 'Business hierarchy for tree-select inputs.', area: 'Reference data', module: 'DLY_CUSTOM_DASHBOARD', ds: null, dims: [], meas: [], views: ['tree'], params: [], tags: ['hierarchy', 'level', 'tree'], syn: ['org tree', 'LEVEL_ID'], owner: 'Platform', used: 21 },
+  { code: 'DLY_EQ_VAR_VD_HIST_CVAR', name: 'Component VaR · Historical (old)', desc: 'Replaced by the Monte Carlo component VaR API.', area: 'VaR', module: 'DLY_EQ_VAR', ds: 'var', dims: ['desk'], meas: ['cvar'], views: ['grid'], params: [P.desk], tags: ['VaR'], syn: [], owner: 'Equities Market Risk Tech', used: 2, status: 'deprecated', replacedBy: 'DLY_EQ_VAR_VD_MC_CVAR_CSVAR' }
+];
+K.API = {}; K.APIS.forEach(a => { a.status = a.status || 'active'; K.API[a.code] = a; });
+K.registerApi = a => { a.status = a.status || 'unofficial'; K.APIS.push(a); K.API[a.code] = a; };
+K.searchApis = function (q, opts) {
+  q = (q || '').trim().toLowerCase(); opts = opts || {};
+  return K.APIS.filter(a => (opts.showDeprecated || a.status !== 'deprecated') && (!opts.view || a.views.indexOf(opts.view) >= 0 || (opts.view === 'chart' && a.views.some(v => ['column', 'bar', 'line', 'area', 'donut'].indexOf(v) >= 0))) && (!q || (a.name + ' ' + a.desc + ' ' + a.code + ' ' + a.tags.join(' ') + ' ' + a.syn.join(' ') + ' ' + a.area).toLowerCase().indexOf(q) >= 0));
+};
+K.grainOf = a => a.dims.length ? a.dims.map(d => d === 'cob' ? 'COB (trend)' : K.DIMS[d].label).join(' × ') : 'Totals';
+
+/* ---------- query service (mock gateway) ---------- */
+K.stats = { requests: 0, deduped: 0, ms: 0, log: [] };
+const cache = new Map();
+K.clearCache = () => cache.clear();
+K.query = function (code, params, ctx) {
+  const key = JSON.stringify([code, params, ctx.cob, ctx.compare, ctx.filters || {}, ctx.version || 0, ctx.page || 0, ctx.sort || '']);
+  if (cache.has(key)) { K.stats.deduped++; return cache.get(key); }
+  const sim = (ctx.sim || {})[code];
+  const t0 = performance.now();
+  const p = new Promise((res, rej) => {
+    const api = K.API[code];
+    const lat = (sim === 'slow' ? 2600 : 180 + Math.random() * 380) + (api && api.heavy ? 1800 : 0);
+    setTimeout(() => {
+      K.stats.requests++; const ms = Math.round(performance.now() - t0); K.stats.ms += ms;
+      K.stats.log.unshift({ at: K.now(), code: code, ms: ms, params: params }); K.stats.log = K.stats.log.slice(0, 40);
+      if (!api) return rej({ type: 'error', status: 404, msg: 'Unknown API ' + code });
+      if (sim === 'error') return rej({ type: 'error', status: 500, msg: 'Request failed (500)', rid: 'req-' + Math.random().toString(16).slice(2, 10) });
+      const miss = api.params.find(pp => pp.required && !params[pp.name]);
+      if (miss) return rej({ type: 'missing', param: miss });
+      try { res(api.custom ? api.custom(params, ctx, sim) : run(api, params, ctx, sim)); } catch (e) { rej({ type: 'error', status: 500, msg: String(e && e.message || e) }); }
+    }, lat);
+  });
+  cache.set(key, p); p.catch(() => cache.delete(key));
+  return p;
+};
+function run(api, params, ctx, sim) {
+  const src = api.rowsFn ? api.rowsFn() : K.DATA[api.ds];
+  const ci = K.COBS.indexOf(ctx.cob); const pcob = K.COBS[Math.max(0, ci - (K.OFF[ctx.compare] || 1))];
+  const flt = {};
+  api.params.forEach(pp => { const v = params[pp.name]; if (pp.dim && pp.dim !== 'level' && v && v !== 'ALL') flt[pp.dim] = [v]; if (pp.dim === 'level' && v) { const n = K.hierFlat.find(h => h.id === v); if (n && n.depth === 1) flt.business = [n.label]; if (n && n.depth === 2) flt.desk = [n.label]; } });
+  Object.keys(ctx.filters || {}).forEach(d => { if ((ctx.filters[d] || []).length) flt[d] = ctx.filters[d]; });
+  (api.extraFilters || []).forEach(f => { if (f.vals.length) flt[f.field] = f.vals; });
+  const pass = r => Object.keys(flt).every(d => !(d in r) || flt[d].indexOf(r[d]) >= 0);
+  const scale = params.VARIANT === '10DAY' ? Math.sqrt(10) : 1;
+  const trend = api.dims.indexOf('cob') >= 0;
+  const dates = trend ? K.COBS.slice(Math.max(0, ci - 19), ci + 1) : [ctx.cob];
+  const meas = api.meas.filter(m => !(K.MEAS[m] || {}).calc);
+  const agg = (rows) => { const o = {}; meas.forEach(m => { o[m] = rows.reduce((a, r) => a + r[m], 0) * (api.ds === 'var' && ['var1d', 'svar'].indexOf(m) >= 0 ? .74 : 1) * (m === 'limit' ? 1 : scale); }); if (api.meas.indexOf('usage') >= 0) o.usage = o.limit ? o.var1d / o.limit * 100 : 0; (api.calc || []).forEach(c => { o[c.id] = c.fn(o); }); return o; };
+  const group = (rows) => { const m = new Map(); rows.forEach(r => { const k = api.dims.map(d => r[d]).join('|'); if (!m.has(k)) m.set(k, []); m.get(k).push(r); }); return m; };
+  let cur = src.filter(r => dates.indexOf(r.cob) >= 0 && pass(r));
+  if (sim === 'empty') cur = [];
+  const vf = 1 + (ctx.version || 0) * 0.018; if (vf !== 1) cur = cur.map(r => { if (r.cob !== ctx.cob) return r; const c = Object.assign({}, r); meas.forEach(m => { if (m !== 'limit' && typeof c[m] === 'number') c[m] = c[m] * vf; }); return c; });
+  const prev = src.filter(r => r.cob === pcob && pass(r));
+  const gp = group(prev);
+  const rows = []; group(cur).forEach((rs, k) => { const o = { _k: k }; api.dims.forEach(d => { o[d] = rs[0][d]; }); Object.assign(o, agg(rs)); if (!trend) { const pr = gp.get(k); const pa = pr ? agg(pr) : null; api.meas.concat((api.calc || []).map(c => c.id)).forEach(m => { o['p_' + m] = pa ? pa[m] : null; }); } rows.push(o); });
+  if (trend) rows.sort((a, b) => a.cob < b.cob ? -1 : 1);
+  const total = agg(cur); if (!trend) { const pt = agg(prev); Object.keys(pt).forEach(m => { total['p_' + m] = pt[m]; }); }
+  const cols = api.dims.map(d => ({ key: d, label: K.DIMS[d].label, dim: true })).concat(api.meas.map(m => ({ key: m, label: K.MEAS[m].label, unit: K.MEAS[m].unit, pol: K.MEAS[m].pol }))).concat((api.calc || []).map(c => ({ key: c.id, label: c.label, unit: c.unit || '', pol: c.pol || 'neutral' })));
+  let all = rows;
+  if (ctx.sort && !trend) { const [k, dir] = ctx.sort.split(':'); all = rows.slice().sort((a, b) => (a[k] > b[k] ? 1 : a[k] < b[k] ? -1 : 0) * (dir === 'desc' ? -1 : 1)); }
+  return { api: api.code, cols: cols, rows: all, total: total, trend: trend, meta: { cob: ctx.cob, pcob: pcob, asOf: sim === 'stale' ? K.COBS[ci - 2] : ctx.cob, count: rows.length } };
+}
+
+/* ---------- formatting by polarity ---------- */
+K.tone = function (pol, diff) { if (!diff || Math.abs(diff) < 1e-9 || pol === 'neutral') return 'flat'; const worse = pol === 'higherIsWorse' ? diff > 0 : pol === 'lowerIsWorse' ? diff < 0 : false; return worse ? 'bad' : 'good'; };
+function heatBg(v, mx, pol) { const t = Math.min(Math.abs(v) / (mx || 1), 1); const bad = pol === 'lowerIsWorse' ? v < 0 : pol === 'higherIsWorse' ? v > 0 : v < 0; return bad ? 'rgba(217,45,32,' + (.08 + t * .45).toFixed(2) + ')' : 'rgba(18,183,106,' + (.08 + t * .4).toFixed(2) + ')'; }
+
+/* ---------- renderers (return HTML) ---------- */
+K.renderGrid = function (res, o) {
+  o = o || {}; const dec = o.dec == null ? 1 : o.dec; const cmp = o.compare && !res.trend;
+  const cols = res.cols.filter(c => !o.hidden || o.hidden.indexOf(c.key) < 0);
+  // hide constant dims (e.g. one COB) unless asked
+  const show = cols.filter(c => !(c.dim && o.hideConst !== false && res.rows.length > 1 && res.rows.every(r => r[c.key] === res.rows[0][c.key])));
+  const mx = {}; show.forEach(c => { if (!c.dim) mx[c.key] = Math.max.apply(null, res.rows.map(r => Math.abs(r[c.key] || 0)).concat([1e-9])); });
+  let h = '<table class="tbl" role="grid"><thead>';
+  if (cmp) { h += '<tr>' + show.map(c => c.dim ? '<th></th>' : '<th class="grp" colspan="3">' + esc(o.labels && o.labels[c.key] || c.label) + '</th>').join('') + '</tr>'; }
+  h += '<tr>' + show.map(c => { const lab = esc(o.labels && o.labels[c.key] || c.label) + (c.unit && !cmp ? ' <span class="muted">' + esc(c.unit) + '</span>' : ''); const ar = o.sort && o.sort.split(':')[0] === c.key ? (o.sort.split(':')[1] === 'desc' ? ' ▼' : ' ▲') : ''; return c.dim ? '<th data-act="sort" data-k="' + c.key + '">' + (c.key === 'cob' ? 'COB' : lab) + ar + '</th>' : cmp ? '<th class="num" data-act="sort" data-k="' + c.key + '">COB' + ar + '</th><th class="num">PCOB</th><th class="num">Δ</th>' : '<th class="num" data-act="sort" data-k="' + c.key + '">' + lab + ar + '</th>'; }).join('') + '</tr></thead><tbody>';
+  const sel = o.sel || {};
+  res.rows.forEach((r, i) => {
+    const on = Object.keys(sel).length && Object.keys(sel).every(k => r[k] === sel[k]);
+    h += '<tr class="row' + (on ? ' sel' : '') + '" data-act="ev" data-ev="rowClick" data-ri="' + i + '">' + show.map(c => {
+      const v = r[c.key]; if (c.dim) return '<td>' + (c.key === 'cob' ? K.dLabel(v) : esc(v)) + '</td>';
+      const txt = K.fmt(v, c.unit === '%' ? 1 : dec, o.neg);
+      const cell = o.heat ? '<span class="heat" style="background:' + heatBg(v, mx[c.key], c.pol) + '">' + txt + '</span>' : '<span class="' + (v < 0 ? 'neg' : '') + '">' + txt + '</span>';
+      if (!cmp) return '<td class="num">' + cell + (c.unit === '%' && !o.heat ? '' : '') + '</td>';
+      const p = r['p_' + c.key], d = p == null ? null : v - p; const tn = K.tone(c.pol, d);
+      return '<td class="num">' + cell + '</td><td class="num muted">' + K.fmt(p, dec, o.neg) + '</td><td class="num" style="color:' + (tn === 'bad' ? 'var(--bad)' : tn === 'good' ? 'var(--good)' : '#667085') + '">' + K.fmtD(d, dec) + '</td>';
+    }).join('') + '</tr>';
+  });
+  if (o.totals !== false && res.rows.length > 1 && !res.trend) h += '<tr class="tot">' + show.map((c, i) => c.dim ? '<td>' + (i === 0 ? 'Total' : '') + '</td>' : cmp ? '<td class="num">' + K.fmt(res.total[c.key], dec, o.neg) + '</td><td class="num muted">' + K.fmt(res.total['p_' + c.key], dec, o.neg) + '</td><td class="num">' + K.fmtD(res.total[c.key] - res.total['p_' + c.key], dec) + '</td>' : '<td class="num">' + K.fmt(res.total[c.key], dec, o.neg) + '</td>').join('') + '</tr>';
+  return h + '</tbody></table>';
+};
+const TONES = ['#3a6ae6', '#e8762b', '#0e9384', '#7a5af8', '#e04f8e', '#667085'];
+K.TONES = TONES;
+function niceMax(v) { if (v <= 0) return 1; const e = Math.pow(10, Math.floor(Math.log10(v))); const n = v / e; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * e; }
+function short(v) { const a = Math.abs(v); return (v < 0 ? MINUS : '') + (a >= 1e6 ? (a / 1e6).toFixed(1) + 'M' : a >= 1e3 ? (a / 1e3).toFixed(0) + 'k' : a.toFixed(a < 10 ? 1 : 0)); }
+K.renderChart = function (res, o) {
+  o = o || {}; const type = o.type || 'column'; const meas = res.cols.filter(c => !c.dim && (!o.hidden || o.hidden.indexOf(c.key) < 0)).slice(0, o.maxSeries || 3);
+  const xk = res.cols.find(c => c.dim); if (!xk || !res.rows.length) return '<div class="state"><b>No rows</b><span>Nothing to chart for these filters.</span></div>';
+  const rows = res.rows; const xl = r => xk.key === 'cob' ? K.dShort(r.cob) : r[xk.key];
+  const legend = '<div style="display:flex;gap:12px;flex-wrap:wrap;padding:0 14px 4px;font-size:11.5px;color:#475467">' + meas.map((m, i) => '<span style="display:inline-flex;gap:6px;align-items:center"><i style="width:9px;height:9px;border-radius:3px;background:' + TONES[i] + '"></i>' + esc(o.labels && o.labels[m.key] || m.label) + '</span>').join('') + '</div>';
+  if (type === 'donut') {
+    const m = meas[0]; const vals = rows.map(r => Math.abs(r[m.key])); const tot = vals.reduce((a, b) => a + b, 0) || 1; const C = 2 * Math.PI * 62; let off = 0;
+    return '<div style="display:flex;align-items:center;gap:18px;padding:6px 16px;height:100%"><svg viewBox="0 0 160 160" style="width:150px;flex:none">' + vals.map((v, i) => { const len = v / tot * C; const s = '<circle data-act="ev" data-ev="pointClick" data-ri="' + i + '" cx="80" cy="80" r="62" fill="none" stroke="' + TONES[i % 6] + '" stroke-width="22" stroke-dasharray="' + len.toFixed(2) + ' ' + (C - len).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '" transform="rotate(-90 80 80)" style="cursor:pointer"/>'; off += len; return s; }).join('') + '<text x="80" y="78" text-anchor="middle" font-family="IBM Plex Mono" font-size="15" font-weight="600">' + short(tot) + '</text><text x="80" y="95" text-anchor="middle" font-size="10" fill="#667085">|' + esc(m.label) + '|</text></svg><div style="display:flex;flex-direction:column;gap:6px;font-size:12px;flex:1">' + rows.map((r, i) => '<div data-act="ev" data-ev="pointClick" data-ri="' + i + '" style="display:flex;gap:8px;align-items:center;cursor:pointer"><i style="width:9px;height:9px;border-radius:3px;background:' + TONES[i % 6] + '"></i><span style="flex:1">' + esc(xl(r)) + '</span><b class="mono" style="font-weight:600">' + K.fmt(r[m.key], 0, o.neg) + '</b><span class="muted mono">' + (vals[i] / tot * 100).toFixed(0) + '%</span></div>').join('') + '</div></div>';
+  }
+  if (type === 'bar') {
+    const m = meas[0]; const mx = Math.max.apply(null, rows.map(r => Math.abs(r[m.key])).concat([1e-9])); const sorted = rows.map((r, i) => ({ r, i })).sort((a, b) => Math.abs(b.r[m.key]) - Math.abs(a.r[m.key]));
+    return '<div style="padding:0 14px 2px;font-size:11.5px;color:#475467">' + esc(o.labels && o.labels[m.key] || m.label) + ' <span class="muted">' + esc(m.unit || '') + '</span></div><div style="display:flex;flex-direction:column;gap:9px;padding:6px 16px 12px">' + sorted.map(o2 => { const v = o2.r[m.key]; const on = o.sel && Object.keys(o.sel).length && Object.keys(o.sel).every(k => o2.r[k] === o.sel[k]); return '<div data-act="ev" data-ev="pointClick" data-ri="' + o2.i + '" style="cursor:pointer;display:flex;flex-direction:column;gap:3px;padding:2px 4px;border-radius:6px;' + (on ? 'background:#eef3fd' : '') + '"><div style="display:flex;justify-content:space-between;font-size:12px"><span>' + esc(xl(o2.r)) + '</span><b class="mono ' + (v < 0 ? 'neg' : '') + '" style="font-weight:600">' + K.fmt(v, 1, o.neg) + '</b></div><div style="height:7px;border-radius:99px;background:#eef1f6"><div style="height:100%;width:' + (Math.abs(v) / mx * 100).toFixed(1) + '%;border-radius:99px;background:' + (v < 0 ? '#e8762b' : '#3a6ae6') + '"></div></div></div>'; }).join('') + '</div>';
+  }
+  const W = 640, H = 230, L = 52, R = 12, T = 12, B = 30; const n = rows.length;
+  let mxv = 0, mnv = 0; rows.forEach(r => meas.forEach(m => { mxv = Math.max(mxv, r[m.key]); mnv = Math.min(mnv, r[m.key]); }));
+  const top = niceMax(Math.max(mxv, -mnv) * 1.08); const lo = mnv < 0 ? -top : 0, hi = mxv > 0 ? top : 0; const Y = v => T + (hi - v) / ((hi - lo) || 1) * (H - T - B);
+  const ticks = []; const steps = lo < 0 && hi > 0 ? [-1, -.5, 0, .5, 1] : [0, .25, .5, .75, 1]; steps.forEach(s => ticks.push(lo < 0 && hi > 0 ? s * top : lo + (hi - lo) * s));
+  let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" style="width:100%;height:100%;display:block">';
+  ticks.forEach(tv => { svg += '<line x1="' + L + '" x2="' + (W - R) + '" y1="' + Y(tv).toFixed(1) + '" y2="' + Y(tv).toFixed(1) + '" stroke="' + (tv === 0 ? '#c4cdd9' : '#eef1f6') + '"/><text x="' + (L - 6) + '" y="' + (Y(tv) + 3.5).toFixed(1) + '" text-anchor="end" font-size="10" fill="#98a2b3" font-family="IBM Plex Mono">' + short(tv) + '</text>'; });
+  const bw = (W - L - R) / Math.max(n, 1);
+  if (type === 'line' || type === 'area') {
+    const X = i => L + (n > 1 ? i / (n - 1) : .5) * (W - L - R);
+    meas.forEach((m, k) => { const d = rows.map((r, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(r[m.key]).toFixed(1)).join(' '); if (type === 'area') svg += '<path d="' + d + ' L' + X(n - 1).toFixed(1) + ' ' + Y(0).toFixed(1) + ' L' + X(0).toFixed(1) + ' ' + Y(0).toFixed(1) + 'Z" fill="' + TONES[k] + '" opacity=".12"/>'; svg += '<path d="' + d + '" fill="none" stroke="' + TONES[k] + '" stroke-width="2.2" vector-effect="non-scaling-stroke"/>'; });
+    const step = Math.max(1, Math.ceil(n / 7)); rows.forEach((r, i) => { if (i % step === 0) svg += '<text x="' + X(i).toFixed(1) + '" y="' + (H - 10) + '" text-anchor="middle" font-size="10" fill="#98a2b3" font-family="IBM Plex Mono">' + esc(xl(r)) + '</text>'; });
+  } else {
+    const gw = bw * .7 / meas.length;
+    rows.forEach((r, i) => { const on = o.sel && Object.keys(o.sel).length && Object.keys(o.sel).every(k2 => r[k2] === o.sel[k2]); meas.forEach((m, k) => { const v = r[m.key]; const y1 = Y(Math.max(v, 0)), y2 = Y(Math.min(v, 0)); svg += '<rect data-act="ev" data-ev="pointClick" data-ri="' + i + '" x="' + (L + i * bw + bw * .15 + k * gw).toFixed(1) + '" y="' + y1.toFixed(1) + '" width="' + Math.max(gw - 2, 1).toFixed(1) + '" height="' + Math.max(y2 - y1, .8).toFixed(1) + '" rx="2" fill="' + (on ? '#0f1a3a' : TONES[k]) + '" style="cursor:pointer"/>'; }); svg += '<text x="' + (L + i * bw + bw / 2).toFixed(1) + '" y="' + (H - 10) + '" text-anchor="middle" font-size="10.5" fill="#667085">' + esc(xl(r)) + '</text>'; });
+  }
+  return legend + '<div style="flex:1;min-height:0;padding:0 8px 6px;height:calc(100% - 26px)">' + svg + '</svg></div>';
+};
+K.renderKpis = function (res, o) {
+  o = o || {}; const dec = o.dec == null ? 1 : o.dec; const thr = o.thr; const variant = o.variant || (thr ? 'detail' : 'headline'); const sum = { breach: 0, warn: 0 };
+  const cards = res.cols.filter(c => !c.dim && (!o.hidden || o.hidden.indexOf(c.key) < 0)).map(c => {
+    const v = res.total[c.key], p = res.total['p_' + c.key]; const d = p == null ? null : v - p; const pct = p ? d / Math.abs(p) * 100 : 0; const tn = K.tone(c.pol, d);
+    let st = ''; let used = 0; if (thr && p != null) { used = Math.abs(pct) / thr; st = used >= 1 ? 'breach' : used >= .8 ? 'warnst' : 'okst'; if (st === 'breach') sum.breach++; if (st === 'warnst') sum.warn++; }
+    const badge = st ? '<span class="pill ' + (st === 'breach' ? 'bad' : st === 'warnst' ? 'warn' : 'good') + '" style="height:19px;font-size:10px;margin-left:auto"><i class="dot"></i>' + (st === 'breach' ? 'Breach' : st === 'warnst' ? 'Near' : 'Within') + '</span>' : '';
+    const on = o.sel && o.sel.metric === c.key;
+    return '<div class="kpi ' + st + (on ? ' sel' : '') + '" data-act="ev" data-ev="cardClick" data-metric="' + c.key + '"><div class="kl"><span>' + esc(o.labels && o.labels[c.key] || c.label) + '</span><span class="muted" style="text-transform:none;letter-spacing:0">' + esc(c.unit) + '</span>' + badge + '</div><div class="kv ' + (v < 0 ? 'neg' : '') + '">' + K.fmt(v, dec, o.neg) + '</div>' +
+      (p == null ? '' : '<div class="kd"><span class="delta ' + tn + '">' + (d > 0 ? '▲ ' : d < 0 ? '▼ ' : '') + K.fmt(Math.abs(d), dec) + ' (' + Math.abs(pct).toFixed(1) + '%)</span><span class="muted" style="font-size:11.5px">vs PCOB ' + K.fmt(p, dec, o.neg) + '</span></div>') +
+      (variant === 'detail' && p != null ? '<div class="krows"><span>COB</span><b>' + K.fmt(v, dec, o.neg) + '</b><span>PCOB</span><b>' + K.fmt(p, dec, o.neg) + '</b><span>Diff</span><b style="color:' + (tn === 'bad' ? 'var(--bad)' : tn === 'good' ? 'var(--good)' : '') + '">' + K.fmtD(d, dec) + '</b><span>Diff %</span><b>' + K.fmtD(pct, 1) + '%</b>' + (thr ? '<span>% of threshold</span><b>' + Math.round(used * 100) + '%</b>' : '') + '</div>' : '') +
+      (thr && p != null ? '<div class="meter" title="' + Math.round(used * 100) + '% of a ' + thr + '% move"><i style="width:' + (Math.min(used, 1.5) / 1.5 * 100).toFixed(1) + '%;background:' + (st === 'breach' ? '#d92d20' : st === 'warnst' ? '#f79009' : '#12b76a') + '"></i><u></u></div>' : '') + '</div>';
+  }).join('');
+  return { html: '<div class="kpis">' + cards + '</div>', sum: sum };
+};
+K.skeleton = function (view) {
+  if (view === 'kpi') return '<div class="kpis">' + [1, 2, 3].map(() => '<div class="kpi" style="cursor:default"><div class="sk" style="height:10px;width:50%"></div><div class="sk" style="height:24px;width:70%"></div><div class="sk" style="height:12px;width:40%"></div></div>').join('') + '</div>';
+  if (view === 'grid') return '<div style="padding:8px 14px;display:flex;flex-direction:column;gap:9px">' + [90, 70, 80, 60, 75].map(w => '<div class="sk" style="height:14px;width:' + w + '%"></div>').join('') + '</div>';
+  return '<div style="padding:8px 16px;display:flex;align-items:flex-end;gap:14px;height:85%">' + [60, 85, 40, 70, 55, 90].map(h => '<div class="sk" style="flex:1;height:' + h + '%"></div>').join('') + '</div>';
+};
+K.md = function (t, vars) { return esc(t || '').replace(/\{\{(\w+)\}\}/g, (m, k) => '<b>' + esc(vars && vars[k] != null ? vars[k] : m) + '</b>').replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>'); };
+
+/* ---------- component manifests (from the common library) ---------- */
+K.MANIFESTS = [
+  { type: 'grid', version: '2.3.0', label: 'Grid', icon: 'grid', category: 'Data', desc: 'AG Grid with heat colours, COB/PCOB columns, totals', accepts: ['grid'], size: { w: 6, h: 9, minW: 3, minH: 5 }, events: ['rowClick', 'selectionChange'], slots: ['main', 'master', 'detail', 'breakdown'],
+    props: [{ k: 'heat', label: 'Heat colours', type: 'bool', def: true }, { k: 'compare', label: 'COB / PCOB / Δ columns', type: 'bool', def: false }, { k: 'totals', label: 'Totals row', type: 'bool', def: true }, { k: 'dec', label: 'Decimals', type: 'enum', opts: [0, 1, 2], def: 1 }, { k: 'neg', label: 'Negative numbers', type: 'enum', opts: ['parens', 'minus'], def: 'parens' }] },
+  { type: 'chart', version: '1.8.1', label: 'Chart', icon: 'chart', category: 'Data', desc: 'Highcharts column, bar, line, area, donut', accepts: ['column', 'bar', 'line', 'area', 'donut'], size: { w: 6, h: 9, minW: 3, minH: 6 }, events: ['pointClick', 'legendClick'], slots: ['trend', 'breakdown', 'detail'],
+    props: [{ k: 'type', label: 'Chart type', type: 'chartType', def: 'column' }, { k: 'dec', label: 'Decimals', type: 'enum', opts: [0, 1, 2], def: 1 }] },
+  { type: 'kpi', version: '1.2.0', label: 'KPI cards', icon: 'kpi', category: 'Data', desc: 'Headline values with change, status and threshold', accepts: ['kpi'], size: { w: 12, h: 6, minW: 3, minH: 4 }, events: ['cardClick', 'thresholdBreach'], slots: ['kpis'],
+    props: [{ k: 'variant', label: 'Card style', type: 'enum', opts: ['headline', 'detail'], def: 'detail' }, { k: 'thr', label: 'Threshold (move vs PCOB, %)', type: 'enum', opts: [null, 5, 10, 15, 20], def: null }, { k: 'dec', label: 'Decimals', type: 'enum', opts: [0, 1, 2], def: 1 }] },
+  { type: 'text', version: '1.0.4', label: 'Text', icon: 'text', category: 'Layout', desc: 'Notes with live values like {{cob}}', accepts: [], size: { w: 4, h: 4, minW: 2, minH: 2 }, events: [], slots: ['notes'], props: [{ k: 'text', label: 'Text', type: 'text', def: 'Write a note. Use {{cob}} for live values.' }] },
+  { type: 'header', version: '1.0.0', label: 'Section header', icon: 'header', category: 'Layout', desc: 'Title for a group of widgets', accepts: [], size: { w: 12, h: 2, minW: 3, minH: 2 }, events: [], slots: [], props: [] }
+];
+K.MAN = {}; K.MANIFESTS.forEach(m => { K.MAN[m.type] = m; });
+K.viewOf = it => it.type === 'chart' ? (it.props.type || 'column') : it.type;
+
+/* ---------- templates (skeleton slots) ---------- */
+K.TEMPLATES = [
+  { id: 'exec', name: 'Executive summary', desc: 'Headline KPIs, a trend, a breakdown and commentary', best: 'Management overview, daily headline', ds: 'Stress Testing',
+    slots: [{ x: 0, y: 0, w: 12, h: 6, slot: 'kpis', label: 'KPI strip', hint: '3 to 6 headline totals', types: ['kpi'], suggest: 'GSST_STRESS_TOTALS' }, { x: 0, y: 6, w: 8, h: 9, slot: 'trend', label: 'Trend', hint: 'Values over the last 20 COBs', types: ['chart'], view: 'line', suggest: 'GSST_STRESS_TREND' }, { x: 8, y: 6, w: 4, h: 9, slot: 'breakdown', label: 'Breakdown', hint: 'Share by business', types: ['chart', 'grid'], view: 'donut', suggest: 'GSST_STRESS_BY_BUSINESS' }, { x: 0, y: 15, w: 7, h: 9, slot: 'main', label: 'Top N', hint: 'Largest desks', types: ['chart', 'grid'], view: 'bar', suggest: 'GSST_STRESS_BY_DESK' }, { x: 7, y: 15, w: 5, h: 9, slot: 'notes', label: 'Commentary', hint: 'Notes for readers', types: ['text'] }] },
+  { id: 'monitor', name: 'Monitor with thresholds', desc: 'Threshold KPIs, the breach list and the trend of breached items', best: 'Limit and VaR monitoring (CRiSP style)', ds: 'VaR',
+    slots: [{ x: 0, y: 0, w: 12, h: 9, slot: 'kpis', label: 'Threshold KPIs', hint: 'Totals with a move threshold', types: ['kpi'], suggest: 'DLY_EQ_VAR_TOTALS', props: { thr: 10 } }, { x: 0, y: 9, w: 12, h: 9, slot: 'main', label: 'Breach grid', hint: 'Rows by desk with limit usage', types: ['grid'], suggest: 'DLY_EQ_VAR_LIMIT_SUMMARY' }, { x: 0, y: 18, w: 12, h: 8, slot: 'trend', label: 'Trend', hint: 'VaR over time', types: ['chart'], view: 'line', suggest: 'DLY_EQ_VAR_TREND' }] },
+  { id: 'gridfirst', name: 'Grid-first analysis', desc: 'A tall main grid with two supporting charts', best: 'Desk-level analysis, compact Excel-style view', ds: 'Stress Testing',
+    slots: [{ x: 0, y: 0, w: 12, h: 11, slot: 'main', label: 'Main grid', hint: 'Rows by region, business or desk', types: ['grid'], suggest: 'GSST_STRESS_BY_DESK' }, { x: 0, y: 11, w: 6, h: 9, slot: 'breakdown', label: 'Chart A', hint: 'By business', types: ['chart'], view: 'column', suggest: 'GSST_STRESS_BY_BUSINESS' }, { x: 6, y: 11, w: 6, h: 9, slot: 'breakdown', label: 'Chart B', hint: 'By region', types: ['chart'], view: 'column', suggest: 'GSST_STRESS_BY_REGION' }] },
+  { id: 'compare', name: 'Compare COB vs PCOB', desc: 'Delta KPIs, a compare grid with Δ columns and the top movers', best: 'Day-on-day and week-on-week explain', ds: 'Stress Testing',
+    slots: [{ x: 0, y: 0, w: 12, h: 8, slot: 'kpis', label: 'Delta KPIs', hint: 'Change vs PCOB', types: ['kpi'], suggest: 'GSST_STRESS_TOTALS', props: { variant: 'detail' } }, { x: 0, y: 8, w: 12, h: 9, slot: 'main', label: 'Compare grid', hint: 'COB, PCOB and Δ per row', types: ['grid'], suggest: 'GSST_STRESS_BY_REGION', props: { compare: true, heat: false } }, { x: 0, y: 17, w: 12, h: 8, slot: 'breakdown', label: 'Top movers', hint: 'Largest changes by desk', types: ['chart'], view: 'bar', suggest: 'GSST_STRESS_BY_DESK' }] },
+  { id: 'master', name: 'Drill-down master-detail', desc: 'Summary grid drives a detail panel and a trend of the selected row', best: 'Region to desk investigation', ds: 'VaR',
+    slots: [{ x: 0, y: 0, w: 5, h: 10, slot: 'master', label: 'Master grid', hint: 'Click a row to drive the detail', types: ['grid'], suggest: 'GSST_STRESS_BY_REGION' }, { x: 5, y: 0, w: 7, h: 10, slot: 'detail', label: 'Detail', hint: 'Follows the selected row', types: ['grid', 'chart'], view: 'bar', suggest: 'GSST_STRESS_BY_DESK' }, { x: 0, y: 10, w: 12, h: 8, slot: 'trend', label: 'Selection trend', hint: 'Trend for the selection', types: ['chart'], view: 'line', suggest: 'GSST_STRESS_TREND' }] }
+];
+K.TPL = {}; K.TEMPLATES.forEach(t => { K.TPL[t.id] = t; });
+K.tplThumb = function (t, w) {
+  w = w || 220; const cw = (w - 16) / 12, rh = 4.2; const H = Math.max.apply(null, t.slots.map(s => s.y + s.h)) * rh + 12;
+  return '<svg viewBox="0 0 ' + w + ' ' + H + '" style="width:100%;display:block">' + t.slots.map(s => '<rect x="' + (8 + s.x * cw + 1.5).toFixed(1) + '" y="' + (6 + s.y * rh + 1.5).toFixed(1) + '" width="' + (s.w * cw - 3).toFixed(1) + '" height="' + (s.h * rh - 3).toFixed(1) + '" rx="4" fill="' + (s.types[0] === 'kpi' ? '#dbe6fb' : s.types[0] === 'text' ? '#f2f4f7' : '#eef3fd') + '" stroke="#c9d7f5"/>' + '<text x="' + (8 + s.x * cw + 7).toFixed(1) + '" y="' + (6 + s.y * rh + 13).toFixed(1) + '" font-size="8" fill="#1d4596" font-weight="700">' + esc(s.label) + '</text>').join('') + '</svg>';
+};
+
+/* ---------- shared phase banner ---------- */
+const P1 = 'Phase-1-Builder-MVP.html', P2 = 'Phase-2-New-Query.html', P3 = 'Phase-3-Live-and-Scale.html', P4 = 'Phase-4-Platform.html';
+const VIEWS = { home: [P1, 'home'], editor: [P1, 'editor'], data: [P1, 'data'], interactions: [P1, 'interactions'], publish: [P1, 'publish'], newquery: [P2], live: [P3], platform: [P4] };
+const FILE2KEY = { '01-home.html': 'home', '02-editor.html': 'editor', '03-data.html': 'data', '04-interactions.html': 'interactions', '05-publish.html': 'publish', '06-new-query.html': 'newquery', '07-live.html': 'live', '08-platform.html': 'platform' };
+K.url = (key, q) => { const v = VIEWS[key]; return v[0] + (v[1] ? '?v=' + v[1] + (q ? '&' + q : '') : (q ? '?' + q : '')); };
+K.PHASES = [[P1, 'Phase 1 \u00b7 Builder MVP', 'home'], [P2, 'Phase 2 \u00b7 New query', 'newquery'], [P3, 'Phase 3 \u00b7 Live & scale', 'live'], [P4, 'Phase 4 \u00b7 Platform', 'platform']];
+K.STEPS = [['home', '1 Home'], ['editor', '2 Editor'], ['data', '3 Data'], ['interactions', '4 Interactions'], ['publish', '5 Save & publish']];
+K.banner = function (cur, tag, text) {
+  const key = FILE2KEY[cur] || cur; const file = VIEWS[key][0];
+  const steps = file === P1 ? '<div class="steps" style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px"><span style="font-size:10.5px;letter-spacing:.08em;color:#8fa6e0;font-weight:700;align-self:center;margin-right:4px">PHASE 1 SCREENS</span>' + K.STEPS.map(s => '<a href="' + K.url(s[0]) + '"' + (s[0] === key ? ' class="on"' : '') + '>' + s[1] + '</a>').join('') + '</div>' : '';
+  return '<div class="phase" style="flex-wrap:wrap"><span class="tag">' + esc(tag) + '</span><span>' + text + '</span><nav aria-label="Phases">' + K.PHASES.map(p => '<a href="' + K.url(p[2]) + '"' + (p[0] === file ? ' class="on"' : '') + '>' + p[1] + '</a>').join('') + '</nav>' + (steps ? '<div style="flex-basis:100%"></div>' + steps.replace(/<a /g, '<a style="color:#c9d4f2;text-decoration:none;font-size:11.5px;padding:3px 9px;border-radius:7px;border:1px solid rgba(255,255,255,.12)" ').replace(/class="on"/g, 'class="on" data-on="1"') : '') + '</div>';
+};
+K.sidebar = function (active, extra) {
+  const dashes = K.store.get('cds.dashboards', null) || [];
+  return '<aside class="side" aria-label="App navigation"><div class="brand"><i>RM</i>Risk Management</div><div class="who">SOEID · AB12345</div>' +
+    '<div class="sec">DAILY RISK</div><a href="#" onclick="return false">' + K.icon('chart') + 'VaR</a><a href="#" onclick="return false">' + K.icon('chart') + 'GSST</a><a href="#" onclick="return false">' + K.icon('chart') + 'Limit</a>' +
+    '<div class="sec">CUSTOM DASHBOARDS</div><a href="' + K.url('home') + '"' + (active === 'home' ? ' class="on"' : '') + '>' + K.icon('home') + 'All dashboards</a>' + (extra || '') + '</aside>';
+};
+})(window);
+
+</script><script>
+/* ===== Custom Dashboard Studio · editor engine (prototype) ===== */
+(function () {
+'use strict';
+const K = window.K, esc = K.esc, I = K.icon;
+const COLS = 12, RH = 22, M = 14;
+let CFG, F, S;
+const $ = s => document.querySelector(s);
+
+/* ---------------- doc helpers ---------------- */
+const items = () => S.doc.items;
+const byId = id => S.doc.items.find(x => x.i === id);
+const apiOf = it => it && it.src && it.src.code ? K.API[it.src.code] : null;
+const isData = it => ['grid', 'chart', 'kpi'].indexOf(it.type) >= 0;
+function titleOf(it) { if (!it) return ''; if (it.title) return it.title; if (it.type === 'slot') return it.label; const a = apiOf(it); return a ? a.name : (K.MAN[it.type] || {}).label || it.type; }
+function defaultParams(api) {
+  const o = {};
+  (api ? api.params : []).forEach(p => { const v = S.doc.varDefs.find(d => (p.dim && d.dim === p.dim) || (p.type === 'tree' && d.type === 'tree')); o[p.name] = v && F.data ? { mode: 'var', var: v.id } : v && p.dim && p.dim !== 'level' ? { mode: 'var', var: v.id } : { mode: 'fixed', value: p.def }; });
+  return o;
+}
+function newWidget(type, opt) {
+  opt = opt || {}; const m = K.MAN[type];
+  const it = { i: K.uid('w'), type: type, x: 0, y: 0, w: m.size.w, h: m.size.h, title: opt.title || null, props: {}, labels: {}, hidden: [] };
+  m.props.forEach(p => { it.props[p.k] = p.def; });
+  if (opt.view && type === 'chart') it.props.type = opt.view;
+  Object.assign(it.props, opt.props || {});
+  if (isData(it)) { const api = K.API[opt.api] || pickApi(type, it.props.type); it.src = { code: api ? api.code : null, params: defaultParams(api) }; }
+  if (type === 'text') it.props.text = opt.text || it.props.text;
+  if (type === 'header') it.title = opt.title || 'Section';
+  return it;
+}
+function pickApi(type, view) { const v = type === 'chart' ? view || 'column' : type; const l = K.searchApis('', { view: v }); return type === 'kpi' ? l[0] : (l.find(a => a.dims.length && !a.params.some(p => p.required)) || l[0]); }
+function viewFits(api, view) { return api && api.views.indexOf(view) >= 0; }
+
+/* ---------------- layout engine (react-grid-layout semantics) ---------------- */
+const hit = (a, b) => a !== b && a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
+function compact(list, fixed) {
+  const sorted = list.slice().sort((a, b) => a.y - b.y || a.x - b.x); const placed = [];
+  sorted.forEach(it => { if (it !== fixed) { while (it.y > 0) { it.y--; if (placed.some(p => hit(p, it)) || (fixed && hit(fixed, it))) { it.y++; break; } } } placed.push(it); });
+}
+function resolve(list, moved) {
+  let guard = 0; let changed = true;
+  while (changed && guard++ < 200) { changed = false; list.forEach(o => { if (o !== moved && hit(o, moved)) { o.y = moved.y + moved.h; changed = true; list.forEach(o2 => { if (o2 !== o && o2 !== moved && hit(o2, o)) { o2.y = o.y + o.h; } }); } }); }
+}
+function maxY() { return items().reduce((a, it) => Math.max(a, it.y + it.h), 0); }
+function placeNew(it, near) {
+  const L = items();
+  if (near) { // right of the selection if the row has room
+    const nx = near.x + near.w; if (nx + it.w <= COLS) { it.x = nx; it.y = near.y; if (!L.some(o => hit(o, it))) return 'next to “' + titleOf(near) + '”'; }
+    it.x = 0; it.y = near.y + near.h; L.push(it); resolve(L, it); L.pop(); return 'below “' + titleOf(near) + '”';
+  }
+  // first gap at the bottom row
+  const my = maxY(); for (let y = 0; y <= my; y++) for (let x = 0; x + it.w <= COLS; x++) { it.x = x; it.y = y; if (!L.some(o => hit(o, it))) return y >= my ? 'at the bottom' : 'in free space'; }
+  it.x = 0; it.y = my; return 'at the bottom';
+}
+
+/* ---------------- history / persistence ---------------- */
+function snap() { S.hist.push(JSON.stringify(S.doc)); if (S.hist.length > 80) S.hist.shift(); S.fut = []; }
+function commit(fn, o) { o = o || {}; if (!o.noHist) snap(); fn(S.doc); compact(items(), o.fixed); save(); renderAll(); }
+function undo() { if (!S.hist.length) return; S.fut.push(JSON.stringify(S.doc)); S.doc = JSON.parse(S.hist.pop()); save(); renderAll(); }
+function redo() { if (!S.fut.length) return; S.hist.push(JSON.stringify(S.doc)); S.doc = JSON.parse(S.fut.pop()); save(); renderAll(); }
+let saveT;
+function save() {
+  S.dirty = true; S.changes++;
+  clearTimeout(saveT); saveT = setTimeout(() => {
+    if (F.pub && S.offline) { K.store.set('cds.local.' + CFG.page, { doc: S.doc, at: Date.now(), time: K.now() }); S.unsynced++; S.saveNote = 'Offline · ' + S.unsynced + ' change' + (S.unsynced > 1 ? 's' : '') + ' kept on this device'; renderHdr(); return; }
+    S.doc.rev = (S.doc.rev || 1) + 1; K.store.set('cds.srv.' + CFG.page, { doc: S.doc, at: Date.now() }); K.store.del('cds.local.' + CFG.page); S.unsynced = 0;
+    S.saveNote = (F.pub ? 'Draft · autosaved ' : 'Saved · ') + K.now(); S.savedAt = K.now(); renderHdr();
+  }, 600);
+}
+
+/* ---------------- data ---------------- */
+function resolvedParams(it) {
+  const api = apiOf(it); const o = {}; if (!api) return o;
+  api.params.forEach(p => { const b = (it.src.params || {})[p.name] || { mode: 'fixed', value: p.def }; o[p.name] = b.mode === 'var' ? S.doc.vars[b.var] : b.value; if (o[p.name] === undefined) o[p.name] = p.def; });
+  return o;
+}
+function filtersFor(it) {
+  const f = {}; Object.keys(S.xf).forEach(fld => { const x = S.xf[fld]; if (x.from !== it.i && (x.targets === 'all' || x.targets.indexOf(it.i) >= 0)) f[fld] = [x.value]; });
+  if (S.viewAs && S.viewAs.region) f.region = [S.viewAs.region];
+  return f;
+}
+function ctxFor(it) { const a = apiOf(it); return { cob: S.doc.vars.cob, compare: S.doc.vars.compare, filters: filtersFor(it), sim: S.sim, version: a && a.ds ? (S.ver[a.ds] || 0) : 0, page: (S.page[it.i] || 0), sort: S.sort[it.i] || '' }; }
+function refreshData(force) {
+  items().forEach(it => {
+    if (!isData(it)) return;
+    if (it.src && it.src.kind === 'query') buildAdhoc(it);
+    const api = apiOf(it); if (!api) { S.data[it.i] = { status: 'nosrc' }; return; }
+    if (it.src.kind === 'query' && queryIssues(it.src).length) { S.data[it.i] = { status: 'invalid', key: 'inv' }; return; }
+    const params = resolvedParams(it), ctx = ctxFor(it);
+    const key = JSON.stringify([api.code, params, ctx]);
+    const d = S.data[it.i];
+    if (!force && d && d.key === key) return;
+    const prev = d && d.res && d.code === api.code ? d.res : null;
+    S.data[it.i] = { status: 'loading', key: key, res: prev, code: api.code, t0: Date.now() };
+    if (api.async) startJob(it.i);
+    K.query(api.code, params, ctx).then(res => { const cur = S.data[it.i]; if (!cur || cur.key !== key) return; S.data[it.i] = { status: 'ok', key: key, res: res, code: api.code }; if (S.pendingUpd && S.pendingUpd[api.ds]) S.updated[it.i] = S.pendingUpd[api.ds]; renderNode(it.i); renderHdrBits(); })
+      .catch(err => { const cur = S.data[it.i]; if (!cur || cur.key !== key) return; S.data[it.i] = { status: err.type === 'missing' ? 'missing' : 'error', key: key, err: err, code: api.code }; renderNode(it.i); });
+  });
+}
+function startJob(id) { let p = 0; const t = setInterval(() => { const d = S.data[id]; if (!d || d.status !== 'loading') { clearInterval(t); return; } p = Math.min(96, p + 7 + Math.random() * 9); d.job = Math.round(p); const el = document.querySelector('[data-id="' + id + '"] .jobbar i'); const tx = document.querySelector('[data-id="' + id + '"] .jobpct'); if (el) el.style.width = d.job + '%'; if (tx) tx.textContent = d.job + '%'; }, 220); }
+
+/* ---------------- phase 2: ad-hoc queries ---------------- */
+const CATALOG = { gsst: { name: 'GSST · Stress loss', additive: true, dims: ['region', 'business', 'desk', 'cob'], meas: ['s1974', 's2008', 'covid'], aggs: ['sum', 'avg', 'max', 'min'] }, var: { name: 'VaR summary · node values', additive: false, availableAt: [[], ['region'], ['business'], ['desk']], dims: ['region', 'business', 'desk', 'cob'], meas: ['var1d', 'svar', 'cvar', 'limit'], aggs: [] } };
+function queryIssues(q) {
+  const c = CATALOG[q.ds], out = []; if (!q.metrics.length) out.push({ t: 'Add a metric', d: 'Drop at least one metric into Metrics.' });
+  const g = q.groupBy.filter(x => x !== 'cob').slice().sort().join(',');
+  if (!c.additive && q.metrics.some(m => ['var1d', 'svar', 'cvar'].indexOf(m.f) >= 0)) {
+    if (!c.availableAt.some(a => a.join(',') === g)) out.push({ t: 'VaR is not additive', d: 'Adding VaR across ' + q.groupBy.filter(x => x !== 'cob').map(x => K.DIMS[x].label).join(' and ') + ' gives a wrong number, so the service refuses it. VaR is precomputed at: Total, Region, Business, Desk.' });
+    q.filters.forEach(f => { if (f.vals.length > 1) out.push({ t: 'VaR can’t be combined across ' + K.DIMS[f.field].label.toLowerCase() + ' values', d: 'Pick one value, or group by ' + K.DIMS[f.field].label + ' instead.' }); });
+  }
+  if (q.groupBy.length > 3) out.push({ t: 'Too many dimensions', d: 'The service allows at most 3 group-by fields.' });
+  return out;
+}
+const CALC = { diff: { label: 'A − B', fn: (a, b) => a - b }, ratio: { label: 'A ÷ B', fn: (a, b) => b ? a / b : 0 }, pct: { label: 'A as % of B', fn: (a, b) => b ? a / b * 100 : 0, unit: '%' }, sum: { label: 'A + B', fn: (a, b) => a + b } };
+function buildAdhoc(it) {
+  const q = it.src; const code = 'ADHOC_' + it.i;
+  K.API[code] = { code: code, name: q.name || adhocName(q), desc: 'Ad-hoc query (phase 2)', area: 'Ad-hoc', module: 'POST /query', ds: q.ds, dims: q.groupBy.slice(), meas: q.metrics.map(m => m.f), views: ['grid', 'column', 'bar', 'line', 'area', 'donut', 'kpi'], params: [], tags: [], syn: [], status: 'adhoc', extraFilters: q.filters,
+    calc: (q.calc || []).map(c => ({ id: c.id, label: c.label, unit: CALC[c.op].unit, fn: o => CALC[c.op].fn(o[c.a] || 0, o[c.b] || 0) })) };
+  it.src.code = code;
+}
+function adhocName(q) { const ms = q.metrics.map(m => K.MEAS[m.f].label); return (ms.length > 2 ? ms.length + ' metrics' : ms.join(' & ') || 'New query') + (q.groupBy.length ? ' by ' + q.groupBy.map(g => g === 'cob' ? 'day' : K.DIMS[g].label).join(' & ') : ''); }
+
+/* ---------------- interactions runtime ---------------- */
+function fieldsOf(it, res, ri) { const a = apiOf(it); const r = res && res.rows[ri]; const o = {}; if (!a || !r) return o; a.dims.forEach(d => { if (d !== 'cob') o[d] = r[d]; }); return o; }
+function fire(it, ev, payload) {
+  if (!F.ix) return;
+  const fired = [];
+  S.doc.rules.filter(r => r.src === it.i && r.ev === ev).forEach(r => {
+    if (r.skipTotal && payload.__total) return;
+    r.acts.forEach(a => {
+      const field = a.field || Object.keys(payload)[0]; const val = payload[field]; if (field == null || val == null) return;
+      if (a.type === 'filter' || a.type === 'highlight') { const cur = S.xf[field]; if (r.toggle && cur && cur.from === it.i && cur.value === val) delete S.xf[field]; else S.xf[field] = { value: val, from: it.i, targets: a.targets, rule: r.id, kind: a.type }; }
+      if (a.type === 'setVar') { const v = S.doc.varDefs.find(d => d.dim === field); if (v) S.doc.vars[v.id] = val; }
+      if (a.type === 'drill') K.toast('Drill through: opens “' + (a.to || 'Detail dashboard') + '” with ' + field + '=' + val);
+      fired.push(r.id + ' → ' + a.type);
+    });
+  });
+  S.log.unshift({ at: K.now(), w: titleOf(it), ev: ev, payload: payload, fired: fired }); S.log = S.log.slice(0, 50);
+  writeHash(); refreshData(); renderAll();
+}
+function writeHash() { if (!F.ix) return; const st = { xf: S.xf, vars: S.doc.vars }; try { history.replaceState(null, '', '#' + encodeURIComponent(JSON.stringify(st))); } catch (e) {} }
+function readHash() { try { const h = decodeURIComponent(location.hash.slice(1)); if (!h) return; const st = JSON.parse(h); if (st.xf) S.xf = st.xf; if (st.vars) Object.assign(S.doc.vars, st.vars); } catch (e) {} }
+function linkCandidates(src) { return items().filter(o => o !== src && isData(o)); }
+
+/* ---------------- rendering: shell ---------------- */
+function shell() {
+  document.body.innerHTML = '<div class="app">' + K.sidebar('', '<a href="#" class="on" onclick="return false">' + I('chart') + '<span>' + esc(S.doc.name) + '</span></a>') + '<div class="main">' + K.banner(CFG.page, CFG.tag, CFG.banner) +
+    '<div id="hdr"></div><div id="bar"></div><div id="xf"></div><div class="work"><aside class="lib panel" id="lib" aria-label="Component library"></aside><div class="cvwrap"><div id="notes" style="display:flex;flex-direction:column;gap:8px"></div><div class="cv" id="cv"></div><div id="cvEnd"></div></div><aside class="insp panel" id="insp" aria-label="Settings"></aside></div></div></div><div id="logp"></div><div id="ghost" style="position:fixed;pointer-events:none;z-index:200;display:none" class="pill acc"></div>';
+}
+function renderAll() { renderHdr(); renderBar(); renderXf(); renderLib(); renderNotes(); renderCanvas(); renderInsp(); renderLog(); }
+function renderHdrBits() { if (F.live) renderNotes(); }
+function renderHdr() {
+  const ed = S.mode === 'edit';
+  const status = F.pub ? (S.offline ? '<span class="pill warn"><i class="dot"></i>' + esc(S.saveNote || 'Offline') + '</span>' : '<span class="pill ' + (S.doc.versions && S.doc.versions.length ? 'acc' : '') + '"><i class="dot" style="color:#12b76a"></i>' + esc(S.saveNote || 'Draft · all changes saved') + '</span>' + (S.doc.envs && S.doc.envs.prod ? '<span class="pill good">Prod · v' + S.doc.envs.prod + '</span>' : '')) : '<span class="pill"><i class="dot" style="color:#12b76a"></i>' + esc(S.saveNote || 'Saved') + '</span>';
+  $('#hdr').innerHTML = '<div class="hdr"><div><div class="crumb">Risk Management / Custom Dashboards / <b>' + esc(S.doc.tab || 'GSST') + '</b></div>' + (ed ? '<input class="title-in" aria-label="Dashboard name" data-in="name" value="' + esc(S.doc.name) + '">' : '<h1>' + esc(S.doc.name) + '</h1>') + '</div><span class="sp"></span>' + status +
+    (ed ? '<button class="btn ghost" data-a="undo" title="Undo (Ctrl+Z)"' + (S.hist.length ? '' : ' disabled') + '>' + I('undo') + '</button><button class="btn ghost" data-a="redo" title="Redo (Ctrl+Shift+Z)"' + (S.fut.length ? '' : ' disabled') + '>' + I('redo') + '</button>' : '') +
+    (F.ix ? '<button class="btn" data-a="log">' + I('code') + 'Event log</button>' : '') +
+    '<button class="btn" data-a="mode">' + (ed ? I('eye') + 'Preview' : I('layers') + 'Edit') + '</button>' +
+    (F.pub && ed ? '<button class="btn pri" data-a="openPublish">' + I('check') + 'Publish…</button>' : '') + '</div>';
+}
+function renderBar() {
+  const v = S.doc.vars; const ci = K.COBS.indexOf(v.cob); const pcob = K.COBS[Math.max(0, ci - (K.OFF[v.compare] || 1))];
+  const needLevel = items().some(it => { const a = apiOf(it); return a && a.params.some(p => p.type === 'tree' && p.required); });
+  let h = '<div class="bar" role="toolbar" aria-label="Dashboard inputs">';
+  S.doc.varDefs.forEach(d => {
+    if (d.type === 'cob') h += '<div class="grp"><span class="lbl">COB</span><button class="arrow" data-a="cob" data-d="-1" aria-label="Previous COB">‹</button><span class="cob">' + K.dLabel(v.cob) + '</span><button class="arrow" data-a="cob" data-d="1" aria-label="Next COB">›</button><span class="lbl" style="margin-left:6px">PCOB</span><span class="cob" style="color:#c9d4f2">' + K.dLabel(pcob) + '</span></div>';
+    else if (d.type === 'seg') h += '<div class="grp"><span class="lbl">COMPARE</span><div class="seg">' + ['DoD', 'WoW', 'MoM'].map(o => '<button class="' + (v.compare === o ? 'on' : '') + '" data-a="var" data-v="compare" data-val="' + o + '">' + o + '</button>').join('') + '</div></div>';
+    else if (d.type === 'select') { const opts = d.dim === 'desk' ? K.deskOf(v.business && v.business !== 'ALL' ? v.business : null) : K.DIMS[d.dim].values; h += '<div class="grp"><span class="lbl">' + esc(d.label.toUpperCase()) + '</span><select data-in="var" data-v="' + d.id + '" aria-label="' + esc(d.label) + '"><option value="ALL">All</option>' + opts.map(o => '<option' + (v[d.id] === o ? ' selected' : '') + '>' + esc(o) + '</option>').join('') + '</select>' + (d.dim === 'desk' && v.business && v.business !== 'ALL' ? '<span class="lbl" style="color:#8fa6e0;letter-spacing:0;font-weight:500">in ' + esc(v.business) + '</span>' : '') + '</div>'; }
+    else if (d.type === 'tree') h += '<div class="grp"' + (needLevel && !v[d.id] ? ' style="border-color:#fda29b"' : '') + '><span class="lbl">' + esc(d.label.toUpperCase()) + '</span><select data-in="var" data-v="' + d.id + '" aria-label="' + esc(d.label) + '"><option value="">Choose a node…</option>' + K.hierFlat.map(n => '<option value="' + n.id + '"' + (v[d.id] === n.id ? ' selected' : '') + '>' + ' '.repeat(n.depth) + esc(n.label) + '</option>').join('') + '</select>' + (needLevel && !v[d.id] ? '<span class="lbl" style="color:#fda29b">REQUIRED</span>' : '') + '</div>';
+  });
+  if (S.mode === 'edit' && F.data) h += '<button class="btn sm ghost" style="color:#a9c0ff" data-a="dash">＋ Input</button>';
+  $('#bar').innerHTML = h + '</div>';
+}
+function renderXf() {
+  if (!F.ix) { $('#xf').innerHTML = ''; return; }
+  const ks = Object.keys(S.xf);
+  $('#xf').innerHTML = '<div class="xf">' + I('filter') + '<b style="font-size:10.5px;letter-spacing:.1em;color:#a9c0ff">CROSS-FILTERS</b>' + (ks.length ? ks.map(k => { const x = S.xf[k]; const src = byId(x.from); return '<span class="chip"><small>' + esc((K.DIMS[k] || { label: k }).label.toUpperCase()) + '</small>' + esc(x.value) + '<span class="muted" style="font-weight:500;font-size:11px">from ' + esc(titleOf(src)) + (x.kind === 'highlight' ? ' · highlight' : '') + '</span><button data-a="xfClear" data-k="' + k + '" aria-label="Clear">×</button></span>'; }).join('') + '<button class="btn sm ghost" style="color:#a9c0ff;margin-left:auto" data-a="xfAll">Clear all</button>' : '<span>Click a row, bar or card to filter related widgets</span>') + '</div>';
+}
+function renderLib() {
+  const ed = S.mode === 'edit'; $('#lib').classList.toggle('hide', !ed); if (!ed) return;
+  const cats = ['Data', 'Layout']; const sel = byId(S.sel);
+  $('#lib').innerHTML = '<div class="sect"><h4>Components</h4><div class="note">From the common library (manifests). ' + (sel ? 'Click adds next to “' + esc(titleOf(sel)) + '”.' : 'Click adds to the first free space.') + ' Drag is optional.</div></div>' +
+    cats.map(c => '<div class="grpT">' + c.toUpperCase() + '</div>' + K.MANIFESTS.filter(m => m.category === c).map(m => '<button class="item" data-a="add" data-t="' + m.type + '" data-libdrag="' + m.type + '"><span class="ic">' + I(m.icon) + '</span><span><b>' + esc(m.label) + '</b><small>' + esc(m.desc) + '</small></span></button>').join('')).join('') +
+    '<div class="hint"><b>Fastest:</b> click an empty <b>skeleton slot</b> on the page, or <span class="kbd">＋ Add a component</span> below the grid.<br><br><span class="kbd">Del</span> delete · <span class="kbd">Ctrl+D</span> duplicate · <span class="kbd">Alt+←→↑↓</span> move · <span class="kbd">Shift+Alt+←→</span> resize · <span class="kbd">Ctrl+Z</span> undo</div>';
+}
+function renderNotes() {
+  const n = [];
+  if (S.recover) n.push('<div class="notice warn">' + I('clock') + '<span><b>Unsaved changes from ' + esc(S.recover.time) + ' were found on this device.</b> They were made while you were offline.</span><span class="sp"></span><button class="btn sm" data-a="recover" data-v="1">Restore</button><button class="btn sm ghost" data-a="recover" data-v="0">Discard</button></div>');
+  if (S.conflict) n.push('<div class="notice vio">' + I('users') + '<span><b>' + esc(S.conflict.by) + ' saved this dashboard (rev ' + S.conflict.doc.rev + ') while you were editing.</b> Nothing was overwritten.</span><span class="sp"></span><button class="btn sm" data-a="conflictView">Review changes</button></div>');
+  if (S.link) { const src = byId(S.link.src); n.push('<div class="notice info">' + I('link') + '<span><b>Link mode:</b> click the widgets that should react when someone clicks “' + esc(titleOf(src)) + '”. Fields are matched for you.</span><span class="sp"></span><button class="btn sm pri" data-a="linkDone">Done</button></div>'); }
+  if (S.viewAs) n.push('<div class="notice good">' + I('shield') + '<span><b>Viewing as ' + esc(S.viewAs.label) + '.</b> Rows outside ' + esc(S.viewAs.region) + ' are removed by the gateway, as for that user.</span><span class="sp"></span><button class="btn sm" data-a="viewAs" data-v="">Stop</button></div>');
+  const empty = items().filter(i => i.type === 'slot').length;
+  if (S.mode === 'edit' && empty && !S.link) n.push('<div class="notice info">' + I('template') + '<span>' + empty + ' empty slot' + (empty > 1 ? 's' : '') + ' from the template. Click a slot to fill it; empty slots are hidden in view mode.</span></div>');
+  if (CFG.tries && S.mode === 'edit') n.push('<div class="notice" style="border-color:var(--line);background:#fff;color:#475467;flex-wrap:wrap">' + I('bolt') + '<b style="color:var(--navy)">Try in this prototype:</b>' + CFG.tries.map(t => '<button class="btn sm" data-a="try" data-v="' + t[0] + '">' + esc(t[1]) + '</button>').join('') + '</div>');
+  $('#notes').innerHTML = n.join('');
+}
+function geo() { const W = $('#cv').clientWidth || 900; const cw = (W - (COLS - 1) * M) / COLS; return { cw: cw, pos: it => ({ l: it.x * (cw + M), t: it.y * (RH + M), w: it.w * cw + (it.w - 1) * M, h: it.h * RH + (it.h - 1) * M }) }; }
+function renderCanvas() {
+  const cv = $('#cv'); const ed = S.mode === 'edit'; cv.classList.toggle('edit', ed);
+  const vis = items().filter(it => ed || it.type !== 'slot'); const g = geo();
+  cv.innerHTML = (S.drag && S.drag.moved ? '<div class="guide">' + '<span></span>'.repeat(12) + '</div>' : '') + vis.map(it => nodeHtml(it, g)).join('');
+  cv.style.height = (vis.reduce((a, it) => Math.max(a, it.y + it.h), 0) * (RH + M) + 10) + 'px';
+  $('#cvEnd').innerHTML = !ed ? '' : S.picker === 'end' ? '<div class="inlinePick">' + pickerHtml(null) + '</div>' : '<button class="endAdd" style="width:100%" data-a="pickEnd">＋ Add a component</button>';
+}
+function positionNodes() { const g = geo(); items().forEach(it => { const el = document.querySelector('.gi[data-id="' + it.i + '"]'); if (!el) return; const p = g.pos(it); el.style.left = p.l + 'px'; el.style.top = p.t + 'px'; el.style.width = p.w + 'px'; el.style.height = p.h + 'px'; }); $('#cv').style.height = (maxY() * (RH + M) + 10) + 'px'; }
+function renderNode(id) { const it = byId(id); const el = document.querySelector('.gi[data-id="' + id + '"]'); if (!it || !el) return; const tmp = document.createElement('div'); tmp.innerHTML = nodeHtml(it, geo()); el.replaceWith(tmp.firstChild); if (F.pub && S.sel === null && S.ptab === 'publish') renderInsp(); }
+function nodeHtml(it, g) {
+  const p = g.pos(it); const ed = S.mode === 'edit'; const sel = ed && S.sel === it.i;
+  let cls = 'gi' + (sel ? ' sel' : '') + (S.flash === it.i ? ' flash' : '') + (S.drag && S.drag.id === it.i && S.drag.moved ? ' dragging' : '');
+  let extra = '';
+  if (S.link && ed) { const src = byId(S.link.src); if (it.i === S.link.src) cls += ' linkSrc'; else if (isData(it) && src) { const rule = S.doc.rules.find(r => r.id === S.link.rule); const on = rule && rule.acts[0].targets.indexOf(it.i) >= 0; cls += ' linkTarget'; extra += '<button class="linkBadge' + (on ? ' on' : '') + '" data-a="linkToggle" data-id="' + it.i + '">' + (on ? '✓ Connected' : 'Click to connect') + '</button>'; } }
+  let h = '<div class="' + cls + '" data-id="' + it.i + '" style="left:' + p.l + 'px;top:' + p.t + 'px;width:' + p.w + 'px;height:' + p.h + 'px">';
+  if (sel && !S.link) {
+    const m = K.MAN[it.type] || { label: 'Slot' };
+    h += '<div class="tb' + (it.y === 0 ? ' in' : '') + '" role="toolbar" aria-label="Widget tools"><button class="grip" data-drag="move" title="Drag to move">' + I('move') + esc(it.type === 'slot' ? 'Slot' : m.label) + '</button><span class="sep"></span>' + [[3, '¼'], [4, '⅓'], [6, '½'], [8, '⅔'], [12, 'Full']].map(o => '<button class="' + (it.w === o[0] ? 'on' : '') + '" data-a="width" data-v="' + o[0] + '" title="Width ' + o[0] + '/12">' + o[1] + '</button>').join('') + '<span class="sep"></span><button data-a="move" data-v="up" title="Move up (Alt+↑)">▲</button><button data-a="move" data-v="down" title="Move down (Alt+↓)">▼</button>' + (F.ix && isData(it) ? '<span class="sep"></span><button data-a="linkStart" title="Link: make other widgets react to clicks here">' + I('link') + 'Link</button>' : '') + '<span class="sep"></span><button data-a="dup" title="Duplicate (Ctrl+D)">' + I('copy') + '</button><button data-a="del" title="Delete (Del)">' + I('trash') + '</button></div>';
+    h += '<div class="rh e" data-drag="rw" title="Drag to resize width"></div><div class="rh s" data-drag="rh" title="Drag to resize height"></div><div class="rh se" data-drag="rwh" title="Drag to resize"></div>';
+    if (S.drag && S.drag.id === it.i && S.drag.mode !== 'move' && S.drag.moved) h += '<span class="sizeTag">' + it.w + ' / 12 · ' + it.h + ' rows</span>';
+  }
+  return h + extra + bodyHtml(it, ed) + '</div>';
+}
+function bodyHtml(it, ed) {
+  if (it.type === 'slot') return slotHtml(it);
+  if (it.type === 'header') return '<div class="card flat" style="box-shadow:none;background:transparent;border:0;justify-content:flex-end"><div' + (ed ? ' data-drag="move"' : '') + ' style="padding:4px 2px;' + (ed ? 'cursor:grab' : '') + '"><h2 style="margin:0;font-size:16px;color:var(--navy);display:flex;align-items:center;gap:10px"><span style="width:4px;height:18px;border-radius:2px;background:var(--acc)"></span>' + esc(titleOf(it)) + '</h2></div></div>';
+  if (it.type === 'text') return '<div class="card flat" style="border-left:3px solid var(--acc2)"><div class="whead"' + (ed ? ' data-drag="move"' : '') + '><h3>' + esc(it.title || 'Notes') + '</h3></div><div class="wbody" style="padding:0 14px 12px;font-size:12.5px;line-height:1.55;color:#344054">' + K.md(it.props.text, { cob: K.dLabel(S.doc.vars.cob), compare: S.doc.vars.compare }) + '</div></div>';
+  const a = apiOf(it); const d = S.data[it.i] || {}; const chips = [];
+  Object.keys(S.xf).forEach(k => { const x = S.xf[k]; if (x.from !== it.i && (x.targets === 'all' || x.targets.indexOf(it.i) >= 0)) chips.push('<span class="wchip">' + (x.kind === 'highlight' ? 'Highlight ' : 'Filtered by ') + esc((K.DIMS[k] || { label: k }).label) + ': ' + esc(x.value) + '<button data-a="xfClear" data-k="' + k + '" aria-label="Clear filter">×</button></span>'); });
+  if (S.viewAs) chips.push('<span class="wchip good">Entitled: ' + esc(S.viewAs.region) + ' only</span>');
+  if (d.res && d.res.meta.asOf !== d.res.meta.cob) chips.push('<span class="wchip warn">' + I('clock') + ' As of ' + K.dLabel(d.res.meta.asOf) + ' · stale</span>');
+  if (S.updated[it.i]) chips.push('<span class="upd">' + I('refresh') + 'Updated ' + esc(S.updated[it.i]) + '</span>');
+  if (a && a.status === 'unofficial') chips.push('<span class="wchip warn">Unofficial source</span>'); if (a && a.status === 'review') chips.push('<span class="wchip grey">Source in review</span>'); if (a && a.status === 'certified') chips.push('<span class="wchip good">✓ Certified source</span>');
+  if (a && a.status === 'deprecated') chips.push('<span class="wchip warn">Deprecated API</span>'); if (it.src && it.src.kind === 'query') chips.push('<span class="wchip grey">Ad-hoc query</span>');
+  const sub = a ? esc(a.code.indexOf('ADHOC_') === 0 ? 'POST /query · ' + CATALOG[it.src.ds].name : a.code) + ' · ' + K.dLabel(S.doc.vars.cob) : 'No data source';
+  let body;
+  if (d.status === 'nosrc') body = '<div class="state"><b>Choose a data source</b><span>Pick an API in the panel on the right.</span><button class="btn sm" data-a="sel" data-id="' + it.i + '">Open settings</button></div>';
+  else if (d.status === 'invalid' && it.src.kind === 'query' && queryIssues(it.src).length) { const iss = queryIssues(it.src); body = '<div class="state err"><b>' + esc(iss[0].t) + '</b><span>' + esc(iss[0].d) + '</span></div>'; }
+  else if (d.status === 'error') body = '<div class="state err"><b>Couldn’t load data</b><span>' + esc(d.err.msg) + '</span>' + (d.err.rid ? '<code>Request id ' + esc(d.err.rid) + ' · ' + esc(a.code) + '</code>' : '') + '<button class="btn sm" data-a="retry" data-id="' + it.i + '">' + I('refresh') + 'Retry</button></div>';
+  else if (d.status === 'missing') { const v = S.doc.varDefs.find(x => x.type === 'tree'); const bound = (it.src.params[d.err.param.name] || {}).mode === 'var'; body = '<div class="state"><b>Choose a ' + esc(d.err.param.label.toLowerCase()) + ' to load this widget</b><span>' + esc(a.name) + ' needs a ' + esc(d.err.param.label.toLowerCase()) + '.</span>' + (v && bound ? '<div class="req"><select data-in="var" data-v="' + v.id + '" aria-label="' + esc(d.err.param.label) + '"><option value="">Choose a node…</option>' + K.hierFlat.map(n => '<option value="' + n.id + '">' + ' '.repeat(n.depth) + esc(n.label) + '</option>').join('') + '</select></div><span class="muted" style="font-size:11px">Sets the “' + esc(v.label) + '” input for the whole dashboard</span>' : '<button class="btn sm" data-a="sel" data-id="' + it.i + '">Set it in the panel</button>') + '</div>'; }
+  else if (!d.res) body = d.job != null || (a && a.async) ? '<div class="state"><b>Running on the risk engine</b><div class="jobbar"><i style="width:' + (d.job || 2) + '%"></i></div><span><span class="jobpct">' + (d.job || 0) + '%</span> · heavy query runs as a background job; the page stays usable</span></div>' : K.skeleton(K.viewOf(it));
+  else if (!d.res.rows.length && !(it.type === 'kpi')) body = '<div class="state"><b>No rows for this COB and filters</b><span>' + (Object.keys(filtersFor(it)).length ? 'Active filters: ' + esc(Object.keys(filtersFor(it)).map(k => K.DIMS[k].label + ' = ' + filtersFor(it)[k].join(', ')).join('; ')) : 'Try another COB.') + '</span>' + (Object.keys(S.xf).length ? '<button class="btn sm" data-a="xfAll">Clear cross-filters</button>' : '') + '</div>';
+  else body = viewHtml(it, d.res);
+  const loading = d.status === 'loading' && d.res ? '<span title="Refreshing" style="width:12px;height:12px;border-radius:50%;border:2px solid #c9d7f5;border-top-color:#2f62c9;animation:spin .7s linear infinite;display:inline-block;margin-top:4px"></span>' : '';
+  const pager = a && a.paged && d.res ? '<div class="pager">Rows ' + ((S.page[it.i] || 0) * 50 + 1) + '–' + Math.min(((S.page[it.i] || 0) + 1) * 50, d.res.meta.count) + ' of ' + d.res.meta.count.toLocaleString() + ' · server-side paging and sorting<span class="sp" style="flex:1"></span><button class="btn sm" data-a="page" data-id="' + it.i + '" data-v="-1"' + ((S.page[it.i] || 0) ? '' : ' disabled') + '>‹ Prev</button><button class="btn sm" data-a="page" data-id="' + it.i + '" data-v="1">Next ›</button></div>' : '';
+  return '<div class="card"><div class="whead"' + (ed ? ' data-drag="move"' : '') + '><div style="min-width:0"><h3>' + esc(titleOf(it)) + '</h3><div class="sub">' + sub + '</div></div>' + loading + '<div class="acts">' + (it.type !== 'kpi' ? '<button title="Download CSV" data-a="csv">' + I('dl') + '</button><button title="Expand">' + I('expand') + '</button>' : '') + '</div></div>' + (chips.length ? '<div class="wchips">' + chips.join('') + '</div>' : '') + '<div class="wbody" style="display:flex;flex-direction:column">' + body + '</div>' + pager + '</div>';
+}
+function viewHtml(it, res) {
+  const sel = {}; Object.keys(S.xf).forEach(k => { if (S.xf[k].from === it.i || (S.xf[k].kind === 'highlight' && (S.xf[k].targets === 'all' || S.xf[k].targets.indexOf(it.i) >= 0))) sel[k] = S.xf[k].value; });
+  const o = Object.assign({}, it.props, { labels: it.labels, hidden: it.hidden, sel: sel, sort: S.sort[it.i] });
+  if (it.type === 'grid') return K.renderGrid(res, o);
+  if (it.type === 'chart') return '<div style="flex:1;min-height:0;display:flex;flex-direction:column">' + K.renderChart(res, o) + '</div>';
+  if (it.type === 'kpi') { const r = K.renderKpis(res, Object.assign(o, { sel: S.kpiSel[it.i] })); return r.html; }
+  return '';
+}
+function slotHtml(it) {
+  const open = S.picker === it.i;
+  if (open) return '<div class="slot" style="border-style:solid;border-color:var(--acc)">' + pickerHtml(it) + '</div>';
+  const sk = it.types[0] === 'kpi' ? '<div class="sk"></div><div class="sk"></div><div class="sk"></div>' : it.types[0] === 'text' ? '<div style="display:flex;flex-direction:column;gap:8px"><div class="sk" style="height:10px;width:90%"></div><div class="sk" style="height:10px;width:70%"></div><div class="sk" style="height:10px;width:80%"></div></div>' : it.types[0] === 'grid' ? '<div style="display:flex;flex-direction:column;gap:8px">' + [92, 80, 86, 70].map(w => '<div class="sk" style="height:12px;width:' + w + '%"></div>').join('') + '</div>' : '<div style="display:flex;align-items:flex-end;gap:10px;height:100%">' + [50, 80, 35, 65, 90, 45].map(h => '<div class="sk" style="flex:1;height:' + h + '%"></div>').join('') + '</div>';
+  return '<div class="slot" data-a="pickSlot" data-id="' + it.i + '" role="button" tabindex="0" aria-label="Fill slot ' + esc(it.label) + '"><div class="sh"><span class="pill acc" style="height:22px">' + I(it.types[0] === 'chart' ? 'chart' : it.types[0]) + esc(it.label) + '</span><small>' + esc(it.hint) + '</small><span class="sp"></span><span class="btn sm pri" style="pointer-events:none">＋ Fill slot</span></div><div class="skel">' + sk + '</div></div>';
+}
+function pickerHtml(slot) {
+  const types = slot ? slot.types : K.MANIFESTS.map(m => m.type);
+  const sug = slot && slot.suggest ? K.API[slot.suggest] : null;
+  return '<div class="pick"><div style="display:flex;align-items:center;gap:8px"><b style="color:var(--navy)">' + (slot ? 'Fill “' + esc(slot.label) + '”' : 'Add a component') + '</b><span class="muted" style="font-size:12px">' + (slot ? 'Only components that fit this slot are shown' : 'Added at the bottom of the page') + '</span><span class="sp" style="flex:1"></span><button class="btn sm" data-a="pickClose">Cancel</button></div>' +
+    (sug ? '<button class="sug" data-a="fill" data-id="' + slot.i + '" data-t="' + slot.types[0] + '" data-api="' + sug.code + '">' + I('bolt') + '<span style="flex:1"><b>Use the suggestion: ' + esc(K.MAN[slot.types[0]].label) + (slot.view ? ' (' + slot.view + ')' : '') + ' with “' + esc(sug.name) + '”</b><br><code>' + esc(sug.code) + '</code></span><span class="btn sm pri" style="pointer-events:none">Add</span></button>' : '') +
+    '<div class="row">' + types.map(t => { const m = K.MAN[t]; return '<button class="tile" data-a="' + (slot ? 'fill' : 'addEnd') + '" data-t="' + t + '"' + (slot ? ' data-id="' + slot.i + '"' : '') + '><span class="ic">' + I(m.icon) + '</span><span><b>' + esc(m.label) + '</b><small>' + esc(m.desc) + '</small></span></button>'; }).join('') + '</div></div>';
+}
+
+/* ---------------- inspector ---------------- */
+function renderInsp() {
+  const ed = S.mode === 'edit'; $('#insp').classList.toggle('hide', !ed); if (!ed) return;
+  const it = byId(S.sel);
+  $('#insp').innerHTML = it ? (it.type === 'slot' ? slotInsp(it) : widgetInsp(it)) : dashInsp();
+}
+function sect(title, body, right) { return '<div class="sect"><h4>' + title + '<span class="sp"></span>' + (right || '') + '</h4>' + body + '</div>'; }
+function opt(label, on, act, data, dis, title) { return '<button class="opt' + (on ? ' on' : '') + '" data-a="' + act + '" ' + data + (dis ? ' disabled' : '') + (title ? ' title="' + esc(title) + '"' : '') + '>' + label + '</button>'; }
+function tog(label, on, act, data, sub) { return '<div class="toggle' + (on ? ' on' : '') + '" role="switch" aria-checked="' + !!on + '" tabindex="0" data-a="' + act + '" ' + data + '><i></i><span>' + esc(label) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</span></div>'; }
+function head(icon, kind, title, close) { return '<div class="ih"><span class="ic">' + I(icon) + '</span><span><small>' + esc(kind) + '</small><b>' + esc(title) + '</b></span>' + (close ? '<button class="x" data-a="desel" aria-label="Close">' + I('x') + '</button>' : '') + '</div>'; }
+function slotInsp(it) { return head('template', 'TEMPLATE SLOT', it.label, true) + sect('What goes here', '<div class="note">' + esc(it.hint) + '. Accepts: ' + it.types.map(t => K.MAN[t].label).join(', ') + '.</div><div style="margin-top:10px"><button class="btn pri" data-a="pickSlot" data-id="' + it.i + '">＋ Fill this slot</button> <button class="btn" data-a="del">Remove slot</button></div>'); }
+function widgetInsp(it) {
+  const m = K.MAN[it.type]; const a = apiOf(it); let h = head(m.icon, m.label.toUpperCase(), titleOf(it), true);
+  h += sect('Title', '<input class="inp" data-in="title" placeholder="' + esc(a ? a.name : m.label) + '" value="' + esc(it.title || '') + '"><div class="note" style="margin-top:5px">Leave blank to use the API’s business name.</div>');
+  if (isData(it)) h += sect('Data', dataSect(it), F.nq ? '<span class="seg2">' + ['api', 'query'].map(k => '<button class="' + ((it.src.kind === 'query') === (k === 'query') ? 'on' : '') + '" data-a="srcKind" data-v="' + k + '">' + (k === 'api' ? 'Existing API' : 'New query') + '</button>').join('') + '</span>' : '');
+  if (it.type === 'chart') h += sect('Chart type', chartTypes(it));
+  const props = m.props.filter(p => p.type !== 'chartType');
+  if (props.length) h += sect(it.type === 'text' ? 'Content' : 'Display', props.map(p => propCtl(it, p)).join('') + (isData(it) && a && F.data ? columnsCtl(it, a) : ''));
+  if (F.ix && isData(it)) h += sect('Interactions', ixSect(it));
+  h += sect('Layout', '<div class="opts">' + [[3, 'Quarter'], [4, 'Third'], [6, 'Half'], [8, 'Two-thirds'], [12, 'Full']].map(o => opt(o[1], it.w === o[0], 'width', 'data-v="' + o[0] + '"')).join('') + '</div><div class="opts" style="margin-top:6px">' + [[5, 'Short'], [9, 'Medium'], [13, 'Tall']].map(o => opt(o[1], it.h === o[0], 'height', 'data-v="' + o[0] + '"')).join('') + '</div><div class="note" style="margin-top:6px">Position x ' + it.x + ', y ' + it.y + ' · ' + it.w + ' of 12 columns · ' + it.h + ' rows. Or drag the edges on the page.</div>');
+  h += sect('Actions', '<div class="opts"><button class="btn sm" data-a="dup">' + I('copy') + 'Duplicate</button><button class="btn sm danger" data-a="del">' + I('trash') + 'Delete</button></div>');
+  return h;
+}
+function dataSect(it) {
+  if (it.src.kind === 'query') return querySect(it);
+  const a = apiOf(it); let h = '';
+  if (a) h += '<div class="src"><span class="ic">' + I('api') + '</span><span style="min-width:0"><b>' + esc(a.name) + '</b><code>' + esc(a.code) + '</code><span>' + esc(a.area) + ' · ' + esc(K.grainOf(a)) + ' · ' + esc(a.owner) + '</span></span></div>';
+  h += '<div style="margin:8px 0"><button class="btn sm" data-a="catToggle">' + (S.catOpen ? 'Close catalogue' : (a ? 'Change data source' : 'Choose a data source')) + '</button></div>';
+  if (S.catOpen) h += catalogue(it);
+  if (a && a.user) h += serviceStatus(a);
+  if (a && a.params.length) h += '<div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#475467;margin:10px 0 6px">INPUTS</div>' + a.params.map(p => paramRow(it, p)).join('');
+  if (a && F.data) { const params = resolvedParams(it); h += '<div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#475467;margin:10px 0 6px">REQUEST</div><pre class="code">GET /panels/' + esc(a.code) + '/data\n' + esc(JSON.stringify({ cob: S.doc.vars.cob, compare: S.doc.vars.compare, params: params, filters: filtersFor(it) }, null, 1)) + '</pre>'; }
+  return h;
+}
+function catalogue(it) {
+  const view = it.type === 'chart' ? 'chart' : it.type; const list = K.searchApis(S.catQ, { view: view, showDeprecated: S.showDep });
+  let h = '<div class="cat"><input class="inp" data-in="catQ" placeholder="Search by name, tag, synonym or code" value="' + esc(S.catQ) + '" aria-label="Search APIs">';
+  if (F.data) h += '<div class="toggle' + (S.showDep ? ' on' : '') + '" data-a="showDep" style="font-size:11.5px"><i></i><span>Show deprecated APIs</span></div>';
+  const areas = []; list.forEach(x => { if (areas.indexOf(x.area) < 0) areas.push(x.area); });
+  if (!list.length) h += '<div class="note" style="margin-top:8px">No API matches “' + esc(S.catQ) + '” for a ' + esc(K.MAN[it.type].label.toLowerCase()) + '.</div>';
+  areas.forEach(ar => { h += '<div class="grpT">' + esc(ar.toUpperCase()) + '</div><div class="list">' + list.filter(x => x.area === ar).map(x => '<button class="li' + (S.catSel === x.code ? ' on' : '') + '" data-a="catSel" data-v="' + x.code + '"><span class="t"><b>' + esc(x.name) + (x.status === 'deprecated' ? ' <span class="pill warn" style="height:17px;font-size:9.5px">Deprecated</span>' : x.status === 'unofficial' ? ' <span class="pill warn" style="height:17px;font-size:9.5px">Unofficial</span>' : x.status === 'certified' ? ' <span class="pill good" style="height:17px;font-size:9.5px">Certified</span>' : '') + '</b><span>' + esc(x.desc) + '</span><code>' + esc(x.code) + '</code><span>' + esc(K.grainOf(x)) + ' · ' + x.views.join(' / ') + (F.data ? ' · used in ' + x.used + ' dashboards' : '') + '</span></span></button>').join('') + '</div>'; });
+  if (S.catSel && K.API[S.catSel]) {
+    const x = K.API[S.catSel]; const pv = S.preview[x.code];
+    if (F.data && !pv) { S.preview[x.code] = { loading: true }; K.query(x.code, Object.fromEntries(x.params.map(p => [p.name, p.required ? (K.hierFlat[1] || {}).id : p.def])), { cob: S.doc.vars.cob, compare: 'DoD', filters: {} }).then(r => { S.preview[x.code] = { res: r }; renderInsp(); }).catch(() => { S.preview[x.code] = { err: true }; renderInsp(); }); }
+    h += '<div class="panel" style="margin-top:10px;padding:10px;box-shadow:none"><b style="font-size:12.5px">' + esc(x.name) + '</b><div class="note">' + esc(x.desc) + '</div>' + (x.status === 'deprecated' ? '<div class="alert warn" style="margin-top:6px"><b>Deprecated</b><span>Use “' + esc(K.API[x.replacedBy].name) + '” instead.</span></div>' : '') +
+      (F.data ? '<div style="font-size:10.5px;font-weight:700;color:#475467;margin:8px 0 4px">PREVIEW · columns and sample rows</div>' + (pv && pv.res ? '<div style="max-height:150px;overflow:auto;border:1px solid var(--line);border-radius:8px">' + K.renderGrid({ cols: pv.res.cols, rows: pv.res.rows.slice(0, 3), total: pv.res.total, trend: pv.res.trend }, { totals: false, dec: 1 }) + '</div>' : '<div class="sk" style="height:60px"></div>') : '') +
+      '<div style="margin-top:8px;display:flex;gap:6px"><button class="btn sm pri" data-a="useApi" data-v="' + x.code + '">Use this API</button>' + (x.status === 'deprecated' ? '<button class="btn sm" data-a="useApi" data-v="' + x.replacedBy + '">Use the replacement</button>' : '') + '</div></div>';
+  }
+  return h + '</div>';
+}
+function paramRow(it, p) {
+  const b = it.src.params[p.name] || { mode: 'fixed', value: p.def }; const vars = S.doc.varDefs.filter(d => (p.dim && d.dim === p.dim) || (p.type === 'tree' && d.type === 'tree'));
+  const canBind = F.data ? true : !!vars.length;
+  const fixedCtl = p.type === 'tree' ? '<select class="inp" data-in="param" data-p="' + p.name + '"><option value="">Choose a node…</option>' + K.hierFlat.map(n => '<option value="' + n.id + '"' + (b.value === n.id ? ' selected' : '') + '>' + ' '.repeat(n.depth) + esc(n.label) + '</option>').join('') + '</select>' : '<select class="inp" data-in="param" data-p="' + p.name + '">' + p.options.map(o => '<option' + (b.value === o ? ' selected' : '') + '>' + esc(o) + '</option>').join('') + '</select>';
+  const varCtl = vars.length ? '<select class="inp" data-in="paramVar" data-p="' + p.name + '">' + vars.map(v => '<option value="' + v.id + '"' + (b.var === v.id ? ' selected' : '') + '>Dashboard input: ' + esc(v.label) + '</option>').join('') + '</select>' : '<button class="btn sm" data-a="addVarFor" data-p="' + p.name + '">＋ Add a “' + esc(p.label) + '” input to the bar</button>';
+  return '<div class="param"><div class="pt">' + esc(p.label) + ' <code>' + esc(p.name) + '</code>' + (p.required ? '<span class="pill bad" style="height:17px;font-size:9.5px">Required</span>' : '') + (p.admin ? '<span class="pill" style="height:17px;font-size:9.5px">Set by admin</span>' : '') + '<span class="sp" style="flex:1"></span>' + (canBind && (p.dim || p.type === 'tree') ? '<span class="seg2"><button class="' + (b.mode !== 'var' ? 'on' : '') + '" data-a="paramMode" data-p="' + p.name + '" data-v="fixed">Fixed</button><button class="' + (b.mode === 'var' ? 'on' : '') + '" data-a="paramMode" data-p="' + p.name + '" data-v="var">⇄ Input</button></span>' : '') + '</div><div class="pr">' + (b.mode === 'var' ? varCtl : fixedCtl) + '</div></div>';
+}
+function columnsCtl(it, a) {
+  const ms = a.meas.concat((a.calc || []).map(c => c.id)); if (!ms.length) return '';
+  return '<div style="font-size:11px;font-weight:600;color:#475467;margin:8px 0 5px">Columns · show, hide and rename</div>' + ms.map(k => { const meta = K.MEAS[k] || { label: (a.calc.find(c => c.id === k) || {}).label }; const on = it.hidden.indexOf(k) < 0; return '<div style="display:flex;gap:6px;align-items:center;margin-bottom:5px"><button class="opt' + (on ? ' on' : '') + '" data-a="colToggle" data-v="' + k + '" style="width:32px;justify-content:center" aria-label="Show ' + esc(meta.label) + '">' + (on ? '✓' : '') + '</button><input class="inp" style="height:28px" data-in="colLabel" data-v="' + k + '" placeholder="' + esc(meta.label) + '" value="' + esc(it.labels[k] || '') + '"></div>'; }).join('');
+}
+function propCtl(it, p) {
+  const v = it.props[p.k];
+  if (p.type === 'bool') return tog(p.label, v, 'prop', 'data-k="' + p.k + '"');
+  if (p.type === 'enum') return '<div class="field"><span>' + esc(p.label) + '</span><div class="opts">' + p.opts.map(o => opt(o === null ? 'None' : o === 'parens' ? '(1,234.5)' : o === 'minus' ? '−1,234.5' : String(o), v === o, 'prop', 'data-k="' + p.k + '" data-v=\'' + JSON.stringify(o) + '\'')).join('') + '</div></div>';
+  if (p.type === 'text') return '<div class="field"><span>' + esc(p.label) + '</span><textarea class="inp" data-in="propText" data-k="' + p.k + '">' + esc(v || '') + '</textarea><span class="note">Live values: {{cob}}, {{compare}}</span></div>';
+  return '';
+}
+const CT = [['column', 'Column', 'Compare items'], ['bar', 'Bar', 'Ranking'], ['line', 'Line', 'Trend over COBs'], ['area', 'Area', 'Trend, filled'], ['donut', 'Donut', 'Share of total']];
+function chartTypes(it) {
+  const a = apiOf(it); const d = S.data[it.i]; const n = d && d.res ? d.res.rows.length : 0; const trend = a && a.dims.indexOf('cob') >= 0; const nd = a ? a.dims.filter(x => x !== 'cob').length : 0;
+  const best = trend ? 'line' : nd === 1 && n <= 6 ? 'column' : 'bar';
+  const why = { column: [!trend && nd >= 1 && n <= 15, trend ? 'Use line for dates' : nd ? 'Too many items' : 'Needs rows'], bar: [!trend && nd >= 1, trend ? 'Not for dates' : 'Needs rows'], line: [trend, 'Needs a trend API'], area: [trend, 'Needs a trend API'], donut: [!trend && nd === 1 && n <= 8 && (!d || !d.res || d.res.rows.every(r => (r[d.res.cols.find(c => !c.dim).key] || 0) * (d.res.rows[0][d.res.cols.find(c => !c.dim).key] || 0) >= 0)), 'Needs one dimension, 8 or fewer slices, same sign'] };
+  return '<div class="charts">' + CT.map(c => { const ok = why[c[0]][0]; return '<button class="' + (it.props.type === c[0] ? 'on' : '') + '" data-a="prop" data-k="type" data-v=\'"' + c[0] + '"\'' + (ok ? '' : ' disabled') + ' title="' + esc(ok ? c[2] : 'Not available: ' + why[c[0]][1]) + '">' + (c[0] === best && ok ? '<span class="best">BEST</span>' : '') + I('chart') + c[1] + '<small>' + esc(ok ? c[2] : why[c[0]][1]) + '</small></button>'; }).join('') + '</div><div class="note" style="margin-top:6px">Best fit follows the API’s rows; types that don’t fit are disabled with the reason.</div>';
+}
+function ixSect(it) {
+  const rules = S.doc.rules.filter(r => r.src === it.i); const into = S.doc.rules.filter(r => r.acts.some(a => a.targets === 'all' || a.targets.indexOf(it.i) >= 0));
+  const m = K.MAN[it.type]; let h = '';
+  rules.forEach(r => {
+    const a = r.acts[0]; const open = S.ruleOpen === r.id;
+    h += '<div class="vrow" style="flex-direction:column;gap:6px"><div style="display:flex;width:100%;gap:6px;align-items:center"><span class="t"><b>' + esc(evLabel(r.ev)) + ' → ' + esc(ACTS[a.type]) + '</b><span>' + (a.targets === 'all' ? 'All widgets' : a.targets.length ? a.targets.map(t => titleOf(byId(t))).filter(Boolean).join(', ') : 'No targets yet') + ' · field ' + esc((K.DIMS[a.field] || {}).label || a.field) + '</span></span><button class="btn sm" data-a="ruleOpen" data-v="' + r.id + '">' + (open ? 'Done' : 'Edit') + '</button><button class="btn sm ghost danger" data-a="ruleDel" data-v="' + r.id + '" aria-label="Delete rule">' + I('trash') + '</button></div>' +
+      (open ? '<div style="width:100%"><div class="field"><span>When</span><div class="opts">' + m.events.map(e => opt(evLabel(e), r.ev === e, 'ruleSet', 'data-r="' + r.id + '" data-k="ev" data-v=\'"' + e + '"\'')).join('') + '</div></div><div class="field"><span>Then</span><div class="opts">' + Object.keys(ACTS).map(k => opt(ACTS[k], a.type === k, 'ruleSet', 'data-r="' + r.id + '" data-k="type" data-v=\'"' + k + '"\'')).join('') + '</div></div><div class="field"><span>Pass this field</span><div class="opts">' + (apiOf(it) ? apiOf(it).dims.filter(x => x !== 'cob') : []).map(f => opt(K.DIMS[f].label, a.field === f, 'ruleSet', 'data-r="' + r.id + '" data-k="field" data-v=\'"' + f + '"\'')).join('') + '</div><span class="note">Matched to the same catalog field in each target, so no manual pairing.</span></div>' +
+        '<div class="field"><span>Targets</span><div class="opts">' + opt('Pick on the page', false, 'linkStart', 'data-r="' + r.id + '"') + opt('All widgets with this field', a.targets === 'all', 'ruleSet', 'data-r="' + r.id + '" data-k="targets" data-v=\'"all"\'') + '</div></div>' + tog('Clicking the same item again clears it', r.toggle, 'ruleSet', 'data-r="' + r.id + '" data-k="toggle" data-v="toggle"') + tog('Ignore the Total row', r.skipTotal, 'ruleSet', 'data-r="' + r.id + '" data-k="skipTotal" data-v="toggle"') + '<button class="btn sm" data-a="ruleTest" data-v="' + r.id + '">' + I('bolt') + 'Test with the first row</button></div>' : '') + '</div>';
+  });
+  h += '<button class="btn sm" data-a="linkStart">' + I('link') + (rules.length ? 'Add another interaction' : 'Add interaction · link on the page') + '</button>';
+  if (into.length) h += '<div class="note" style="margin-top:8px"><b>Reacts to:</b> ' + into.map(r => esc(evLabel(r.ev)) + ' on “' + esc(titleOf(byId(r.src))) + '”').join('; ') + '</div>';
+  return h;
+}
+const ACTS = { filter: 'Filter targets', highlight: 'Highlight in targets', setVar: 'Set dashboard input', drill: 'Drill through to a dashboard' };
+const evLabel = e => ({ rowClick: 'Row click', selectionChange: 'Selection change', pointClick: 'Bar / point click', legendClick: 'Legend click', cardClick: 'Card click', thresholdBreach: 'Threshold breach' })[e] || e;
+function querySect(it) {
+  const q = it.src; const c = CATALOG[q.ds]; const used = f => q.groupBy.indexOf(f) >= 0 || q.metrics.some(m => m.f === f);
+  let h = '<div class="alert vio" style="margin-bottom:8px"><b>Phase 2 · new query on the dataset catalog</b><span>No API needed. The gateway checks it against datasets/' + q.ds + '.yaml, runs it and returns the same response contract.</span></div>';
+  h += '<div class="field"><span>Dataset</span><div class="opts">' + Object.keys(CATALOG).map(k => opt(CATALOG[k].name, q.ds === k, 'qDs', 'data-v="' + k + '"')).join('') + '</div></div>';
+  h += '<div class="zone"><div class="zt">GROUP BY<span class="sp"></span></div>' + (q.groupBy.map((g, i) => '<span class="zchip dim">' + esc(K.DIMS[g].label) + '<button data-a="qRm" data-z="groupBy" data-i="' + i + '" aria-label="Remove">×</button></span>').join('') || '<span class="note">No group by: one total row.</span>') + '</div>';
+  h += '<div class="zone"><div class="zt">METRICS · ' + (c.additive ? 'aggregated by the service' : 'node values, not additive') + '</div>' + (q.metrics.map((m, i) => '<span class="zchip met"><em>' + (c.additive ? (m.agg || 'sum').toUpperCase() : 'NODE') + '</em>' + esc(K.MEAS[m.f].label) + (c.additive ? '<button data-a="qAgg" data-i="' + i + '" title="Change aggregation">↻</button>' : '') + '<button data-a="qRm" data-z="metrics" data-i="' + i + '" aria-label="Remove">×</button></span>').join('') || '<span class="note">Add at least one metric.</span>') + (q.calc || []).map((cc, i) => '<span class="zchip calc"><em>CALC</em>' + esc(cc.label) + '<button data-a="qRm" data-z="calc" data-i="' + i + '" aria-label="Remove">×</button></span>').join('') + '</div>';
+  h += '<div class="zone"><div class="zt">FILTERS · this widget only</div>' + (q.filters.map((f, i) => '<span class="zchip flt">' + esc(K.DIMS[f.field].label) + ': ' + esc(f.vals.join(', ')) + '<button data-a="qRm" data-z="filters" data-i="' + i + '" aria-label="Remove">×</button></span>').join('') || '<span class="note">Dashboard inputs and cross-filters apply too.</span>') + '</div>';
+  h += '<div style="font-size:10.5px;font-weight:700;color:#475467;margin:4px 0">FIELDS · datasets/' + q.ds + '.yaml</div><div class="fields" style="margin-bottom:6px">' + c.dims.map(d => '<button class="' + (used(d) ? 'used' : '') + '" data-a="qAdd" data-z="groupBy" data-v="' + d + '" title="Add to Group by">＋ ' + esc(K.DIMS[d].label) + '</button>').join('') + '</div><div class="fields" style="margin-bottom:6px">' + c.meas.map(mm => '<button class="' + (used(mm) ? 'used' : '') + '" data-a="qAdd" data-z="metrics" data-v="' + mm + '" title="Add to Metrics" style="color:#067647">＋ ' + esc(K.MEAS[mm].label) + '</button>').join('') + '</div><div class="fields">' + c.dims.filter(d => d !== 'cob').map(d => '<button data-a="qFilter" data-v="' + d + '" style="color:#93370d">＋ Filter ' + esc(K.DIMS[d].label) + '</button>').join('') + '</div>';
+  if (q.metrics.length >= 2 || (q.ds === 'var')) h += '<div class="field" style="margin-top:10px"><span>Calculated field</span><div class="opts">' + Object.keys(CALC).map(k => opt(CALC[k].label, false, 'qCalc', 'data-v="' + k + '"', q.metrics.length < 2)).join('') + '</div><span class="note">Uses the first two metrics as A and B; e.g. VaR 1D as % of VaR limit.</span></div>';
+  const iss = queryIssues(q);
+  h += iss.length ? iss.map(x => '<div class="alert bad" style="margin-top:6px"><b>⚠ ' + esc(x.t) + '</b><span>' + esc(x.d) + '</span></div>').join('') : '<div class="alert good" style="margin-top:6px"><b>✓ Valid query</b><span>Fields, aggregation and grain pass the catalog rules. Rows are limited to desks you are entitled to.</span></div>';
+  h += '<pre class="code" style="margin-top:8px">POST /query\n' + esc(JSON.stringify({ dataset: q.ds, cob: S.doc.vars.cob, dimensions: q.groupBy, measures: q.metrics.map(m => c.additive ? (m.agg || 'sum') + '(' + m.f + ')' : m.f), calc: (q.calc || []).map(x => x.label), filters: q.filters }, null, 1)) + '</pre>';
+  if (!iss.length) h += '<div class="field" style="margin-top:10px"><span>Save as a reusable service</span><input class="inp" data-in="svcName" placeholder="' + esc(adhocName(q)) + '" value="' + esc(S.svcName || '') + '"></div><button class="btn sm pri" data-a="saveSvc">Save as service → POST /services</button><div class="note" style="margin-top:6px">Saved services start Unofficial, show up in the API catalogue for everyone, and become Certified after review.</div>';
+  return h;
+}
+function serviceStatus(a) {
+  const st = a.status; const tone = st === 'certified' ? 'good' : st === 'review' ? 'info' : 'warn';
+  let h = '<div class="alert ' + tone + '" style="margin-top:8px"><b>' + (st === 'certified' ? '✓ Certified service' : st === 'review' ? 'In certification review' : 'Unofficial service') + ' · ' + esc(a.code) + '</b><span>' + (st === 'certified' ? 'Reconciled with official numbers. Stored as services/' + esc(a.slug) + '.yaml in Git.' : st === 'review' ? 'A data steward is checking the numbers against the official pages.' : 'Saved by you as JSON in the services database. Widgets show an Unofficial badge.') + '</span></div>';
+  if (st === 'unofficial') h += '<button class="btn sm" style="margin-top:6px" data-a="svcStatus" data-v="review">Request certification</button>';
+  if (st === 'review') h += '<button class="btn sm" style="margin-top:6px" data-a="svcStatus" data-v="certified">Approve as data steward (demo)</button>';
+  if (st === 'certified') h += '<pre class="code" style="margin-top:6px">' + esc(svcYaml(a)) + '</pre>';
+  return h;
+}
+function svcYaml(a) { return '# services/' + a.slug + '.yaml (generated from ' + a.code + ', reviewed)\nservice: ' + a.slug + '\nbusinessName: ' + a.name + '\ndataset: ' + a.ds + '\ndimensions: [' + a.dims.join(', ') + ']\nmeasures: [' + a.meas.join(', ') + ']\nfilters: ' + JSON.stringify(a.extraFilters || []) + '\nowner: ' + a.owner + '\ncertified: true\nreviewedBy: risk-data-stewards'; }
+function catYaml(ds) { const c = CATALOG[ds]; return '# datasets/' + ds + '.yaml\ndataset: ' + ds + '\nlabel: ' + c.name + '\ndimensions:\n' + c.dims.map(d => '  ' + d + ': { label: ' + K.DIMS[d].label + ' }').join('\n') + '\nmeasures:\n' + c.meas.map(m => '  ' + m + ': { label: ' + K.MEAS[m].label + ', unit: "' + K.MEAS[m].unit + '", ' + (c.additive ? 'agg: sum' : 'agg: none, availableAt: [total, region, business, desk]') + ', polarity: ' + K.MEAS[m].pol + ' }').join('\n') + '\nlimits: { maxDimensions: 3, maxRows: 5000, timeoutMs: 15000 }'; }
+function dashInsp() {
+  const tabs = F.pub ? [['settings', 'Settings'], ['publish', 'Publish'], ['versions', 'Versions'], ['sharing', 'Sharing']] : null; const t = tabs ? S.ptab : 'settings';
+  let h = head('layers', 'DASHBOARD', S.doc.name, false) + (tabs ? '<div class="ptabs">' + tabs.map(x => '<button class="' + (t === x[0] ? 'on' : '') + '" data-a="ptab" data-v="' + x[0] + '">' + x[1] + '</button>').join('') + '</div>' : '');
+  if (S.conflict && S.ptab === 'conflict') return h + conflictPane();
+  if (t === 'settings') {
+    h += sect('Details', '<div class="field"><span>Name</span><input class="inp" data-in="name" value="' + esc(S.doc.name) + '"></div><div class="field"><span>Show under sidebar tab</span><select class="inp" data-in="tab">' + ['VaR', 'GSST', 'Limit', 'Stress Testing'].map(o => '<option' + (S.doc.tab === o ? ' selected' : '') + '>' + o + '</option>').join('') + '</select></div><div class="note">Template: ' + esc((K.TPL[S.doc.template] || { name: 'Custom' }).name) + '</div>');
+    h += sect('Inputs bar', S.doc.varDefs.map(d => '<div class="vrow"><span class="t"><b>' + esc(d.label) + '</b><span>' + (d.type === 'cob' ? 'COB date with PCOB' : d.type === 'seg' ? 'DoD / WoW / MoM' : d.type === 'tree' ? 'Tree select from GET_HIERARCHY' : 'From ' + esc(K.DIMS[d.dim].label) + ' values' + (d.dim === 'desk' ? ' · depends on Business' : '')) + '</span></span>' + (d.type === 'cob' ? '' : '<button class="btn sm ghost danger" data-a="varDel" data-v="' + d.id + '" aria-label="Remove input">' + I('x') + '</button>') + '</div>').join('') + (F.data ? '<div class="opts">' + [['region', 'Region'], ['business', 'Business'], ['desk', 'Volcker desk'], ['tree', 'Hierarchy node'], ['seg', 'Compare']].filter(o => !S.doc.varDefs.some(d => d.dim === o[0] || d.type === o[0])).map(o => opt('＋ ' + o[1], false, 'varAdd', 'data-v="' + o[0] + '"')).join('') + '</div><div class="note" style="margin-top:6px">Widgets bind their API inputs to these. Desk options follow the chosen Business.</div>' : ''));
+    const rows = {}; items().forEach(it => { (rows[it.y] = rows[it.y] || []).push(it); });
+    h += sect('Page outline', '<div class="outline">' + Object.keys(rows).sort((a, b) => a - b).map(y => '<div class="orow">' + rows[y].sort((a, b) => a.x - b.x).map(it => '<button data-a="sel" data-id="' + it.i + '">' + I(it.type === 'slot' ? 'template' : (K.MAN[it.type] || {}).icon) + esc(titleOf(it)) + ' <span class="muted mono">' + it.w + '/12</span></button>').join('') + '</div>').join('') + '</div>');
+    if (F.nq) h += sect('Dataset catalog', '<div class="opts" style="margin-bottom:6px">' + Object.keys(CATALOG).map(k => opt(k + '.yaml', S.catDs === k, 'catDs', 'data-v="' + k + '"')).join('') + '</div><pre class="code">' + esc(catYaml(S.catDs)) + '</pre><div class="note" style="margin-top:6px">Written by the data team, reviewed by pull request. New queries can only use what this allows.</div>' + (S.services.length ? '<div style="font-size:11px;font-weight:700;color:#475467;margin:10px 0 6px">SAVED SERVICES</div>' + S.services.map(c => { const a = K.API[c]; return '<div class="vrow"><span class="t"><b>' + esc(a.name) + '</b><span>' + esc(a.code) + ' · ' + esc(a.status) + '</span></span></div>'; }).join('') : ''));
+    if (F.live) h += sect('Performance', '<div class="opts"><span class="pill">Requests ' + K.stats.requests + '</span><span class="pill good">Deduplicated ' + K.stats.deduped + '</span><span class="pill">Avg ' + (K.stats.requests ? Math.round(K.stats.ms / K.stats.requests) : 0) + ' ms</span></div><div class="note" style="margin-top:6px">Identical requests from several widgets share one call. Cache key: API + params + COB + filters + dataset version.</div><div style="margin-top:8px;max-height:180px;overflow:auto">' + K.stats.log.slice(0, 10).map(l => '<div class="note mono" style="font-size:10.5px">' + esc(l.at) + ' · ' + esc(l.code) + ' · ' + l.ms + ' ms</div>').join('') + '</div>');
+    h += sect('Shortcuts', '<div class="note" style="line-height:1.9"><span class="kbd">Del</span> delete · <span class="kbd">Ctrl+D</span> duplicate<br><span class="kbd">Alt+arrows</span> move · <span class="kbd">Shift+Alt+arrows</span> resize<br><span class="kbd">Ctrl+Z</span> undo · <span class="kbd">Ctrl+Shift+Z</span> redo · <span class="kbd">Esc</span> deselect</div><button class="btn sm" style="margin-top:8px" data-a="reset">Reset this demo</button>');
+  }
+  if (t === 'publish') h += publishPane();
+  if (t === 'versions') h += versionsPane();
+  if (t === 'sharing') h += sharingPane();
+  return h;
+}
+function health() {
+  const out = [];
+  items().forEach(it => { const a = apiOf(it); const d = S.data[it.i] || {};
+    if (it.type === 'slot') out.push(['warn', 'Empty slot “' + it.label + '”', 'Hidden in view mode; fill or remove it.', it.i]);
+    if (isData(it) && !a) out.push(['bad', titleOf(it) + ': no data source', 'Choose an API.', it.i]);
+    if (d.status === 'error') out.push(['bad', titleOf(it) + ': API error', d.err.msg, it.i]);
+    if (d.status === 'missing') out.push(['bad', titleOf(it) + ': required input missing', d.err.param.label + ' has no value on the latest COB.', it.i]);
+    if (d.status === 'invalid' && it.src.kind === 'query' && queryIssues(it.src).length) out.push(['bad', titleOf(it) + ': invalid query', queryIssues(it.src)[0].t, it.i]);
+    if (a && a.status === 'deprecated') out.push(['warn', titleOf(it) + ': deprecated API', 'Switch to ' + K.API[a.replacedBy].name + '.', it.i]);
+    if (a && (a.status === 'unofficial' || a.status === 'review')) out.push(['warn', titleOf(it) + ': unofficial source', 'Shown with an Unofficial badge until certified.', it.i]);
+    if (d.res && !d.res.rows.length && it.type !== 'kpi') out.push(['warn', titleOf(it) + ': no rows on ' + K.dLabel(S.doc.vars.cob), 'Check filters or the COB.', it.i]);
+  });
+  S.doc.rules.forEach(r => { if (!byId(r.src)) out.push(['bad', 'Interaction from a deleted widget', 'Remove the rule.', null]); r.acts.forEach(a => { if (a.targets !== 'all') a.targets.forEach(t => { if (!byId(t)) out.push(['bad', 'Interaction target was deleted', 'Rule ' + r.id + ' points at a removed widget.', r.src]); }); }); });
+  return out;
+}
+function publishPane() {
+  const hc = health(); const bad = hc.filter(x => x[0] === 'bad').length; const envs = S.doc.envs || {};
+  let h = sect('Dashboard health · ' + (hc.length ? hc.length + ' item' + (hc.length > 1 ? 's' : '') : 'all clear'), hc.length ? hc.map(x => '<div class="alert ' + (x[0] === 'bad' ? 'bad' : 'warn') + '" style="margin-bottom:6px;display:flex;gap:8px;align-items:flex-start"><span style="flex:1"><b>' + esc(x[1]) + '</b><span>' + esc(x[2]) + '</span></span>' + (x[3] ? '<button class="btn sm" data-a="sel" data-id="' + x[3] + '">Go to</button>' : '') + '</div>').join('') : '<div class="alert good"><b>✓ Ready to publish</b><span>Every widget loads on the latest COB, inputs are bound and interactions point at existing widgets.</span></div>');
+  h += sect('Publish a new version', '<div class="field"><span>What changed (version note)</span><input class="inp" data-in="pubNote" placeholder="e.g. Added stress by desk and region filter" value="' + esc(S.pubNote || '') + '"></div><div class="pipe">' + ['dev', 'uat', 'prod'].map((e, i) => (i ? '<i>→</i>' : '') + '<div class="st' + (envs[e] ? ' on' : '') + '"><b>' + e.toUpperCase() + '</b><span>' + (envs[e] ? 'v' + envs[e] : 'not yet') + '</span></div>').join('') + '</div><div class="opts"><button class="btn pri" data-a="publish"' + (bad ? ' disabled title="Fix the red items first"' : '') + '>Publish v' + ((S.doc.versions || []).length + 1) + ' to Dev</button>' + (envs.dev && envs.dev !== envs.uat ? '<button class="btn" data-a="promote" data-v="uat">Promote v' + envs.dev + ' to UAT</button>' : '') + (envs.uat && envs.uat !== envs.prod ? '<button class="btn" data-a="promote" data-v="prod">Promote v' + envs.uat + ' to Prod</button>' : '') + '</div><div class="note" style="margin-top:8px">Publishing writes immutable files (document, definition.json, filters.json) to S3, then moves the pointer. Viewers never see a half-written version; the previous one stays live if anything fails.</div>' + (bad ? '<div class="alert bad" style="margin-top:8px"><b>Publishing is blocked</b><span>Fix the red items above. Yellow items are warnings.</span></div>' : ''));
+  return h;
+}
+function diffDocs(a, b) { const ia = {}, ib = {}; a.items.forEach(x => { ia[x.i] = x; }); b.items.forEach(x => { ib[x.i] = x; }); const o = []; b.items.forEach(x => { if (!ia[x.i]) o.push(['+', titleOf(x)]); else if (JSON.stringify(ia[x.i]) !== JSON.stringify(x)) o.push(['~', titleOf(x)]); }); a.items.forEach(x => { if (!ib[x.i]) o.push(['−', titleOf(x)]); }); if (a.name !== b.name) o.push(['~', 'Renamed to “' + b.name + '”']); if (JSON.stringify(a.rules) !== JSON.stringify(b.rules)) o.push(['~', 'Interactions']); return o; }
+function versionsPane() {
+  const vs = (S.doc.versions || []).slice().reverse();
+  if (!vs.length) return sect('Versions', '<div class="note">No versions yet. Publish creates version 1; drafts are autosaved separately.</div>');
+  return sect('Versions', vs.map((v, i) => { const prev = vs[i + 1]; const df = prev ? diffDocs(prev.doc, v.doc) : [['+', 'First version']]; const envs = Object.keys(S.doc.envs || {}).filter(e => S.doc.envs[e] === v.v); return '<div class="vrow" style="flex-direction:column;gap:5px"><div style="display:flex;gap:8px;width:100%;align-items:center"><span class="t"><b>v' + v.v + ' · ' + esc(v.note || 'No note') + '</b><span>' + esc(v.by) + ' · ' + esc(v.at) + (envs.length ? ' · live in ' + envs.join(', ').toUpperCase() : '') + '</span></span><button class="btn sm" data-a="restore" data-v="' + v.v + '">Restore to draft</button>' + (S.doc.envs && S.doc.envs.prod && S.doc.envs.prod !== v.v && v.v < S.doc.envs.prod ? '<button class="btn sm" data-a="rollback" data-v="' + v.v + '">Roll back Prod</button>' : '') + '</div><div class="note">' + df.map(x => '<span style="color:' + (x[0] === '+' ? 'var(--good)' : x[0] === '~' ? '#1d4596' : 'var(--bad)') + '">' + x[0] + ' ' + esc(x[1]) + '</span>').join(' · ') + '</div></div>'; }).join('') + '<div class="note">Restore copies a version into the draft (undoable). Roll back moves the Prod pointer to an older version; nothing is rewritten.</div>');
+}
+function sharingPane() {
+  const sh = S.doc.sharing || [];
+  return sect('People and groups', sh.map((p, i) => '<div class="vrow" style="align-items:center"><span class="t"><b>' + esc(p.who) + '</b><span>' + esc(p.kind) + '</span></span><select class="inp" style="width:110px;height:28px" data-in="role" data-i="' + i + '"' + (p.role === 'Owner' ? ' disabled' : '') + '>' + ['Owner', 'Editor', 'Viewer'].map(r => '<option' + (p.role === r ? ' selected' : '') + '>' + r + '</option>').join('') + '</select>' + (p.role === 'Owner' ? '' : '<button class="btn sm ghost danger" data-a="shareDel" data-i="' + i + '" aria-label="Remove">' + I('x') + '</button>') + '</div>').join('') + '<div style="display:flex;gap:6px;margin-top:6px"><input class="inp" data-in="shareWho" placeholder="Add a person or group (e.g. EMEA Risk Managers)" value="' + esc(S.shareWho || '') + '"><button class="btn" data-a="shareAdd">Add</button></div><div class="note" style="margin-top:6px">Viewers can change filters and save personal views; only editors change the dashboard. Entitlements still apply to every row.</div>') +
+    sect('Check what others see', '<div class="opts">' + opt('You (owner)', !S.viewAs, 'viewAs', 'data-v=""') + opt('Viewer · EMEA only', S.viewAs && S.viewAs.region === 'EMEA', 'viewAs', 'data-v="EMEA"') + opt('Viewer · APAC only', S.viewAs && S.viewAs.region === 'APAC', 'viewAs', 'data-v="APAC"') + '</div>');
+}
+function conflictPane() {
+  const c = S.conflict; const df = diffDocs(S.conflict.base, c.doc); const mine = diffDocs(S.conflict.base, S.doc);
+  return sect('Their changes (' + esc(c.by) + ')', df.map(x => '<div class="note">' + x[0] + ' ' + esc(x[1]) + '</div>').join('') || '<div class="note">None</div>') + sect('Your changes', mine.map(x => '<div class="note">' + x[0] + ' ' + esc(x[1]) + '</div>').join('') || '<div class="note">None</div>') + sect('Resolve', '<div class="opts"><button class="btn pri" data-a="conflict" data-v="merge">Keep both (merge)</button><button class="btn" data-a="conflict" data-v="mine">Keep mine</button><button class="btn" data-a="conflict" data-v="theirs">Take theirs</button></div><div class="note" style="margin-top:6px">Merge adds their new widgets and keeps your version of anything you both changed. The server only accepts the save with the latest rev, so nobody’s work is lost silently.</div>');
+}
+function renderLog() {
+  const el = $('#logp'); if (!F.ix || !S.logOpen) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div class="logp" role="log"><div class="lh">' + I('code') + 'Event log · last ' + S.log.length + '<span class="sp" style="flex:1"></span><button class="btn sm" data-a="log">Close</button></div>' + (S.log.length ? S.log.map(l => '<div class="le">' + esc(l.at) + '  <b>' + esc(l.ev) + '</b> on “' + esc(l.w) + '”  ' + esc(JSON.stringify(l.payload)) + '  → ' + (l.fired.length ? esc(l.fired.join(', ')) : '<span style="color:#7d8bb3">no rule matched</span>') + '</div>').join('') : '<div class="le">Click a row, bar or KPI card to see events here.</div>') + '</div>';
+}
+
+/* ---------------- actions ---------------- */
+const A = {
+  undo: undo, redo: redo,
+  mode() { S.mode = S.mode === 'edit' ? 'view' : 'edit'; S.sel = null; S.picker = null; S.link = null; renderAll(); },
+  sel(el) { S.sel = el.dataset.id; S.ptab = 'settings'; S.catOpen = false; S.catSel = null; renderAll(); const n = document.querySelector('.gi[data-id="' + S.sel + '"]'); if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); },
+  desel() { S.sel = null; S.ruleOpen = null; renderAll(); },
+  add(el) { if (S.suppress) return; addComponent(el.dataset.t, null); },
+  addEnd(el) { addComponent(el.dataset.t, 'end'); },
+  pickEnd() { S.picker = 'end'; renderCanvas(); },
+  pickSlot(el) { S.picker = el.dataset.id; S.sel = el.dataset.id; renderAll(); },
+  pickClose() { S.picker = null; renderAll(); },
+  fill(el) { const slot = byId(el.dataset.id); const t = el.dataset.t; const api = el.dataset.api || (slot.suggest && viewFits(K.API[slot.suggest], t === 'chart' ? slot.view || 'column' : t) ? slot.suggest : null); const w = newWidget(t, { api: api, view: slot.view, props: slot.props }); w.x = slot.x; w.y = slot.y; w.w = slot.w; w.h = Math.max(slot.h, (K.MAN[t].size.minH)); commit(d => { const i = d.items.indexOf(slot); d.items.splice(i, 1, w); }); S.picker = null; S.sel = w.i; flash(w.i); refreshData(); renderAll(); K.toast('Filled “' + slot.label + '” with ' + K.MAN[t].label + (api ? ' · ' + K.API[api].name : ''), undo); },
+  width(el) { const it = byId(S.sel); commit(() => { it.w = Math.min(+el.dataset.v, COLS); if (it.x + it.w > COLS) it.x = COLS - it.w; resolve(items(), it); }, { fixed: it }); },
+  height(el) { const it = byId(S.sel); commit(() => { it.h = +el.dataset.v; resolve(items(), it); }, { fixed: it }); },
+  move(el) { moveSel(el.dataset.v === 'up' ? 0 : 0, el.dataset.v === 'up' ? -1 : 1); },
+  dup() { const it = byId(S.sel); if (!it) return; const c = K.clone(it); c.i = K.uid('w'); commit(d => { const where = placeNew(c, it); d.items.push(c); resolve(d.items, c); S.lastWhere = where; }); S.sel = c.i; flash(c.i); refreshData(); renderAll(); K.toast('Duplicated ' + S.lastWhere, undo); },
+  del() { const it = byId(S.sel); if (!it) return; const name = titleOf(it); commit(d => { d.items = d.items.filter(x => x !== it); d.rules = d.rules.filter(r => r.src !== it.i); d.rules.forEach(r => r.acts.forEach(a => { if (a.targets !== 'all') a.targets = a.targets.filter(t => t !== it.i); })); }); Object.keys(S.xf).forEach(k => { if (S.xf[k].from === it.i) delete S.xf[k]; }); S.sel = null; renderAll(); K.toast('Deleted “' + name + '”', () => { undo(); refreshData(); renderAll(); }); },
+  cob(el) { const i = K.COBS.indexOf(S.doc.vars.cob) + (+el.dataset.d); if (i < 25 || i >= K.COBS.length) return; S.doc.vars.cob = K.COBS[i]; save(); writeHash(); refreshData(); renderAll(); },
+  var(el) { S.doc.vars[el.dataset.v] = el.dataset.val; save(); writeHash(); refreshData(); renderAll(); },
+  xfClear(el) { delete S.xf[el.dataset.k]; writeHash(); refreshData(); renderAll(); },
+  xfAll() { S.xf = {}; writeHash(); refreshData(); renderAll(); },
+  ev(el, e) { const gi = el.closest('.gi'); if (!gi) return; const it = byId(gi.dataset.id); if (!it) return; const d = S.data[it.i]; if (!d || !d.res) return; let payload;
+    if (el.dataset.ev === 'cardClick') { S.kpiSel[it.i] = S.kpiSel[it.i] && S.kpiSel[it.i].metric === el.dataset.metric ? null : { metric: el.dataset.metric }; payload = { metric: el.dataset.metric }; }
+    else { const ri = +el.dataset.ri; payload = fieldsOf(it, d.res, ri); }
+    if (S.mode === 'edit' && S.sel !== it.i && !S.link) { S.sel = it.i; }
+    fire(it, el.dataset.ev, payload); },
+  sort(el, e) { const gi = el.closest('.gi'); if (!gi) return; const id = gi.dataset.id; const it = byId(id); const a = apiOf(it); const k = el.dataset.k; const cur = S.sort[id] || ''; S.sort[id] = cur === k + ':desc' ? k + ':asc' : k + ':desc'; if (a && a.paged) { S.page[id] = 0; refreshData(); } else { const d = S.data[id]; if (d && d.res) { const [kk, dir] = S.sort[id].split(':'); d.res.rows.sort((x, y) => (x[kk] > y[kk] ? 1 : x[kk] < y[kk] ? -1 : 0) * (dir === 'desc' ? -1 : 1)); } renderNode(id); } e.stopPropagation(); },
+  csv() { K.toast('Exported as CSV'); },
+  retry(el) { const it = byId(el.dataset.id); const a = apiOf(it); if (a) delete S.sim[a.code]; S.data[it.i] = null; refreshData(); renderAll(); },
+  catToggle() { S.catOpen = !S.catOpen; S.catSel = null; renderInsp(); },
+  catSel(el) { S.catSel = el.dataset.v; renderInsp(); },
+  showDep() { S.showDep = !S.showDep; renderInsp(); },
+  useApi(el) { const it = byId(S.sel); const a = K.API[el.dataset.v]; commit(() => { it.src = { code: a.code, params: defaultParams(a) }; if (it.type === 'chart' && !viewFits(a, it.props.type)) it.props.type = a.views.find(v => ['column', 'bar', 'line', 'area', 'donut'].indexOf(v) >= 0) || 'column'; it.hidden = []; it.labels = {}; }); S.catOpen = false; S.catSel = null; refreshData(); renderAll(); K.toast('Data source: ' + a.name, undo); },
+  paramMode(el) { const it = byId(S.sel); const p = el.dataset.p; const a = apiOf(it); const def = a.params.find(x => x.name === p); commit(() => { if (el.dataset.v === 'var') { const v = S.doc.varDefs.find(d => (def.dim && d.dim === def.dim) || (def.type === 'tree' && d.type === 'tree')); it.src.params[p] = v ? { mode: 'var', var: v.id } : { mode: 'var', var: null }; } else it.src.params[p] = { mode: 'fixed', value: (it.src.params[p] || {}).value || def.def }; }); refreshData(); renderAll(); },
+  addVarFor(el) { const it = byId(S.sel); const def = apiOf(it).params.find(x => x.name === el.dataset.p); const vd = def.type === 'tree' ? { id: 'level', type: 'tree', label: 'Hierarchy node', dim: 'level' } : { id: def.dim, type: 'select', dim: def.dim, label: K.DIMS[def.dim].label }; commit(d => { if (!d.varDefs.some(x => x.id === vd.id)) d.varDefs.push(vd); if (d.vars[vd.id] === undefined) d.vars[vd.id] = vd.type === 'tree' ? '' : 'ALL'; it.src.params[def.name] = { mode: 'var', var: vd.id }; }); refreshData(); renderAll(); K.toast('Added “' + vd.label + '” to the inputs bar'); },
+  prop(el) { const it = byId(S.sel); const k = el.dataset.k; commit(() => { it.props[k] = el.dataset.v === undefined ? !it.props[k] : JSON.parse(el.dataset.v); }, { noHist: false }); },
+  colToggle(el) { const it = byId(S.sel); const k = el.dataset.v; commit(() => { const i = it.hidden.indexOf(k); if (i >= 0) it.hidden.splice(i, 1); else it.hidden.push(k); }); },
+  linkStart(el) { const it = byId(S.sel); let rid = el.dataset.r; if (!rid) { const a = apiOf(it); const field = a ? a.dims.filter(x => x !== 'cob')[0] : null; const m = K.MAN[it.type]; rid = K.uid('ix'); commit(d => { d.rules.push({ id: rid, src: it.i, ev: m.events[0], toggle: true, skipTotal: true, acts: [{ type: 'filter', field: field, targets: [] }] }); }); }
+    const r = S.doc.rules.find(x => x.id === rid); if (r.acts[0].targets === 'all') r.acts[0].targets = []; S.link = { src: it.i, rule: rid }; S.ruleOpen = rid; renderAll(); },
+  linkToggle(el, e) { e.stopPropagation(); const r = S.doc.rules.find(x => x.id === S.link.rule); const t = r.acts[0].targets; commit(() => { const i = t.indexOf(el.dataset.id); if (i >= 0) t.splice(i, 1); else t.push(el.dataset.id); }); },
+  linkDone() { const r = S.doc.rules.find(x => x.id === S.link.rule); S.link = null; if (r && !r.acts[0].targets.length) { S.doc.rules = S.doc.rules.filter(x => x !== r); K.toast('No targets picked, so the interaction was not added'); } else if (r) K.toast('Interaction saved: ' + evLabel(r.ev) + ' → ' + r.acts[0].targets.length + ' widget' + (r.acts[0].targets.length > 1 ? 's' : '')); save(); renderAll(); },
+  ruleOpen(el) { S.ruleOpen = S.ruleOpen === el.dataset.v ? null : el.dataset.v; renderInsp(); },
+  ruleDel(el) { commit(d => { d.rules = d.rules.filter(r => r.id !== el.dataset.v); }); S.xf = {}; refreshData(); renderAll(); },
+  ruleSet(el) { const r = S.doc.rules.find(x => x.id === el.dataset.r); const k = el.dataset.k; commit(() => { if (k === 'ev') r.ev = JSON.parse(el.dataset.v); else if (k === 'toggle' || k === 'skipTotal') r[k] = !r[k]; else if (k === 'targets') r.acts[0].targets = r.acts[0].targets === 'all' ? [] : 'all'; else r.acts[0][k] = JSON.parse(el.dataset.v); }); },
+  ruleTest(el) { const r = S.doc.rules.find(x => x.id === el.dataset.v); const it = byId(r.src); const d = S.data[it.i]; if (!d || !d.res || !d.res.rows.length) { K.toast('No data to test with yet'); return; } fire(it, r.ev, fieldsOf(it, d.res, 0)); K.toast('Sent a test ' + evLabel(r.ev) + ' with the first row'); },
+  log() { S.logOpen = !S.logOpen; renderLog(); },
+  dash() { S.sel = null; S.ptab = 'settings'; renderAll(); },
+  varAdd(el) { const v = el.dataset.v; const vd = v === 'tree' ? { id: 'level', type: 'tree', label: 'Hierarchy node', dim: 'level' } : v === 'seg' ? { id: 'compare', type: 'seg', label: 'Compare' } : { id: v, type: 'select', dim: v, label: K.DIMS[v].label }; commit(d => { d.varDefs.push(vd); if (d.vars[vd.id] === undefined) d.vars[vd.id] = vd.type === 'tree' ? '' : vd.type === 'seg' ? 'DoD' : 'ALL'; }); refreshData(); renderAll(); },
+  varDel(el) { commit(d => { d.varDefs = d.varDefs.filter(x => x.id !== el.dataset.v); d.items.forEach(it => { if (it.src && it.src.params) Object.keys(it.src.params).forEach(k => { const b = it.src.params[k]; if (b.mode === 'var' && b.var === el.dataset.v) it.src.params[k] = { mode: 'fixed', value: 'ALL' }; }); }); }); refreshData(); renderAll(); K.toast('Input removed; widgets that used it now send ALL', undo); },
+  ptab(el) { S.ptab = el.dataset.v; renderInsp(); },
+  openPublish() { S.sel = null; S.ptab = 'publish'; renderAll(); },
+  publish() { const v = (S.doc.versions || []).length + 1; const snapDoc = K.clone({ name: S.doc.name, items: S.doc.items, rules: S.doc.rules, varDefs: S.doc.varDefs }); S.doc.versions = (S.doc.versions || []).concat([{ v: v, note: S.pubNote || 'No note', by: 'You (AB12345)', at: 'Today ' + K.now(), doc: snapDoc }]); S.doc.envs = Object.assign({}, S.doc.envs, { dev: v }); S.pubNote = ''; save(); S.saveNote = 'Published v' + v + ' to Dev · ' + K.now(); renderAll(); K.toast('Published v' + v + ' to Dev · immutable files written, pointer moved'); },
+  promote(el) { const e = el.dataset.v; const from = e === 'uat' ? 'dev' : 'uat'; S.doc.envs[e] = S.doc.envs[from]; save(); renderAll(); K.toast('Promoted v' + S.doc.envs[e] + ' to ' + e.toUpperCase()); },
+  restore(el) { const v = S.doc.versions.find(x => x.v === +el.dataset.v); commit(d => { d.items = K.clone(v.doc.items); d.rules = K.clone(v.doc.rules); d.varDefs = K.clone(v.doc.varDefs); d.name = v.doc.name; }); refreshData(); renderAll(); K.toast('v' + v.v + ' copied into the draft', undo); },
+  rollback(el) { S.doc.envs.prod = +el.dataset.v; save(); renderAll(); K.toast('Prod now points at v' + el.dataset.v + ' (rollback, nothing rewritten)'); },
+  shareAdd() { if (!(S.shareWho || '').trim()) return; S.doc.sharing.push({ who: S.shareWho.trim(), kind: /team|group|managers|risk/i.test(S.shareWho) ? 'Group' : 'Person', role: 'Viewer' }); S.shareWho = ''; save(); renderInsp(); },
+  shareDel(el) { S.doc.sharing.splice(+el.dataset.i, 1); save(); renderInsp(); },
+  viewAs(el) { S.viewAs = el.dataset.v ? { region: el.dataset.v, label: 'Viewer · ' + el.dataset.v + ' only' } : null; if (S.viewAs) { S.mode = 'view'; S.sel = null; } refreshData(); renderAll(); },
+  recover(el) { if (el.dataset.v === '1') { snap(); S.doc = S.recover.doc; K.toast('Restored your unsaved changes'); } K.store.del('cds.local.' + CFG.page); S.recover = null; save(); refreshData(); renderAll(); },
+  conflictView() { S.sel = null; S.ptab = 'conflict'; renderAll(); },
+  conflict(el) { const c = S.conflict; const v = el.dataset.v; snap(); if (v === 'theirs') S.doc = K.clone(c.doc); if (v === 'merge') { const mine = {}; S.doc.items.forEach(x => { mine[x.i] = 1; }); const base = {}; c.base.items.forEach(x => { base[x.i] = 1; }); c.doc.items.forEach(x => { if (!mine[x.i] && !base[x.i]) { const n = K.clone(x); placeNew(n, null); S.doc.items.push(n); } }); } S.doc.rev = c.doc.rev; S.conflict = null; S.ptab = 'settings'; save(); refreshData(); renderAll(); K.toast(v === 'merge' ? 'Merged: their new widgets added, your edits kept' : v === 'theirs' ? 'Took their version' : 'Kept your version; it will save as the next rev'); },
+  srcKind(el) { const it = byId(S.sel); commit(() => { if (el.dataset.v === 'query') it.src = { kind: 'query', ds: 'gsst', groupBy: ['region'], metrics: [{ f: 's1974', agg: 'sum' }], filters: [], calc: [] }; else { const a = pickApi(it.type, it.props.type); it.src = { code: a.code, params: defaultParams(a) }; } }); S.data[it.i] = null; refreshData(); renderAll(); },
+  qDs(el) { const it = byId(S.sel); commit(() => { it.src.ds = el.dataset.v; it.src.groupBy = ['region']; it.src.metrics = [{ f: CATALOG[el.dataset.v].meas[0], agg: CATALOG[el.dataset.v].additive ? 'sum' : 'stored' }]; it.src.filters = []; it.src.calc = []; }); refreshData(); renderAll(); },
+  qAdd(el) { const it = byId(S.sel); const q = it.src; const z = el.dataset.z, v = el.dataset.v; commit(() => { if (z === 'groupBy' && q.groupBy.indexOf(v) < 0) q.groupBy.push(v); if (z === 'metrics' && !q.metrics.some(m => m.f === v)) q.metrics.push({ f: v, agg: CATALOG[q.ds].additive ? 'sum' : 'stored' }); }); if (it.type === 'chart' && q.groupBy.indexOf('cob') >= 0) it.props.type = 'line'; refreshData(); renderAll(); },
+  qRm(el) { const it = byId(S.sel); commit(() => { it.src[el.dataset.z].splice(+el.dataset.i, 1); }); refreshData(); renderAll(); },
+  qAgg(el) { const it = byId(S.sel); const m = it.src.metrics[+el.dataset.i]; const ag = CATALOG[it.src.ds].aggs; commit(() => { m.agg = ag[(ag.indexOf(m.agg || 'sum') + 1) % ag.length]; }); refreshData(); renderAll(); },
+  qFilter(el) { const it = byId(S.sel); const d = el.dataset.v; const vals = K.DIMS[d].values; commit(() => { const f = it.src.filters.find(x => x.field === d); if (f) { const nxt = vals.find(v => f.vals.indexOf(v) < 0); if (nxt) f.vals.push(nxt); } else it.src.filters.push({ field: d, vals: [vals[0]] }); }); refreshData(); renderAll(); },
+  qCalc(el) { const it = byId(S.sel); const q = it.src; const a = q.metrics[0].f, b = q.metrics[1].f; const op = el.dataset.v; commit(() => { q.calc = (q.calc || []).concat([{ id: 'c' + ((q.calc || []).length + 1), op: op, a: a, b: b, label: K.MEAS[a].label + ' ' + CALC[op].label.replace('A', '').replace('B', '').trim() + ' ' + K.MEAS[b].label }]); }); refreshData(); renderAll(); },
+  saveSvc() { const it = byId(S.sel); const q = it.src; const base = K.API[q.code]; const n = S.services.length + 1; const code = 'SVC_' + String(100 + n); const name = (S.svcName || '').trim() || adhocName(q);
+    const api = Object.assign({}, base, { code: code, name: name, desc: 'Saved from a query by you · ' + CATALOG[q.ds].name, area: 'Saved services', module: 'SERVICES', status: 'unofficial', owner: 'You (AB12345)', used: 1, user: true, slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40), params: [K.P.region], extraFilters: K.clone(q.filters) });
+    K.registerApi(api); api.status = 'unofficial'; S.services.push(code); K.store.set('cds.svcs', S.services.map(c => { const x = K.API[c]; return { code: x.code, name: x.name, ds: x.ds, dims: x.dims, meas: x.meas, calc: (q.calc || []), status: x.status, slug: x.slug, filters: x.extraFilters }; }));
+    commit(() => { it.src = { code: code, params: defaultParams(api) }; }); S.svcName = ''; refreshData(); renderAll(); K.toast('Saved as service ' + code + ' · now in the API catalogue as Unofficial'); },
+  svcStatus(el) { const a = apiOf(byId(S.sel)); a.status = el.dataset.v; const stored = K.store.get('cds.svcs', []); stored.forEach(x => { if (x.code === a.code) x.status = a.status; }); K.store.set('cds.svcs', stored); renderAll(); K.toast(a.status === 'certified' ? 'Certified · PR opened with services/' + a.slug + '.yaml' : 'Sent to data stewards for review'); },
+  catDs(el) { S.catDs = el.dataset.v; renderInsp(); },
+  page(el) { const id = el.dataset.id; S.page[id] = Math.max(0, (S.page[id] || 0) + (+el.dataset.v)); refreshData(); },
+  reset() { Object.keys(localStorage).filter(k => k.indexOf('cds.') === 0).forEach(k => K.store.del(k)); location.hash = ''; location.reload(); },
+  try(el) { (CFG.onTry || {})[el.dataset.v] && CFG.onTry[el.dataset.v](API); }
+};
+const IN = {
+  name(el) { S.doc.name = el.value; save(); },
+  title(el) { const it = byId(S.sel); it.title = el.value || null; save(); const n = document.querySelector('.gi[data-id="' + it.i + '"] .whead h3'); if (n) n.textContent = titleOf(it); },
+  var(el) { S.doc.vars[el.dataset.v] = el.value; if (el.dataset.v === 'business') { const v = S.doc.vars; if (v.desk && v.desk !== 'ALL' && K.deskOf(v.business === 'ALL' ? null : v.business).indexOf(v.desk) < 0) v.desk = 'ALL'; } save(); writeHash(); refreshData(); renderAll(); },
+  catQ(el) { S.catQ = el.value; const pos = el.selectionStart; renderInsp(); const n = document.querySelector('[data-in="catQ"]'); if (n) { n.focus(); n.setSelectionRange(pos, pos); } },
+  param(el) { const it = byId(S.sel); snap(); it.src.params[el.dataset.p] = { mode: 'fixed', value: el.value || null }; save(); refreshData(); renderAll(); },
+  paramVar(el) { const it = byId(S.sel); snap(); it.src.params[el.dataset.p] = { mode: 'var', var: el.value }; save(); refreshData(); renderAll(); },
+  colLabel(el) { const it = byId(S.sel); it.labels[el.dataset.v] = el.value; save(); renderNode(it.i); },
+  propText(el) { const it = byId(S.sel); it.props[el.dataset.k] = el.value; save(); renderNode(it.i); },
+  tab(el) { S.doc.tab = el.value; save(); renderHdr(); },
+  pubNote(el) { S.pubNote = el.value; },
+  svcName(el) { S.svcName = el.value; },
+  shareWho(el) { S.shareWho = el.value; },
+  role(el) { S.doc.sharing[+el.dataset.i].role = el.value; save(); }
+};
+function flash(id) { S.flash = id; setTimeout(() => { S.flash = null; const n = document.querySelector('.gi[data-id="' + id + '"]'); if (n) n.classList.remove('flash'); }, 1400); }
+function addComponent(type, where, at) {
+  const near = where === 'end' ? null : byId(S.sel);
+  const w = newWidget(type); let msg;
+  commit(d => { if (at) { w.x = Math.max(0, Math.min(COLS - w.w, at.x)); w.y = at.y; d.items.push(w); resolve(d.items, w); msg = 'where you dropped it'; } else if (where === 'end') { w.x = 0; w.y = maxY(); d.items.push(w); msg = 'at the bottom'; } else { msg = placeNew(w, near && near.type !== 'slot' ? near : null); d.items.push(w); resolve(d.items, w); } });
+  S.sel = w.i; S.picker = null; flash(w.i); refreshData(); renderAll();
+  const n = document.querySelector('.gi[data-id="' + w.i + '"]'); if (n && n.scrollIntoView) n.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  K.toast('Added ' + K.MAN[type].label.toLowerCase() + ' ' + msg, () => { undo(); refreshData(); renderAll(); });
+}
+function moveSel(dx, dy) { const it = byId(S.sel); if (!it) return; commit(() => { it.x = Math.max(0, Math.min(COLS - it.w, it.x + dx)); it.y = Math.max(0, it.y + dy * (dy > 0 ? (items().filter(o => o !== it && o.y >= it.y + it.h).sort((a, b) => a.y - b.y)[0] || { h: 1 }).h : 1)); if (dy < 0) { const above = items().filter(o => o !== it && o.y + o.h <= it.y + 0 && o.x < it.x + it.w && o.x + o.w > it.x).sort((a, b) => b.y - a.y)[0]; if (above) it.y = above.y; } resolve(items(), it); }, { fixed: it }); }
+
+/* ---------------- pointer: drag, resize, drop from library ---------------- */
+function onDown(e) {
+  if (e.button !== 0 || S.mode !== 'edit') return;
+  const lib = e.target.closest('[data-libdrag]');
+  if (lib) { S.drag = { mode: 'new', type: lib.dataset.libdrag, sx: e.clientX, sy: e.clientY, moved: false }; return; }
+  const h = e.target.closest('[data-drag]'); if (!h) return; if (e.target.closest('button:not([data-drag])') && !e.target.closest('.tb .grip')) return;
+  const gi = h.closest('.gi'); if (!gi) return; const it = byId(gi.dataset.id); if (!it) return;
+  e.preventDefault(); if (S.sel !== it.i) { S.sel = it.i; renderAll(); }
+  S.drag = { id: it.i, mode: h.dataset.drag, sx: e.clientX, sy: e.clientY, ox: it.x, oy: it.y, w0: it.w, h0: it.h, before: JSON.stringify(S.doc), moved: false };
+}
+function onMove(e) {
+  const d = S.drag; if (!d) return;
+  if (!d.moved && Math.abs(e.clientX - d.sx) + Math.abs(e.clientY - d.sy) < 5) return;
+  const g = geo(); const stepX = g.cw + M, stepY = RH + M;
+  if (d.mode === 'new') { d.moved = true; S.suppress = true; const gh = $('#ghost'); gh.style.display = 'inline-flex'; gh.style.left = (e.clientX + 12) + 'px'; gh.style.top = (e.clientY + 10) + 'px'; gh.textContent = '＋ ' + K.MAN[d.type].label + ' · drop on the page'; return; }
+  if (!d.moved) { d.moved = true; S.suppress = true; renderCanvas(); }
+  const it = byId(d.id); const mn = K.MAN[it.type] ? K.MAN[it.type].size : { minW: 2, minH: 2 };
+  const dx = e.clientX - d.sx, dy = e.clientY - d.sy; let changed = false;
+  if (d.mode === 'move') { const nx = Math.max(0, Math.min(COLS - it.w, Math.round(d.ox + dx / stepX))), ny = Math.max(0, Math.round(d.oy + dy / stepY)); if (nx !== it.x || ny !== it.y) { it.x = nx; it.y = ny; changed = true; } }
+  else { if (d.mode !== 'rh') { const nw = Math.max(mn.minW || 2, Math.min(COLS - it.x, Math.round(d.w0 + dx / stepX))); if (nw !== it.w) { it.w = nw; changed = true; } } if (d.mode !== 'rw') { const nh = Math.max(mn.minH || 2, Math.round(d.h0 + dy / stepY)); if (nh !== it.h) { it.h = nh; changed = true; } } }
+  if (changed) { resolve(items(), it); compact(items(), it); positionNodes(); const tag = document.querySelector('.gi[data-id="' + it.i + '"] .sizeTag'); if (tag) tag.textContent = it.w + ' / 12 · ' + it.h + ' rows'; else if (d.mode !== 'move') renderNode(it.i); }
+  const el = document.querySelector('.gi[data-id="' + it.i + '"]'); if (el && d.mode === 'move') { const p = g.pos(it); el.style.left = (d.ox * stepX + dx) + 'px'; el.style.top = (d.oy * stepY + dy) + 'px'; }
+}
+function onUp(e) {
+  const d = S.drag; S.drag = null; if (!d) return;
+  setTimeout(() => { S.suppress = false; }, 0);
+  if (d.mode === 'new') { $('#ghost').style.display = 'none'; if (!d.moved) return; const cv = $('#cv').getBoundingClientRect(); if (e.clientX < cv.left || e.clientX > cv.right || e.clientY < cv.top - 20 || e.clientY > cv.bottom + 80) { K.toast('Drop it on the page to add it'); return; } const g = geo(); addComponent(d.type, null, { x: Math.floor((e.clientX - cv.left) / (g.cw + M)), y: Math.max(0, Math.floor((e.clientY - cv.top) / (RH + M))) }); return; }
+  if (!d.moved) return;
+  S.hist.push(d.before); S.fut = []; compact(items()); save(); renderAll(); refreshData();
+}
+function onKey(e) {
+  const tg = (e.target.tagName || ''); const typing = tg === 'INPUT' || tg === 'TEXTAREA' || tg === 'SELECT';
+  if (e.key === 'Escape') { if (S.link) A.linkDone(); else if (S.picker) { S.picker = null; renderAll(); } else if (S.sel) A.desel(); return; }
+  if (typing || S.mode !== 'edit') return; const mod = e.ctrlKey || e.metaKey;
+  if (mod && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); refreshData(); return; }
+  if (mod && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); return; }
+  if (!S.sel) return;
+  if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); A.del(); return; }
+  if (mod && e.key.toLowerCase() === 'd') { e.preventDefault(); A.dup(); return; }
+  if (e.altKey && e.key.indexOf('Arrow') === 0) { e.preventDefault(); const it = byId(S.sel); if (e.shiftKey) { commit(() => { if (e.key === 'ArrowRight') it.w = Math.min(COLS - it.x, it.w + 1); if (e.key === 'ArrowLeft') it.w = Math.max(2, it.w - 1); if (e.key === 'ArrowDown') it.h++; if (e.key === 'ArrowUp') it.h = Math.max(2, it.h - 1); resolve(items(), it); }, { fixed: it }); } else moveSel(e.key === 'ArrowLeft' ? -1 : e.key === 'ArrowRight' ? 1 : 0, e.key === 'ArrowUp' ? -1 : e.key === 'ArrowDown' ? 1 : 0); }
+}
+function onClick(e) {
+  const t = e.target.closest('[data-a],[data-act]');
+  if (t && !t.disabled && !S.link) { const fn = A[t.dataset.a || t.dataset.act]; if (fn) { fn(t, e); return; } }
+  if (t && S.link && t.dataset.a) { const fn = A[t.dataset.a]; if (fn) { fn(t, e); return; } }
+  if (S.mode === 'edit') { const gi = e.target.closest('.gi'); if (gi && !S.link) { if (S.sel !== gi.dataset.id) { S.sel = gi.dataset.id; S.ptab = 'settings'; S.catOpen = false; S.catSel = null; S.ruleOpen = null; renderAll(); } return; } if (e.target.closest('#cv') && S.sel && !S.link) { S.sel = null; renderAll(); } }
+}
+const API = { S: () => S, renderAll: renderAll, refresh: refreshData, byId: byId, save: save, commit: commit, undo: undo, flash: flash, snap: snap, titleOf: titleOf, newWidget: newWidget };
+
+/* ---------------- boot ---------------- */
+function boot(cfg) {
+  CFG = cfg; F = Object.assign({ data: false, ix: false, pub: false, nq: false, live: false }, cfg.F);
+  (K.store.get('cds.svcs', []) || []).forEach(x => { K.registerApi({ code: x.code, name: x.name, desc: 'Saved from a query', area: 'Saved services', module: 'SERVICES', ds: x.ds, dims: x.dims, meas: x.meas, views: ['grid', 'column', 'bar', 'line', 'donut', 'kpi'], params: [K.P.region], tags: [], syn: [], owner: 'You (AB12345)', used: 1, user: true, slug: x.slug, extraFilters: x.filters, status: x.status, calc: (x.calc || []).map(c => ({ id: c.id, label: c.label, unit: CALC[c.op].unit, fn: o => CALC[c.op].fn(o[c.a] || 0, o[c.b] || 0) })) }); });
+  const qs = new URLSearchParams(location.search); const fromHome = qs.get('id') ? K.store.get('cds.doc.' + qs.get('id'), null) : null;
+  const srv = K.store.get('cds.srv.' + cfg.page, null);
+  const doc = fromHome || (srv && srv.doc) || cfg.seed();
+  S = { doc: doc, sel: null, mode: 'edit', hist: [], fut: [], data: {}, xf: {}, log: [], picker: null, catOpen: false, catQ: '', catSel: null, preview: {}, showDep: false, sim: {}, ver: {}, page: {}, sort: {}, updated: {}, kpiSel: {}, ptab: 'settings', ruleOpen: null, link: null, logOpen: false, changes: 0, unsynced: 0, services: (K.store.get('cds.svcs', []) || []).map(x => x.code), catDs: 'gsst' };
+  S.doc.items = S.doc.items.map(it => { if (!it.mk) return it; const w = newWidget(it.mk.type, it.mk); w.i = it.i || w.i; w.x = it.x; w.y = it.y; w.w = it.w; w.h = it.h; if (it.mk.params) Object.assign(w.src.params, it.mk.params); if (it.mk.query) { w.src = Object.assign({ kind: 'query', filters: [], calc: [] }, it.mk.query); } return w; });
+  S.doc.rules = S.doc.rules || []; S.doc.sharing = S.doc.sharing || [{ who: 'You (AB12345)', kind: 'Person', role: 'Owner' }, { who: 'Priya Shah (CD67890)', kind: 'Person', role: 'Editor' }, { who: 'GSST Risk Managers', kind: 'Group', role: 'Viewer' }];
+  const local = K.store.get('cds.local.' + cfg.page, null); if (F.pub && local && (!srv || local.at > srv.at)) S.recover = local;
+  if (fromHome) S.doc.template && (S.saveNote = 'Created from template · ' + K.now());
+  if (F.ix) readHash();
+  shell(); renderAll(); refreshData();
+  document.addEventListener('click', onClick); document.addEventListener('pointerdown', onDown); window.addEventListener('pointermove', onMove); window.addEventListener('pointerup', onUp); document.addEventListener('keydown', onKey);
+  document.addEventListener('input', e => { const t = e.target.closest('[data-in]'); if (t && t.tagName !== 'SELECT' && IN[t.dataset.in]) IN[t.dataset.in](t, e); });
+  document.addEventListener('change', e => { const t = e.target.closest('[data-in]'); if (t && t.tagName === 'SELECT' && IN[t.dataset.in]) IN[t.dataset.in](t, e); });
+  document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[role="switch"],[role="button"].slot')) { e.preventDefault(); e.target.click(); } });
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(positionNodes, 80); });
+  if (cfg.after) cfg.after(API);
+}
+window.Studio = { boot: boot, API: API, CATALOG: CATALOG };
+const st = document.createElement('style'); st.textContent = '@keyframes spin{to{transform:rotate(360deg)}}'; document.head.appendChild(st);
+})();
+
+</script><script>
+/* ===== Page configs and seed dashboards for 02–07 (invented sample values) ===== */
+(function () {
+'use strict';
+const K = window.K;
+const VARS = () => ({ cob: K.COBS[K.COBS.length - 1], compare: 'DoD', region: 'ALL', business: 'ALL', desk: 'ALL', level: '' });
+const BASE_DEFS = [{ id: 'cob', type: 'cob', label: 'COB' }, { id: 'compare', type: 'seg', label: 'Compare' }, { id: 'region', type: 'select', dim: 'region', label: 'Region' }];
+function doc(id, name, tab, tpl, items, extra) { return Object.assign({ id: id, name: name, tab: tab, template: tpl, rev: 1, vars: VARS(), varDefs: K.clone(BASE_DEFS), items: items, rules: [] }, extra || {}); }
+const slot = (tplId, n, id) => { const s = K.TPL[tplId].slots[n]; return Object.assign({ i: id || 'slot' + n, type: 'slot' }, K.clone(s)); };
+const mk = (id, x, y, w, h, m) => ({ i: id, x: x, y: y, w: w, h: h, mk: m });
+
+/* ---------- live-phase custom APIs (phase 3) ---------- */
+function liveApis() {
+  const N = 5000; const rows = [];
+  const rr = (function (s) { return () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; })(77);
+  const books = ['EQD-FLOW-01', 'EQD-EXO-02', 'EQ-CASH-03', 'RATES-SWP-04', 'CR-IG-05', 'FX-OPT-06'];
+  for (let i = 0; i < N; i++) { const rg = K.DIMS.region.values[i % 4]; const bz = K.DIMS.business.values[i % 4]; const dk = K.deskOf(bz)[i % K.deskOf(bz).length]; rows.push({ trade: 'T' + String(100000 + i), book: books[i % books.length], region: rg, business: bz, desk: dk, s1974: +((rr() - .62) * 900).toFixed(1), s2008: +((rr() - .6) * 1100).toFixed(1), covid: +((rr() - .58) * 700).toFixed(1) }); }
+  K.registerApi({ code: 'GSST_STRESS_BY_TRADE', name: 'Stress loss by trade (5,000 rows)', desc: 'Trade-level scenario P&L. Paged and sorted on the server; only 50 rows travel at a time.', area: 'Stress Testing', module: 'DLY_GSST', ds: 'gsst', dims: ['trade', 'book', 'desk'], meas: ['s1974', 's2008', 'covid'], views: ['grid'], params: [K.P.region], tags: ['trade', 'positions', 'big'], syn: ['trade level'], owner: 'Stress Testing Tech', used: 3, status: 'active', paged: true,
+    custom: (params, ctx) => { let r = rows.filter(x => (params.REGION_NAME === 'ALL' || x.region === params.REGION_NAME) && Object.keys(ctx.filters || {}).every(f => !(f in x) || ctx.filters[f].indexOf(x[f]) >= 0)); if (ctx.sort) { const [k, d] = ctx.sort.split(':'); r = r.slice().sort((a, b) => (a[k] > b[k] ? 1 : a[k] < b[k] ? -1 : 0) * (d === 'desc' ? -1 : 1)); } const v = (ctx.version || 0) * 0.013; const page = r.slice((ctx.page || 0) * 50, (ctx.page || 0) * 50 + 50).map(x => Object.assign({}, x, { s1974: +(x.s1974 * (1 + v)).toFixed(1) })); const tot = { s1974: 0, s2008: 0, covid: 0 }; r.forEach(x => { tot.s1974 += x.s1974 * (1 + v); tot.s2008 += x.s2008; tot.covid += x.covid; });
+      return { api: 'GSST_STRESS_BY_TRADE', cols: [{ key: 'trade', label: 'Trade', dim: true }, { key: 'book', label: 'Book', dim: true }, { key: 'desk', label: 'Volcker desk', dim: true }].concat(['s1974', 's2008', 'covid'].map(m => ({ key: m, label: K.MEAS[m].label, unit: K.MEAS[m].unit, pol: K.MEAS[m].pol }))), rows: page, total: tot, trend: false, meta: { cob: ctx.cob, pcob: ctx.cob, asOf: ctx.cob, count: r.length } }; } });
+  K.DIMS.trade = { label: 'Trade', values: [] }; K.DIMS.book = { label: 'Book', values: books };
+  K.registerApi({ code: 'GSST_FULL_REVAL_BY_BUSINESS', name: 'Full revaluation stress by business (heavy)', desc: 'Runs a full revaluation on the risk engine (about 10 s). Runs as a background job with progress.', area: 'Stress Testing', module: 'DLY_GSST', ds: 'gsst', dims: ['business'], meas: ['s1974', 's2008', 'covid'], views: ['grid', 'column', 'bar'], params: [K.P.region], tags: ['full reval', 'heavy'], syn: [], owner: 'Stress Testing Tech', used: 2, status: 'active', heavy: true, async: true });
+}
+
+/* ---------- seeds ---------- */
+const SEEDS = {
+  '02': () => doc('d-gsst', 'GSST stress overview', 'GSST', 'exec', [
+    mk('w-kpi', 0, 0, 12, 6, { type: 'kpi', api: 'GSST_STRESS_TOTALS', props: { variant: 'headline' } }),
+    mk('w-trend', 0, 6, 8, 9, { type: 'chart', api: 'GSST_STRESS_TREND', view: 'line' }),
+    slot('exec', 2, 'slot-bk'), slot('exec', 3, 'slot-top'), slot('exec', 4, 'slot-notes')]),
+  '03': () => doc('d-var', 'VaR and limits by desk', 'VaR', 'monitor', [
+    mk('w-kpi', 0, 0, 12, 9, { type: 'kpi', api: 'DLY_EQ_VAR_TOTALS', props: { thr: 5 } }),
+    mk('w-cvar', 0, 9, 7, 10, { type: 'grid', api: 'DLY_EQ_VAR_VD_MC_CVAR_CSVAR', title: 'Component VaR / SVaR by Volcker desk' }),
+    mk('w-limit', 7, 9, 5, 10, { type: 'grid', api: 'DLY_EQ_VAR_LIMIT_SUMMARY', props: { heat: false } }),
+    mk('w-trend', 0, 19, 12, 8, { type: 'chart', api: 'DLY_EQ_VAR_TREND', view: 'line' })],
+    { varDefs: K.clone(BASE_DEFS).concat([{ id: 'business', type: 'select', dim: 'business', label: 'Business' }, { id: 'desk', type: 'select', dim: 'desk', label: 'Volcker desk' }, { id: 'level', type: 'tree', dim: 'level', label: 'Hierarchy node' }]) }),
+  '04': () => doc('d-ix', 'Stress drill-down: region to desk', 'GSST', 'master', [
+    mk('w-kpi', 0, 0, 12, 6, { type: 'kpi', api: 'GSST_STRESS_TOTALS', props: { variant: 'headline' } }),
+    mk('w-reg', 0, 6, 5, 10, { type: 'grid', api: 'GSST_STRESS_BY_REGION' }),
+    mk('w-desk', 5, 6, 7, 10, { type: 'chart', api: 'GSST_STRESS_BY_DESK', view: 'bar' }),
+    mk('w-biz', 0, 16, 5, 9, { type: 'chart', api: 'GSST_STRESS_BY_BUSINESS', view: 'column' }),
+    mk('w-trend', 5, 16, 7, 9, { type: 'chart', api: 'GSST_STRESS_TREND', view: 'line' })],
+    { rules: [{ id: 'ix1', src: 'w-reg', ev: 'rowClick', toggle: true, skipTotal: true, acts: [{ type: 'filter', field: 'region', targets: ['w-desk', 'w-biz', 'w-kpi'] }] }, { id: 'ix2', src: 'w-biz', ev: 'pointClick', toggle: true, skipTotal: true, acts: [{ type: 'filter', field: 'business', targets: ['w-desk', 'w-trend'] }] }] }),
+  '05': () => { const d = SEEDS['04'](); d.id = 'd-pub'; d.name = 'GSST daily review'; d.items.push(mk('w-note', 0, 24, 12, 4, { type: 'text', title: 'Commentary', text: 'Stress numbers for **{{cob}}** compared {{compare}}. Sample values only.' })); return d; },
+  '06': () => doc('d-nq', 'Ad-hoc stress analysis', 'GSST', 'gridfirst', [
+    mk('w-q1', 0, 0, 12, 10, { type: 'grid', title: 'Stress by region and business (new query)', query: { ds: 'gsst', groupBy: ['region', 'business'], metrics: [{ f: 's1974', agg: 'sum' }, { f: 's2008', agg: 'sum' }] } }),
+    mk('w-q2', 0, 10, 6, 9, { type: 'chart', view: 'bar', title: 'VaR 1D by desk (new query)', query: { ds: 'var', groupBy: ['desk'], metrics: [{ f: 'var1d', agg: 'stored' }, { f: 'limit', agg: 'stored' }], calc: [] } }),
+    mk('w-api', 6, 10, 6, 9, { type: 'chart', api: 'GSST_STRESS_BY_BUSINESS', view: 'column' })]),
+  '07': () => doc('d-live', 'GSST live monitor', 'GSST', 'monitor', [
+    mk('w-kpi', 0, 0, 12, 6, { type: 'kpi', api: 'GSST_STRESS_TOTALS', props: { variant: 'headline' } }),
+    mk('w-reg', 0, 6, 4, 9, { type: 'chart', api: 'GSST_STRESS_BY_REGION', view: 'column' }),
+    mk('w-var', 4, 6, 4, 9, { type: 'kpi', api: 'DLY_EQ_VAR_TOTALS', title: 'VaR headline (separate dataset)', props: { variant: 'headline' } }),
+    mk('w-heavy', 8, 6, 4, 9, { type: 'grid', api: 'GSST_FULL_REVAL_BY_BUSINESS' }),
+    mk('w-trade', 0, 15, 12, 13, { type: 'grid', api: 'GSST_STRESS_BY_TRADE', props: { heat: false, totals: true } })],
+    { rules: [{ id: 'ix1', src: 'w-reg', ev: 'pointClick', toggle: true, skipTotal: true, acts: [{ type: 'filter', field: 'region', targets: ['w-trade'] }] }] })
+};
+
+/* ---------- try buttons ---------- */
+function simOn(api, code, mode, label) { const S = api.S(); K.clearCache(); S.sim = {}; if (mode) S.sim[code] = mode; api.refresh(); api.renderAll(); K.toast(label); }
+const TRY = {
+  '03': { tries: [['err', 'API error on the limit grid'], ['slow', 'Slow API (stale data kept)'], ['empty', 'No rows on CVaR grid'], ['stale', 'Stale VaR (as of 2 COBs ago)'], ['ok', 'Back to normal']],
+    on: { err: a => simOn(a, 'DLY_EQ_VAR_LIMIT_SUMMARY', 'error', 'Limit API now fails; pick a hierarchy node to see the error state'), slow: a => simOn(a, 'DLY_EQ_VAR_TREND', 'slow', 'Trend API now takes ~3 s; old values stay on screen with a spinner'), empty: a => simOn(a, 'DLY_EQ_VAR_VD_MC_CVAR_CSVAR', 'empty', 'CVaR API now returns no rows'), stale: a => simOn(a, 'DLY_EQ_VAR_TOTALS', 'stale', 'VaR totals are now 2 COBs old'), ok: a => simOn(a, null, null, 'All APIs back to normal') } },
+  '05': { tries: [['conflict', 'A teammate saves a change'], ['offline', 'Go offline / online'], ['crash', 'Simulate a browser crash']],
+    on: {
+      conflict: a => { const S = a.S(); const theirs = K.clone(S.doc); theirs.rev = (S.doc.rev || 1) + 1; const w = a.newWidget('text', { text: 'Added by Priya: check the APAC move before sign-off.' }); w.title = 'Note from Priya'; w.x = 0; w.y = 40; w.w = 12; w.h = 3; theirs.items.push(w); S.conflict = { by: 'Priya Shah', base: K.clone(S.doc), doc: theirs }; a.renderAll(); K.toast('Priya saved rev ' + theirs.rev + '. Your next save would be rejected (412), so review first.'); },
+      offline: a => { const S = a.S(); S.offline = !S.offline; if (!S.offline) { S.saveNote = 'Back online · syncing ' + S.unsynced + ' change(s)'; a.save(); } else S.saveNote = 'Offline · changes are kept on this device'; a.renderAll(); K.toast(S.offline ? 'Offline: keep editing, nothing is lost' : 'Online: local changes synced'); },
+      crash: a => { const S = a.S(); const d = K.clone(S.doc); d.name = S.doc.name + ' (edited before crash)'; K.store.set('cds.local.05-publish.html', { doc: d, at: Date.now() + 5000, time: K.now() }); window.onbeforeunload = null; location.reload(); }
+    } },
+  '06': { tries: [['bad', 'Try VaR by region and business'], ['calc', 'Add VaR % of limit']], on: {
+    bad: a => { const S = a.S(); const it = a.byId('w-q2'); S.sel = 'w-q2'; a.commit(() => { it.src.groupBy = ['region', 'business']; }); a.refresh(); a.renderAll(); },
+    calc: a => { const S = a.S(); const it = a.byId('w-q2'); S.sel = 'w-q2'; a.commit(() => { it.src.groupBy = ['desk']; it.src.calc = [{ id: 'c1', op: 'pct', a: 'var1d', b: 'limit', label: 'VaR as % of limit' }]; }); a.refresh(); a.renderAll(); } } },
+  '07': { tries: [['rerun', 'GSST rerun lands (push event)'], ['tick', 'VaR intraday update'], ['stale', 'Feed delayed']], on: {
+    rerun: a => push(a, 'gsst', 'GSST rerun for ' + K.dLabel(a.S().doc.vars.cob) + ' published; only GSST widgets refresh'),
+    tick: a => push(a, 'var', 'VaR intraday tick; only the VaR widget refreshes'),
+    stale: a => { simOn(a, 'GSST_STRESS_TOTALS', 'stale', 'Stress feed delayed: KPI shows the last good COB with a Stale badge'); } } }
+};
+function push(a, ds, msg) { const S = a.S(); S.ver[ds] = (S.ver[ds] || 0) + 1; S.pendingUpd = {}; S.pendingUpd[ds] = K.now(); a.refresh(); a.renderAll(); K.toast('Event: dataset.updated {' + ds + ', v' + S.ver[ds] + '} · ' + msg); setTimeout(() => { S.pendingUpd = null; }, 4000); setTimeout(() => { Object.keys(S.updated).forEach(k => { delete S.updated[k]; }); a.renderAll(); }, 25000); }
+
+/* ---------- page table ---------- */
+const PAGES = {
+  '02': { page: '02-editor.html', tag: 'PHASE 1 · BUILDER MVP', banner: '<b>Editor.</b> Template skeleton slots, component library, click-to-add, inline ＋ picker, optional drag, resize on a 12-column grid, undo/redo and keyboard.', F: {} },
+  '03': { page: '03-data.html', tag: 'PHASE 1 · DATA', banner: '<b>Data binding.</b> API catalogue by business name, preview, typed inputs bound to the inputs bar, hierarchy tree select, cascading Business → Desk, and every widget state.', F: { data: true } },
+  '04': { page: '04-interactions.html', tag: 'PHASE 1 · INTERACTIONS', banner: '<b>Interactions.</b> Click a region row or a business bar. Select a widget and use <b>Link</b> to wire new ones on the page. Open the <b>Event log</b> to see what fires.', F: { data: true, ix: true } },
+  '05': { page: '05-publish.html', tag: 'PHASE 1 · SAVE & PUBLISH', banner: '<b>Saving and publishing.</b> Autosaved drafts, teammate conflicts, offline and crash recovery, health check, versions with diff and rollback, Dev → UAT → Prod, sharing and view-as.', F: { data: true, ix: true, pub: true } },
+  '06': { page: '06-new-query.html', tag: 'PHASE 2 · NEW QUERY', banner: '<b>Widgets without an API.</b> Select a widget and switch Data to <b>New query</b>: group by, metrics, filters and calculated fields from the dataset catalog. Save it as a service.', F: { data: true, ix: true, pub: true, nq: true } },
+  '07': { page: '07-live.html', tag: 'PHASE 3 · LIVE & SCALE', banner: '<b>Live data and scale.</b> Push events refresh only the affected widgets, 5,000-row grid paged on the server, heavy query as a background job, request stats in Settings.', F: { data: true, ix: true, pub: true, nq: true, live: true } }
+};
+window.bootPage = function (id) {
+  if (id === '07') liveApis();
+  const p = PAGES[id]; const t = TRY[id] || {};
+  Studio.boot({ page: p.page, tag: p.tag, banner: p.banner, F: p.F, seed: SEEDS[id], tries: t.tries, onTry: t.on, after: id === '05' ? a => { const S = a.S(); if (!S.doc.versions) { S.doc.versions = [{ v: 1, note: 'First release', by: 'Priya Shah (CD67890)', at: '24-Nov ' + '10:12', doc: K.clone({ name: S.doc.name, items: S.doc.items.slice(0, 3), rules: [], varDefs: S.doc.varDefs }) }, { v: 2, note: 'Added trend and business chart', by: 'You (AB12345)', at: '26-Nov 16:40', doc: K.clone({ name: S.doc.name, items: S.doc.items.slice(0, 5), rules: S.doc.rules, varDefs: S.doc.varDefs }) }]; S.doc.envs = { dev: 2, uat: 2, prod: 1 }; S.saveNote = 'Draft · autosaved ' + K.now(); a.renderAll(); } } : null });
+};
+window.SEEDS = SEEDS;
+})();
+
+</script><script>bootPage('06');</script></body></html>
